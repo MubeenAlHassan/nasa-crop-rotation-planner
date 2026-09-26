@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "product": "SPL3SMP_E",
+    "version": "6"
+  },
+  "granules": [
+    "SMAP_L3_SM_P_E_20251010_R18290_001.h5"
+  ],
+  "cell_id": "ease9km_31_73",
+  "grid_posting_km": 9,
+  "rows": [
+    {
+      "day": "2025-10-10",
+      "surface_m3_m3": 0.25,
+      "retrieval_quality_flag": 0,
+      "pass_id": "AM"
+    }
+  ],
+  "reference_rows": [
+    {
+      "day": "2024-12-31",
+      "surface_m3_m3": 0.3,
+      "retrieval_quality_flag": 0,
+      "pass_id": "AM"
+    }
+  ],
+  "available": true
+}
