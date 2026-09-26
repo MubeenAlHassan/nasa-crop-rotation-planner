@@ -1,33 +1,39 @@
 {
   "schema_version": "fixture-1",
   "fixture_id": "faisalabad_2025",
-  "synthetic": false,
-  "transform_version": "features-v1",
-  "catalog_version": "1.0.0",
-  "farm": "faisalabad",
-  "coordinates": [
-    31.418,
-    73.079
+  "farm_id": "faisalabad_2025",
+  "location": {
+    "latitude": 31.4504,
+    "longitude": 73.135
+  },
+  "assessment_end": "2025-10-15",
+  "slots": [
+    {
+      "slot_id": "rabi_2025",
+      "start_date": "2025-11-01",
+      "end_date": "2026-03-31"
+    }
   ],
-  "assessment_date": "2025-10-15",
-  "slot": "rabi_2025",
+  "transform_version": "features-v1",
+  "synthetic": false,
+  "catalog_version": "1.0.1",
   "files": [
     {
       "provider": "power",
       "path": "backend/tests/fixtures/power_archive.json",
-      "sha256": "4a0916fd06d01905691227b97e9d60feba0d2ae3ae85a77576bbf6d5294450db",
+      "sha256": "4ac69b0b0d70696c89ef133876885bf186840d4c7c810d25b86904a12409b5de",
       "available": true
     },
     {
       "provider": "smap",
       "path": "backend/tests/fixtures/smap_archive.json",
-      "sha256": "ca01742d1abe0909670b834297b7185c1516f2bc60f970786ae7ef1c86640160",
-      "available": true
+      "sha256": "bb7710d7a85b941c906cae958f5a6a3da6733c0ff539ca1a76637d867edc9bf2",
+      "available": false
     },
     {
       "provider": "soilgrids",
       "path": "backend/tests/fixtures/soilgrids_archive.json",
-      "sha256": "bc6adb60d98b106f81be1acb2006a701e07d8a2cb1d8e89cf7dcb96ef02b678d",
+      "sha256": "ccadcb07bf42fa19bf92ec7e071d7bce82e513f28e6757904c4182acc1ab9b13",
       "available": false
     }
   ]

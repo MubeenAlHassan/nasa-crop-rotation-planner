@@ -1,28 +1,19 @@
 {
-  "metadata": {
-    "product": "SPL3SMP_E",
-    "version": "6"
+  "schema_version": "fixture-1",
+  "provider": "smap",
+  "farm_id": "faisalabad_2025",
+  "location": {
+    "latitude": 31.4504,
+    "longitude": 73.135
   },
-  "granules": [
-    "SMAP_L3_SM_P_E_20251010_R18290_001.h5"
-  ],
-  "cell_id": "ease9km_31_73",
+  "product": "SPL3SMP_E",
+  "version": "6",
+  "cell_id": null,
   "grid_posting_km": 9,
-  "rows": [
-    {
-      "day": "2025-10-10",
-      "surface_m3_m3": 0.25,
-      "retrieval_quality_flag": 0,
-      "pass_id": "AM"
-    }
-  ],
-  "reference_rows": [
-    {
-      "day": "2024-12-31",
-      "surface_m3_m3": 0.3,
-      "retrieval_quality_flag": 0,
-      "pass_id": "AM"
-    }
-  ],
-  "available": true
+  "retrieved_at": "2026-09-26T15:25:09.308843+00:00",
+  "granule_ids": [],
+  "available": false,
+  "unavailable_reason": "No authorized SPL3SMP_E Version 6 granules supplied; previous observations lacked verifiable provenance.",
+  "rows": [],
+  "reference_rows": []
 }
