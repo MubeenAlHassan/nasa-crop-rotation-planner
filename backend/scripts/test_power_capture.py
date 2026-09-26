@@ -1,155 +1,297 @@
+"""Capture genuine POWER responses; all pytest checks run offline."""
+
+from __future__ import annotations
+
+import argparse
+import asyncio
+import copy
 import json
 import math
+import random
+import tempfile
 import time
-from datetime import date, datetime, timezone, timedelta
+from collections.abc import Callable, Mapping
+from datetime import date, datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Callable, Mapping, Any
 
 import httpx
 import pytest
+from pydantic import JsonValue
 
-JsonValue = str | int | float | bool | None | dict[str, 'JsonValue'] | list['JsonValue']
 JsonRequest = Callable[[str, Mapping[str, str], float], Mapping[str, JsonValue]]
 PowerArchive = dict[str, JsonValue]
+URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
+FARM_ID = "faisalabad_2025"
+LOCATION = {"latitude": 31.4504, "longitude": 73.1350}
+OBSERVATION_START = date(2025, 7, 18)
+OBSERVATION_END = date(2025, 10, 15)
+PERIODS = [(OBSERVATION_START, OBSERVATION_END)] + [
+    (date(year, 1, 1), date(year, 12, 31)) for year in range(1991, 2021)
+]
+ARCHIVE_PATH = Path(__file__).resolve().parents[1] / "tests/fixtures/power_archive.json"
+
 
 class PowerCaptureError(Exception):
-    pass
+    """Required POWER acquisition failed."""
+
 
 class RateLimitError(PowerCaptureError):
-    pass
+    """The provider's retry delay cannot fit the capture deadline."""
 
-def default_request_adapter(url: str, params: Mapping[str, str], timeout: float) -> Mapping[str, JsonValue]:
-    budget = timeout
-    attempts = 0
-    max_attempts = 2
-    
-    timeout_config = httpx.Timeout(budget, connect=2.0, read=4.0, write=2.0, pool=1.0)
-    
-    while attempts < max_attempts:
-        start_time = time.monotonic()
-        attempts += 1
+
+def _number(value: object) -> bool:
+    return type(value) in (int, float) and math.isfinite(value)
+
+
+def _utc(value: object) -> None:
+    if not isinstance(value, str):
+        raise ValueError("retrieved_at must be a UTC timestamp")
+    try:
+        timestamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as error:
+        raise ValueError("Invalid retrieved_at") from error
+    if timestamp.utcoffset() != timedelta(0):
+        raise ValueError("retrieved_at must be timezone-aware UTC")
+
+
+def _finite_json(value: object) -> None:
+    if isinstance(value, dict):
+        for item in value.values():
+            _finite_json(item)
+    elif isinstance(value, list):
+        for item in value:
+            _finite_json(item)
+    elif isinstance(value, float) and not math.isfinite(value):
+        raise ValueError("Nonfinite JSON number")
+
+
+def _atomic_write(output: Path, archive: Mapping[str, JsonValue]) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=output.parent, delete=False
+        ) as handle:
+            temporary = Path(handle.name)
+            json.dump(archive, handle, indent=2, allow_nan=False)
+            handle.write("\n")
+        temporary.replace(output)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def _retry_delay(value: str | None) -> float:
+    if value is None:
+        return random.uniform(0.05, 0.15)
+    try:
+        delay = float(value)
+    except ValueError:
         try:
-            with httpx.Client(timeout=timeout_config) as client:
-                response = client.get(url, params=params)
-                
-            if response.status_code == 200:
-                try:
-                    data = response.json()
-                    if not isinstance(data, dict):
-                        raise PowerCaptureError("Payload is not a JSON object")
-                    return data
-                except ValueError:
-                    raise PowerCaptureError("Invalid JSON in response")
-            elif response.status_code in (429, 500, 502, 503, 504):
-                elapsed = time.monotonic() - start_time
-                budget -= elapsed
-                
-                retry_after = 0.0
-                if "Retry-After" in response.headers:
-                    try:
-                        retry_after = float(response.headers["Retry-After"])
-                    except ValueError:
-                        pass
-                
-                if budget <= 0 or retry_after > budget or attempts >= max_attempts:
-                    if response.status_code == 429:
-                        raise RateLimitError(f"HTTP {response.status_code}")
-                    raise PowerCaptureError(f"HTTP {response.status_code}")
-                    
-                if retry_after > 0:
-                    time.sleep(retry_after)
-                    budget -= retry_after
-                    
-                timeout_config = httpx.Timeout(budget, connect=2.0, read=4.0, write=2.0, pool=1.0)
-                continue
-            else:
-                raise PowerCaptureError(f"HTTP {response.status_code}")
-                
-        except (httpx.RequestError, httpx.TimeoutException) as e:
-            elapsed = time.monotonic() - start_time
-            budget -= elapsed
-            if budget <= 0 or attempts >= max_attempts:
-                raise PowerCaptureError(f"Request failed: {e}")
-            timeout_config = httpx.Timeout(budget, connect=2.0, read=4.0, write=2.0, pool=1.0)
-            
-    raise PowerCaptureError("Max attempts reached")
+            timestamp = parsedate_to_datetime(value)
+            delay = (timestamp - datetime.now(timezone.utc)).total_seconds()
+        except (ValueError, TypeError, OverflowError) as error:
+            raise PowerCaptureError("Invalid Retry-After") from error
+    if not math.isfinite(delay):
+        raise PowerCaptureError("Invalid Retry-After")
+    return max(0.0, delay)
+
+
+async def _fetch_power_json(
+    url: str, params: Mapping[str, str], timeout: float
+) -> Mapping[str, JsonValue]:
+    """At most two GET attempts, with one monotonic deadline."""
+    if url != URL:
+        raise PowerCaptureError("POWER URL is not allowlisted")
+    if not _number(timeout) or not 0 < timeout <= 8:
+        raise PowerCaptureError("Capture timeout must be in (0, 8]")
+    deadline = time.monotonic() + timeout
+    async with httpx.AsyncClient() as client:
+        for attempt in range(2):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise PowerCaptureError("Capture deadline exhausted")
+            limits = httpx.Timeout(
+                min(4.0, remaining),
+                connect=min(2.0, remaining),
+                write=min(2.0, remaining),
+                pool=min(1.0, remaining),
+            )
+            delay = 0.0
+            rate_limited = False
+            try:
+                async with client.stream("GET", url, params=params, timeout=limits) as response:
+                    if response.status_code == 200:
+                        chunks = []
+                        async for chunk in response.aiter_bytes():
+                            if time.monotonic() >= deadline:
+                                raise PowerCaptureError("Capture deadline exhausted")
+                            chunks.append(chunk)
+                        if time.monotonic() >= deadline:
+                            raise PowerCaptureError("Capture deadline exhausted")
+                        try:
+                            data = json.loads(b"".join(chunks))
+                        except (ValueError, UnicodeDecodeError) as error:
+                            raise PowerCaptureError("Invalid JSON response") from error
+                        if not isinstance(data, dict):
+                            raise PowerCaptureError("Payload must be a JSON object")
+                        _finite_json(data)
+                        return data
+                    if response.status_code != 429 and not 500 <= response.status_code < 600:
+                        raise PowerCaptureError(f"HTTP {response.status_code}")
+                    rate_limited = response.status_code == 429
+                    delay = _retry_delay(response.headers.get("Retry-After"))
+                    failure = f"HTTP {response.status_code}"
+            except (httpx.ConnectError, httpx.TimeoutException) as error:
+                delay = _retry_delay(None)
+                failure = type(error).__name__
+            remaining = deadline - time.monotonic()
+            if attempt == 1 or delay >= remaining:
+                error_type = RateLimitError if rate_limited else PowerCaptureError
+                raise error_type(failure)
+            await asyncio.sleep(delay)
+    raise PowerCaptureError("Capture deadline exhausted")
+
+
+def default_request_adapter(
+    url: str, params: Mapping[str, str], timeout: float
+) -> Mapping[str, JsonValue]:
+    """Synchronous preprocessing interface; one cancellable wall-clock budget."""
+    if not _number(timeout) or not 0 < timeout <= 8:
+        raise PowerCaptureError("Capture timeout must be in (0, 8]")
+
+    async def bounded() -> Mapping[str, JsonValue]:
+        try:
+            async with asyncio.timeout(timeout):
+                return await _fetch_power_json(url, params, timeout)
+        except TimeoutError as error:
+            raise PowerCaptureError("Capture deadline exhausted") from error
+
+    return asyncio.run(bounded())
+
 
 def verify_power_archive(archive: Mapping[str, JsonValue]) -> None:
-    if archive.get("schema_version") != "1.0":
-        raise ValueError("Invalid schema version")
-        
-    reqs = archive.get("requests")
-    if not isinstance(reqs, list):
-        raise ValueError("requests must be a list")
-        
-    for req in reqs:
-        payload = req.get("payload")
+    """Validate the complete pinned acquisition, including query provenance."""
+    if set(archive) != {"schema_version", "provider", "farm_id", "location", "requests"}:
+        raise ValueError("Invalid POWER archive keys")
+    if archive["schema_version"] != "fixture-1" or archive["provider"] != "power":
+        raise ValueError("Invalid POWER schema/provider")
+    if archive["farm_id"] != FARM_ID or archive["location"] != LOCATION:
+        raise ValueError("POWER farm/location must match the pinned scenario")
+    location = archive["location"]
+    if not isinstance(location, dict) or set(location) != set(LOCATION):
+        raise ValueError("Invalid location")
+    if not all(_number(value) for value in location.values()):
+        raise ValueError("Invalid coordinate numbers")
+    requests = archive["requests"]
+    if not isinstance(requests, list) or len(requests) != 31:
+        raise ValueError("Exactly 31 POWER requests are required")
+    expected_periods = {(start.isoformat(), end.isoformat()) for start, end in PERIODS}
+    seen_periods = set()
+    for request in requests:
+        fields = {
+            "start_date",
+            "end_date",
+            "retrieved_at",
+            "url",
+            "params",
+            "status_code",
+            "payload",
+        }
+        if not isinstance(request, dict) or set(request) != fields:
+            raise ValueError("Invalid POWER request keys")
+        if not all(isinstance(request[key], str) for key in ("start_date", "end_date")):
+            raise ValueError("POWER period boundaries must be ISO dates")
+        period = (request["start_date"], request["end_date"])
+        if period not in expected_periods or period in seen_periods:
+            raise ValueError("Invalid/duplicate POWER period")
+        seen_periods.add(period)
+        start, end = map(date.fromisoformat, period)
+        _utc(request["retrieved_at"])
+        if (
+            request["url"] != URL
+            or type(request["status_code"]) is not int
+            or request["status_code"] != 200
+        ):
+            raise ValueError("Invalid POWER request URL/status")
+        pairs = request["params"]
+        if not isinstance(pairs, list) or any(
+            not isinstance(pair, list)
+            or len(pair) != 2
+            or any(not isinstance(value, str) for value in pair)
+            for pair in pairs
+        ):
+            raise ValueError("params must be string pairs")
+        params = dict(pairs)
+        expected_params = {
+            "parameters": "PRECTOTCORR,T2M",
+            "community": "AG",
+            "format": "JSON",
+            "time-standard": "UTC",
+            "latitude": str(LOCATION["latitude"]),
+            "longitude": str(LOCATION["longitude"]),
+            "start": start.strftime("%Y%m%d"),
+            "end": end.strftime("%Y%m%d"),
+        }
+        if len(params) != len(pairs) or params != expected_params:
+            raise ValueError("POWER query does not match the pinned period/location/UTC")
+        payload = request["payload"]
         if not isinstance(payload, dict):
-             raise ValueError("Payload must be a dict")
-             
-        if req.get("status_code") != 200:
-             raise ValueError("Expected status_code 200")
-             
-        parameters = payload.get("parameters", {})
-        if not isinstance(parameters, dict):
-            raise ValueError("Missing or invalid parameters in payload")
-            
-        prec_meta = parameters.get("PRECTOTCORR", {})
-        t2m_meta = parameters.get("T2M", {})
-        
-        if not isinstance(prec_meta, dict) or prec_meta.get("units") not in ("mm/day", "mm"):
-            raise ValueError("Invalid rainfall units")
-        if not isinstance(t2m_meta, dict) or t2m_meta.get("units") != "C":
-            raise ValueError("Invalid temperature units")
-            
+            raise ValueError("Payload must be a JSON object")
+        _finite_json(payload)
         header = payload.get("header", {})
-        if not isinstance(header, dict):
-             raise ValueError("Missing header")
-        fill_value = header.get("fill_value")
-        if not isinstance(fill_value, (int, float)):
-            raise ValueError("Missing or invalid fill_value")
-            
-        props = payload.get("properties", {})
-        if not isinstance(props, dict):
-             raise ValueError("Missing properties")
-        param_data = props.get("parameter", {})
-        if not isinstance(param_data, dict):
-            raise ValueError("Missing parameter data")
-            
-        prec_data = param_data.get("PRECTOTCORR", {})
-        t2m_data = param_data.get("T2M", {})
-        if not isinstance(prec_data, dict) or not isinstance(t2m_data, dict):
-            raise ValueError("Absent parameter maps")
-            
-        start_date = date.fromisoformat(str(req.get("start_date")))
-        end_date = date.fromisoformat(str(req.get("end_date")))
-        
-        current = start_date
-        expected_keys = set()
-        while current <= end_date:
-            date_key = current.strftime("%Y%m%d")
-            expected_keys.add(date_key)
-            
-            if date_key not in prec_data or date_key not in t2m_data:
-                raise ValueError(f"Absent date key: {date_key}")
-                
-            p_val = prec_data[date_key]
-            t_val = t2m_data[date_key]
-            
-            for v in (p_val, t_val):
-                if isinstance(v, bool):
-                    raise ValueError(f"Boolean not allowed: {v}")
-                if not isinstance(v, (int, float)):
-                    raise ValueError(f"Numeric string or invalid type: {v}")
-                if not math.isfinite(v):
-                    raise ValueError(f"Nonfinite number: {v}")
-                    
-            current += timedelta(days=1)
-            
-        if set(prec_data.keys()) - expected_keys:
-             raise ValueError("Impossible date keys in PRECTOTCORR")
-        if set(t2m_data.keys()) - expected_keys:
-             raise ValueError("Impossible date keys in T2M")
+        if not isinstance(header, dict) or not _number(header.get("fill_value")):
+            raise ValueError("Missing/invalid fill_value")
+        if header.get("time_standard") != "UTC":
+            raise ValueError("POWER time standard must be UTC")
+        if str(header.get("start")) != start.strftime("%Y%m%d") or str(
+            header.get("end")
+        ) != end.strftime("%Y%m%d"):
+            raise ValueError("POWER header dates disagree with query")
+        geometry = payload.get("geometry", {})
+        coords = geometry.get("coordinates", []) if isinstance(geometry, dict) else []
+        # POWER emits three-decimal geometry; the request/cache pin stays exact.
+        requested_point = [LOCATION["longitude"], LOCATION["latitude"]]
+        if (
+            not isinstance(geometry, dict)
+            or geometry.get("type") != "Point"
+            or not isinstance(coords, list)
+            or len(coords) < 2
+            or coords[:2] not in (requested_point, [round(value, 3) for value in requested_point])
+        ):
+            raise ValueError("POWER payload geometry does not match the requested point")
+        units = payload.get("parameters", {})
+        if (
+            not isinstance(units, dict)
+            or not isinstance(units.get("PRECTOTCORR"), dict)
+            or units["PRECTOTCORR"].get("units") != "mm/day"
+        ):
+            raise ValueError("Invalid rainfall units")
+        if not isinstance(units.get("T2M"), dict) or units["T2M"].get("units") != "C":
+            raise ValueError("Invalid temperature units")
+        properties = payload.get("properties", {})
+        parameter_data = properties.get("parameter", {}) if isinstance(properties, dict) else {}
+        if not isinstance(parameter_data, dict):
+            raise ValueError("Missing POWER parameter object")
+        expected_days = {
+            (start + timedelta(days=offset)).strftime("%Y%m%d")
+            for offset in range((end - start).days + 1)
+        }
+        for parameter in ("PRECTOTCORR", "T2M"):
+            data = parameter_data.get(parameter)
+            if not isinstance(data, dict) or set(data) != expected_days:
+                raise ValueError(f"Absent or impossible date keys in {parameter}")
+            for value in data.values():
+                if not _number(value):
+                    raise ValueError("Observation must be a finite number, not bool/string")
+                if parameter == "PRECTOTCORR" and value < 0 and value != header["fill_value"]:
+                    raise ValueError("Negative rainfall is not a declared fill value")
+            if all(value == header["fill_value"] for value in data.values()):
+                raise ValueError(f"No usable observations in {parameter}")
+    if seen_periods != expected_periods:
+        raise ValueError("Incomplete POWER periods")
+
 
 def capture_power_archive(
     *,
@@ -163,20 +305,17 @@ def capture_power_archive(
     request_json: JsonRequest,
     output: Path,
 ) -> PowerArchive:
-    if not (math.isfinite(latitude) and math.isfinite(longitude)):
-         raise ValueError("Coordinates must be finite")
-    if not (-90.0 <= latitude <= 90.0 and -180.0 <= longitude <= 180.0):
-         raise ValueError("Coordinates out of bounds")
-
-    if observation_start > observation_end:
-        raise ValueError("Invalid observation dates")
-    if baseline_start_year > baseline_end_year:
-        raise ValueError("Invalid baseline years")
-        
-    requests_data = []
-    
-    def fetch_period(start: date, end: date):
-        url = "https://power.larc.nasa.gov/api/temporal/daily/point"
+    if (
+        farm_id != FARM_ID
+        or not _number(latitude)
+        or not _number(longitude)
+        or {"latitude": latitude, "longitude": longitude} != LOCATION
+        or (observation_start, observation_end) != (OBSERVATION_START, OBSERVATION_END)
+        or (baseline_start_year, baseline_end_year) != (1991, 2020)
+    ):
+        raise ValueError("Capture must use the pinned Faisalabad scenario")
+    records = []
+    for start, end in PERIODS:
         params = {
             "parameters": "PRECTOTCORR,T2M",
             "community": "AG",
@@ -187,218 +326,237 @@ def capture_power_archive(
             "start": start.strftime("%Y%m%d"),
             "end": end.strftime("%Y%m%d"),
         }
-        
-        retrieved_at = datetime.now(timezone.utc).isoformat()
-        payload = request_json(url, params, 8.0)
-        
-        requests_data.append({
-            "start_date": start.isoformat(),
-            "end_date": end.isoformat(),
-            "retrieved_at": retrieved_at,
-            "url": url,
-            "query_params": params,
-            "status_code": 200,
-            "payload": payload
-        })
-        
-    fetch_period(observation_start, observation_end)
-    
-    for year in range(baseline_start_year, baseline_end_year + 1):
-        fetch_period(date(year, 1, 1), date(year, 12, 31))
-        
+        payload = dict(request_json(URL, params, 8.0))
+        records.append(
+            {
+                "start_date": start.isoformat(),
+                "end_date": end.isoformat(),
+                "retrieved_at": datetime.now(timezone.utc).isoformat(),
+                "url": URL,
+                "params": [list(pair) for pair in params.items()],
+                "status_code": 200,
+                "payload": payload,
+            }
+        )
     archive = {
-        "schema_version": "1.0",
-        "provider": "nasa_power",
+        "schema_version": "fixture-1",
+        "provider": "power",
         "farm_id": farm_id,
-        "location": {
-            "latitude": latitude,
-            "longitude": longitude
-        },
-        "requests": requests_data
+        "location": {"latitude": latitude, "longitude": longitude},
+        "requests": records,
     }
-    
     verify_power_archive(archive)
-    
-    temp_file = output.with_suffix('.tmp')
-    try:
-        with open(temp_file, 'w', encoding='utf-8') as f:
-            json.dump(archive, f, indent=2)
-        temp_file.replace(output)
-    except Exception as e:
-        if temp_file.exists():
-            temp_file.unlink()
-        raise e
-        
+    _atomic_write(output, archive)
     return archive
 
-# --- Tests ---
 
-def test_validate_committed_archive():
-    fixture_path = Path(__file__).parent.parent / "tests" / "fixtures" / "power_archive.json"
-    with open(fixture_path, "r", encoding="utf-8") as f:
-        archive = json.load(f)
+@pytest.fixture
+def archive() -> PowerArchive:
+    return json.loads(ARCHIVE_PATH.read_text())
+
+
+def test_validate_committed_archive(archive):
     verify_power_archive(archive)
-    
-def mock_request_json(url: str, params: Mapping[str, str], timeout: float):
-    start = date.fromisoformat(params["start"][:4] + "-" + params["start"][4:6] + "-" + params["start"][6:])
-    end = date.fromisoformat(params["end"][:4] + "-" + params["end"][4:6] + "-" + params["end"][6:])
-    
-    prec_data = {}
-    t2m_data = {}
-    
-    current = start
-    while current <= end:
-        dk = current.strftime("%Y%m%d")
-        prec_data[dk] = 0.0
-        t2m_data[dk] = 10.0
-        current += timedelta(days=1)
-        
-    return {
-        "header": {"fill_value": -999.0},
-        "parameters": {
-            "PRECTOTCORR": {"units": "mm/day"},
-            "T2M": {"units": "C"}
-        },
-        "properties": {
-            "parameter": {
-                "PRECTOTCORR": prec_data,
-                "T2M": t2m_data
-            }
-        }
-    }
 
-def test_leap_years(tmp_path):
-    out = tmp_path / "out.json"
-    capture_power_archive(
-        farm_id="f1",
-        latitude=0.0,
-        longitude=0.0,
-        observation_start=date(2023,1,1),
-        observation_end=date(2023,1,2),
-        baseline_start_year=2024,
-        baseline_end_year=2024,
-        request_json=mock_request_json,
-        output=out
-    )
-    
-    with open(out, "r") as f:
-        data = json.load(f)
-    verify_power_archive(data)
-    
-    req_2024 = [r for r in data["requests"] if r["start_date"].startswith("2024")][0]
-    assert "20240229" in req_2024["payload"]["properties"]["parameter"]["PRECTOTCORR"]
 
-def test_sentinels(tmp_path):
-    def mock_sentinel(url, params, timeout):
-        payload = mock_request_json(url, params, timeout)
-        dk = params["start"]
-        payload["properties"]["parameter"]["PRECTOTCORR"][dk] = -999.0
-        return payload
-        
-    out = tmp_path / "out.json"
-    capture_power_archive(
-        farm_id="f1", latitude=0.0, longitude=0.0,
-        observation_start=date(2023,1,1), observation_end=date(2023,1,2),
-        baseline_start_year=2020, baseline_end_year=2020,
-        request_json=mock_sentinel, output=out
-    )
-    assert out.exists()
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda data: data.update(requests=[]),
+        lambda data: data.update(farm_id="other"),
+        lambda data: data.update(location={"latitude": 39.5, "longitude": -98.5}),
+        lambda data: data.update(unexpected=True),
+        lambda data: data["requests"][0].update(start_date="2023-01-01"),
+        lambda data: data["requests"].__setitem__(1, copy.deepcopy(data["requests"][0])),
+        lambda data: data["requests"][0].update(retrieved_at="2025-10-15T00:00:00"),
+        lambda data: data["requests"][0]["payload"]["header"].update(time_standard="LST"),
+    ],
+)
+def test_reject_archive_mutations(archive, mutation):
+    mutation(archive)
+    with pytest.raises(ValueError):
+        verify_power_archive(archive)
 
-def test_malformed_payload_missing_keys(tmp_path):
-    def mock_missing(url, params, timeout):
-        payload = mock_request_json(url, params, timeout)
-        dk = params["start"]
-        del payload["properties"]["parameter"]["PRECTOTCORR"][dk]
-        return payload
-        
-    out = tmp_path / "out.json"
-    with pytest.raises(ValueError, match="Absent date key"):
-        capture_power_archive(
-            farm_id="f1", latitude=0.0, longitude=0.0,
-            observation_start=date(2023,1,1), observation_end=date(2023,1,2),
-            baseline_start_year=2020, baseline_end_year=2020,
-            request_json=mock_missing, output=out
-        )
 
-def test_malformed_payload_impossible_date(tmp_path):
-    def mock_impossible(url, params, timeout):
-        payload = mock_request_json(url, params, timeout)
-        payload["properties"]["parameter"]["PRECTOTCORR"]["20990101"] = 0.0
-        return payload
-        
-    out = tmp_path / "out.json"
-    with pytest.raises(ValueError, match="Impossible date keys"):
-        capture_power_archive(
-            farm_id="f1", latitude=0.0, longitude=0.0,
-            observation_start=date(2023,1,1), observation_end=date(2023,1,2),
-            baseline_start_year=2020, baseline_end_year=2020,
-            request_json=mock_impossible, output=out
-        )
+def test_leap_years_and_raw_fill_values(archive):
+    leap = next(row for row in archive["requests"] if row["start_date"] == "1992-01-01")
+    assert "19920229" in leap["payload"]["properties"]["parameter"]["PRECTOTCORR"]
+    row = archive["requests"][0]
+    values = row["payload"]["properties"]["parameter"]
+    values["PRECTOTCORR"]["20250718"] = row["payload"]["header"]["fill_value"]
+    values["T2M"]["20250718"] = -2.0
+    verify_power_archive(archive)
+    assert values["PRECTOTCORR"]["20250718"] == row["payload"]["header"]["fill_value"]
+
+
+@pytest.mark.parametrize("bad", [True, "1.2", float("nan"), float("inf"), -5.0])
+def test_reject_invalid_rainfall(archive, bad):
+    archive["requests"][0]["payload"]["properties"]["parameter"]["PRECTOTCORR"]["20250718"] = bad
+    with pytest.raises(ValueError):
+        verify_power_archive(archive)
+
+
+@pytest.mark.parametrize(
+    "key,value",
+    [
+        ("geometry", None),
+        ("geometry", {"type": "Point", "coordinates": None}),
+        ("parameters", None),
+        ("parameters", {"PRECTOTCORR": []}),
+        ("properties", {"parameter": None}),
+        (
+            "header",
+            {"fill_value": -999, "time_standard": "UTC", "start": "20230101", "end": "20230131"},
+        ),
+    ],
+)
+def test_reject_malformed_payload_objects(archive, key, value):
+    archive["requests"][0]["payload"][key] = value
+    with pytest.raises(ValueError):
+        verify_power_archive(archive)
+
 
 def test_preservation_of_existing_file(tmp_path):
-    out = tmp_path / "out.json"
-    out.write_text('{"existing": true}')
-    
-    def mock_fail(url, params, timeout):
-        payload = mock_request_json(url, params, timeout)
-        payload["parameters"]["PRECTOTCORR"]["units"] = "wrong"
-        return payload
-        
-    with pytest.raises(ValueError, match="Invalid rainfall units"):
+    output = tmp_path / "out.json"
+    output.write_text('{"existing": true}')
+
+    def failure(url, params, timeout):
+        raise PowerCaptureError("timeout")
+
+    with pytest.raises(PowerCaptureError):
         capture_power_archive(
-            farm_id="f1", latitude=0.0, longitude=0.0,
-            observation_start=date(2023,1,1), observation_end=date(2023,1,2),
-            baseline_start_year=2020, baseline_end_year=2020,
-            request_json=mock_fail, output=out
+            farm_id=FARM_ID,
+            **LOCATION,
+            observation_start=OBSERVATION_START,
+            observation_end=OBSERVATION_END,
+            baseline_start_year=1991,
+            baseline_end_year=2020,
+            request_json=failure,
+            output=output,
         )
-        
-    assert out.read_text() == '{"existing": true}'
-    assert not out.with_suffix('.tmp').exists()
+    assert output.read_text() == '{"existing": true}'
+
+
+def test_capture_preserves_raw_payloads(tmp_path, archive):
+    records = iter(archive["requests"])
+    result = capture_power_archive(
+        farm_id=FARM_ID,
+        **LOCATION,
+        observation_start=OBSERVATION_START,
+        observation_end=OBSERVATION_END,
+        baseline_start_year=1991,
+        baseline_end_year=2020,
+        request_json=lambda url, params, timeout: next(records)["payload"],
+        output=tmp_path / "capture.json",
+    )
+    assert [row["payload"] for row in result["requests"]] == [
+        row["payload"] for row in archive["requests"]
+    ]
+
+
+def _mock_client(monkeypatch, handler):
+    client_type = httpx.AsyncClient
+    transport = httpx.MockTransport(handler)
+    monkeypatch.setattr(httpx, "AsyncClient", lambda: client_type(transport=transport))
+
 
 def test_rate_limiting_retry(monkeypatch):
-    class MockResponse:
-        def __init__(self, status_code, json_data=None, headers=None):
-            self.status_code = status_code
-            self._json_data = json_data or {}
-            self.headers = headers or {}
-            
-        def json(self):
-            return self._json_data
-            
     calls = []
-    
-    class MockClient:
-        def __init__(self, **kwargs):
-            pass
-        def __enter__(self): return self
-        def __exit__(self, *args): pass
-        def get(self, url, params=None):
-            calls.append(url)
-            if len(calls) == 1:
-                return MockResponse(429, headers={"Retry-After": "0.1"})
-            return MockResponse(200, json_data={"a": "b"})
-            
-    monkeypatch.setattr(httpx, "Client", MockClient)
-    
-    result = default_request_adapter("http://fake", {}, 5.0)
-    assert result == {"a": "b"}
+
+    def handler(request):
+        calls.append(request)
+        if len(calls) == 1:
+            return httpx.Response(429, headers={"Retry-After": "0"})
+        return httpx.Response(200, json={"verified": True})
+
+    _mock_client(monkeypatch, handler)
+    assert default_request_adapter(URL, {}, 8.0) == {"verified": True}
     assert len(calls) == 2
 
+
 def test_timeout_exhaustion(monkeypatch):
-    class MockResponse:
-        def __init__(self, status_code, headers=None):
-            self.status_code = status_code
-            self.headers = headers or {}
-            
-    class MockClient:
-        def __init__(self, **kwargs):
-            pass
-        def __enter__(self): return self
-        def __exit__(self, *args): pass
-        def get(self, url, params=None):
-            return MockResponse(429, headers={"Retry-After": "2.0"})
-            
-    monkeypatch.setattr(httpx, "Client", MockClient)
-    
+    _mock_client(monkeypatch, lambda request: httpx.Response(429, headers={"Retry-After": "20"}))
     with pytest.raises(RateLimitError):
-        default_request_adapter("http://fake", {}, 1.0)
+        default_request_adapter(URL, {}, 8.0)
+
+
+@pytest.mark.parametrize("status", [400, 401, 403, 404])
+def test_no_retry_other_4xx(monkeypatch, status):
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(status)
+
+    _mock_client(monkeypatch, handler)
+    with pytest.raises(PowerCaptureError):
+        default_request_adapter(URL, {}, 8.0)
+    assert len(calls) == 1
+
+
+def test_retries_bounded_and_timeout_clamped(monkeypatch):
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        assert all(limit <= 0.1 for limit in request.extensions["timeout"].values())
+        raise httpx.ReadTimeout("read timeout", request=request)
+
+    _mock_client(monkeypatch, handler)
+    monkeypatch.setattr(time, "sleep", lambda delay: None)
+    monkeypatch.setattr(random, "uniform", lambda start, end: 0.01)
+    with pytest.raises(PowerCaptureError):
+        default_request_adapter(URL, {}, 0.1)
+    assert len(calls) == 2
+
+
+def test_slow_stream_cannot_extend_deadline(monkeypatch):
+    delivered = []
+
+    class SlowStream(httpx.AsyncByteStream):
+        async def __aiter__(self):
+            await asyncio.sleep(1)
+            delivered.append(True)
+            yield b'{"too_late": true}'
+
+    _mock_client(monkeypatch, lambda request: httpx.Response(200, stream=SlowStream()))
+    with pytest.raises(PowerCaptureError, match="deadline"):
+        default_request_adapter(URL, {}, 0.03)
+    assert delivered == []
+
+
+@pytest.mark.parametrize("status", [500, 502, 503, 504])
+def test_server_errors_get_only_two_attempts(monkeypatch, status):
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(status, headers={"Retry-After": "0"})
+
+    _mock_client(monkeypatch, handler)
+    with pytest.raises(PowerCaptureError):
+        default_request_adapter(URL, {}, 8.0)
+    assert len(calls) == 2
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--capture", action="store_true", help="Opt in to live NASA acquisition")
+    parser.add_argument("--output", type=Path, default=ARCHIVE_PATH)
+    args = parser.parse_args()
+    if not args.capture:
+        parser.error("--capture is required; ordinary pytest is offline")
+    capture_power_archive(
+        farm_id=FARM_ID,
+        **LOCATION,
+        observation_start=OBSERVATION_START,
+        observation_end=OBSERVATION_END,
+        baseline_start_year=1991,
+        baseline_end_year=2020,
+        request_json=default_request_adapter,
+        output=args.output,
+    )
+
+
+if __name__ == "__main__":
+    main()
