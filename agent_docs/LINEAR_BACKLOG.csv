@@ -1,0 +1,857 @@
+"Title,"Description,"Priority,"Status,"Assignee,"Created,"Completed,"Labels,"Estimate
+"[FS-01] [Platform] Bootstrap pinned Python and Next.js toolchains,"ALREADY CREATED in Linear as SCR-14: https://linear.app/scrum-agent/issue/SCR-14/fs-01-platform-bootstrap-pinned-python-and-nextjs-toolchains
+
+## [FS-01] [Platform] Bootstrap pinned Python and Next.js toolchains
+
+- **Target Git Branch:** `codex/feat/fs-01-toolchains`
+- **Target File Paths:**
+  - `pyproject.toml`
+  - `frontend/package.json`
+- **Context References:** @agent_docs/PARALLEL_EXECUTION.md @agent_docs/ARCHITECTURE.md
+- **Depends on:** None
+
+### I/O & Algorithmic Logic
+
+Create the root Python 3.11 project metadata with backend source discovery, FastAPI/Pydantic v2/HTTPX/Pandas runtime dependencies, pytest/Ruff dev dependencies, and an offline pytest configuration. Create the Node 22 frontend package with exact saved dependency versions for Next.js App Router, React, TypeScript, Tailwind, Leaflet, Recharts, Ajv draft-2020-12, Vitest, and Testing Library. Export the npm scripts `build` (Vitest `--passWithNoTests`, strict TypeScript check, Next.js production build) and `test` (Vitest). Do not commit lockfiles in Phase 0.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] `pip install -e '.[dev]'` installs Python tooling
+- [ ] Node 22 installs frontend dependencies
+- [ ] one `npm run build` executes tests, tsc and `next build`
+- [ ] package versions are exact, no placeholders, lockfiles stay untracked until Phase 4.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 0,"
+"[FS-02] [Frontend] Scaffold the empty Next.js App Router shell,"ALREADY CREATED in Linear as SCR-12: https://linear.app/scrum-agent/issue/SCR-12/fs-02-frontend-scaffold-the-empty-nextjs-app-router-shell
+
+## [FS-02] [Frontend] Scaffold the empty Next.js App Router shell
+
+- **Target Git Branch:** `codex/feat/fs-02-app-shell`
+- **Target File Paths:**
+  - `frontend/app/layout.tsx`
+  - `frontend/app/page.tsx`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-01
+
+### I/O & Algorithmic Logic
+
+Export `default function RootLayout(props: Readonly<{children: ReactNode}>): ReactElement` with `lang=""en""` and a minimal semantic document. Export `default function HomePage(): ReactElement` as the empty Field Shift shell with project heading and one accessible main landmark. Import types from React and include no mock or agronomic results.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Next.js production build renders `/`
+- [ ] page contains one h1 and main landmark
+- [ ] no third-party network calls occur during build.,"High,"Backlog,","2026-09-26,","Feature, Phase 0,"
+"[FS-03] [Data] Capture and verify the NASA POWER daily archive,"ALREADY CREATED in Linear as SCR-13: https://linear.app/scrum-agent/issue/SCR-13/fs-03-data-capture-and-verify-the-nasa-power-daily-archive
+
+## [FS-03] [Data] Capture and verify the NASA POWER daily archive
+
+- **Target Git Branch:** `codex/feat/fs-03-power-archive`
+- **Target File Paths:**
+  - `backend/scripts/test_power_capture.py`
+  - `backend/tests/fixtures/power_archive.json`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-01
+
+### I/O & Algorithmic Logic
+
+In `test_power_capture.py`, export `capture_power_archive(*, farm_id: str, latitude: float, longitude: float, observation_start: date, observation_end: date, baseline_start_year: int, baseline_end_year: int, request_json: JsonRequest, output: Path) -> PowerArchive` and `verify_power_archive(archive: Mapping[str, JsonValue]) -> None`; define `JsonRequest` and `PowerArchive` in that same script with exact JSON-value types. Capture POWER daily AG JSON UTC for PRECTOTCORR,T2M, one exact location, inclusive observation dates, and each complete baseline year; keep raw payloads/fill values. Real capture is opt-in; self-tests use injected responses.
+
+### Definition of Done
+
+`pytest -q backend/scripts/test_power_capture.py`
+
+### Acceptance Criteria
+
+- [ ] The committed archive contains the pinned Faisalabad 90-day period and 30 baseline-year requests with source URLs, dates, params, timestamps and unmodified POWER payloads
+- [ ] offline tests validate response keys, units, date coverage, fill values and malformed payload rejection.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 0,"
+"[FS-04] [Data] Probe SoilGrids REST and cache genuine topsoil layers,"ALREADY CREATED in Linear as SCR-10: https://linear.app/scrum-agent/issue/SCR-10/fs-04-data-probe-soilgrids-rest-and-cache-genuine-topsoil-layers
+
+## [FS-04] [Data] Probe SoilGrids REST and cache genuine topsoil layers
+
+- **Target Git Branch:** `codex/feat/fs-04-soil-archive`
+- **Target File Paths:**
+  - `backend/scripts/test_soil_capture.py`
+  - `backend/tests/fixtures/soilgrids_archive.json`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/AGRONOMY_RULES.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-01
+
+### I/O & Algorithmic Logic
+
+Export `capture_soil_archive(*, farm_id: str, latitude: float, longitude: float, request_json: JsonRequest, output: Path) -> SoilArchive` and `verify_soil_archive(archive: Mapping[str, JsonValue]) -> None`, with self-contained `JsonRequest`/`SoilArchive` aliases. Request phh2o,soc,nitrogen,sand,silt,clay at 0–5,5–15,15–30 cm, median plus Q0.05/Q0.95 and preserve raw values/conversion factors. Probe official REST once in opt-in capture; if unavailable, record verified WCS acquisition or an honest unavailable reason/status, never invented layers.
+
+### Definition of Done
+
+`pytest -q backend/scripts/test_soil_capture.py`
+
+### Acceptance Criteria
+
+- [ ] Archive is pinned to Faisalabad and validates its source URL, retrieval time, acquisition method, product, coordinates and all 18 property/depth keys when available
+- [ ] an unavailable response has empty layers and an explicit reason
+- [ ] offline tests exercise both states and reject fabricated zero layers.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 0,"
+"[FS-05] [Data] Record SMAP Version 6 fixture availability and quality flags,"ALREADY CREATED in Linear as SCR-11: https://linear.app/scrum-agent/issue/SCR-11/fs-05-data-record-smap-version-6-fixture-availability-and-quality
+
+## [FS-05] [Data] Record SMAP Version 6 fixture availability and quality flags
+
+- **Target Git Branch:** `codex/feat/fs-05-smap-archive`
+- **Target File Paths:**
+  - `backend/scripts/test_smap_capture.py`
+  - `backend/tests/fixtures/smap_archive.json`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/AGRONOMY_RULES.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-01
+
+### I/O & Algorithmic Logic
+
+Export `verify_smap_archive(archive: Mapping[str, JsonValue]) -> None` and `capture_smap_archive(*, farm_id: str, granules: Sequence[Path], output: Path) -> SmapArchive`, with exact aliases local to this script. Capture authorized SPL3SMP_E V6 HDF5 granules through a supplied Earthdata workflow only; select AM, retain cell/granule IDs and flags, convert scale to m³/m³ once, and honor advisory exclusions. With no granules, write the specified unavailable record with null cell_id and empty rows.
+
+### Definition of Done
+
+`pytest -q backend/scripts/test_smap_capture.py`
+
+### Acceptance Criteria
+
+- [ ] Offline tests accept only product/version 6, AM rows, the documented metadata and availability/unavailability states
+- [ ] flags/fill values remain auditable. Do not create synthetic successful observations when Earthdata data is unavailable.,"High,"Backlog,","2026-09-26,","Feature, Phase 0,"
+"[FS-06] [Agronomy] Source and validate the regional crop catalog,"ALREADY CREATED in Linear as SCR-15: https://linear.app/scrum-agent/issue/SCR-15/fs-06-agronomy-source-and-validate-the-regional-crop-catalog
+
+## [FS-06] [Agronomy] Source and validate the regional crop catalog
+
+- **Target Git Branch:** `codex/feat/fs-06-crop-catalog`
+- **Target File Paths:**
+  - `backend/data/punjab_crops.json`
+  - `backend/scripts/test_crop_catalog.py`
+- **Context References:** @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-01
+
+### I/O & Algorithmic Logic
+
+Create 1–12 Faisalabad/Punjab crop records with the exact `Crop` fields in PARALLEL_EXECUTION.md, source HTTPS citations per record, verified calendar/maturity/family/root/N/climate/pH/tolerance values, and no defaults. Export `load_catalog_json(path: Path) -> dict[str, JsonValue]` and `validate_catalog_document(document: Mapping[str, JsonValue]) -> None` in the self-contained test script; verify strict field sets, finite/ranged values, unique IDs, ordered intervals and real HTTPS reference strings.
+
+### Definition of Done
+
+`pytest -q backend/scripts/test_crop_catalog.py`
+
+### Acceptance Criteria
+
+- [ ] At least wheat, chickpea and maize are included only where complete regional trait sources support them
+- [ ] every enabled record passes strict validation and each numeric range is traceable to the listed references
+- [ ] missing/uncited traits fail.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 0,"
+"[FS-07] [Data] Hash and validate immutable source fixture manifests,"ALREADY CREATED in Linear as SCR-16: https://linear.app/scrum-agent/issue/SCR-16/fs-07-data-hash-and-validate-immutable-source-fixture-manifests
+
+## [FS-07] [Data] Hash and validate immutable source fixture manifests
+
+- **Target Git Branch:** `codex/feat/fs-07-fixture-manifest`
+- **Target File Paths:**
+  - `backend/scripts/test_fixture_manifest.py`
+  - `backend/tests/fixtures/manifest.json`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/PARALLEL_EXECUTION.md @agent_docs/DATA_SCHEMA.md
+- **Depends on:** FS-03, FS-04, FS-05, FS-06
+
+### I/O & Algorithmic Logic
+
+Export frozen self-contained `FixtureFile(provider: Literal['power','soilgrids','smap'], path: str, sha256: str, available: bool)` and `validate_fixture_manifest(root: Path) -> dict[str, JsonValue]`. Validate pinned Faisalabad location/date/slot, `synthetic=false`, catalog/transform versions, sorted unique provider rows, confined exact archive paths and recomputed SHA-256 for each present file; do not hash the catalog as a provider archive.
+
+### Definition of Done
+
+`pytest -q backend/scripts/test_fixture_manifest.py`
+
+### Acceptance Criteria
+
+- [ ] Manifest matches the three exact provider archive paths, includes lowercase 64-character computed hashes and availability flags, and offline tamper/path traversal/missing-file tests fail validation.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 0,"
+"[FS-08] [Backend] Freeze strict Pydantic v2 wire contracts,"ALREADY CREATED in Linear as SCR-17: https://linear.app/scrum-agent/issue/SCR-17/fs-08-backend-freeze-strict-pydantic-v2-wire-contracts
+
+## [FS-08] [Backend] Freeze strict Pydantic v2 wire contracts
+
+- **Target Git Branch:** `codex/feat/fs-08-pydantic-contracts`
+- **Target File Paths:**
+  - `backend/app/schemas/contracts.py`
+  - `backend/tests/test_contracts.py`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md @agent_docs/AGRONOMY_RULES.md
+- **Depends on:** FS-01
+
+### I/O & Algorithmic Logic
+
+Export `WireModel`, every request/response/error model named in PARALLEL_EXECUTION.md, plus `PlantingWindow`, `Crop`, `CropCatalogResponse`, and `ContractDocument`; export `contract_json_schema() -> dict[str, JsonValue]`. Enforce extra=forbid, finite strict numerics, ISO date strings, documented bounds, unique slots/crops, exact provider source cardinality and enums. Keep all fields nullable only where DATA_SCHEMA says null is required. Add executable tests for every documented sample and boundary.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_contracts.py`
+
+### Acceptance Criteria
+
+- [ ] OpenAPI types match DATA_SCHEMA.md
+- [ ] invalid coordinate/date/texture/unknown fields and numeric-string coercion fail
+- [ ] response serialization emits every nullable key
+- [ ] ContractDocument schema has the fixed $id and all response/crop `$defs`.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 1,"
+"[FS-09] [Backend] Add frozen internal provider and scoring models,"ALREADY CREATED in Linear as SCR-18: https://linear.app/scrum-agent/issue/SCR-18/fs-09-backend-add-frozen-internal-provider-and-scoring-models
+
+## [FS-09] [Backend] Add frozen internal provider and scoring models
+
+- **Target Git Branch:** `codex/feat/fs-09-domain-types`
+- **Target File Paths:**
+  - `backend/app/schemas/domain.py`
+  - `backend/tests/test_domain_types.py`
+- **Context References:** @agent_docs/PARALLEL_EXECUTION.md @agent_docs/DATA_SCHEMA.md @agent_docs/ARCHITECTURE.md
+- **Depends on:** FS-08
+
+### I/O & Algorithmic Logic
+
+Export each internal frozen model, exception, and Protocol exactly as specified under Shared internal Python types in PARALLEL_EXECUTION.md: `PowerDaily`, `PowerSeries`, `SoilLayer`, `SoilProfile`, `SmapObservation`, `SmapSeries`, `HttpPayload`, `FetchedInputs`, feature results, `ScoredRotation`, `RankingResult`, provider exceptions and provider interfaces. All models forbid extra fields; UTC timestamps, finite/null values, ordered unique days/layers and typed provider literals validate.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_domain_types.py`
+
+### Acceptance Criteria
+
+- [ ] Exact exported symbols and annotations import from `app.schemas.domain`
+- [ ] tests verify frozen mutation rejection, date order/uniqueness, units/ranges, UTC-only datetimes and exception attributes.,"High,"Backlog,","2026-09-26,","Feature, Phase 1,"
+"[FS-10] [Frontend] Generate TypeScript contracts and JSON Schema,"ALREADY CREATED in Linear as SCR-20: https://linear.app/scrum-agent/issue/SCR-20/fs-10-frontend-generate-typescript-contracts-and-json-schema
+
+## [FS-10] [Frontend] Generate TypeScript contracts and JSON Schema
+
+- **Target Git Branch:** `codex/feat/fs-10-generated-contracts`
+- **Target File Paths:**
+  - `frontend/src/lib/generated/contracts.ts`
+  - `frontend/src/lib/generated/contracts.schema.json`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-01, FS-08
+
+### I/O & Algorithmic Logic
+
+Generate schema by calling `ContractDocument.model_json_schema()` through exported `contract_json_schema()`, then generate interfaces using the pinned `json-schema-to-typescript` CLI. Export generated interfaces `RecommendationRequest`, `RecommendationResponse`, `CropCatalogResponse`, `ErrorEnvelope`, `Location`, `Slot`, `History`, `SoilOverride`, `Features`, `Source`, `Recommendation`, `Crop`, and every remaining model name. Dates are strings, `null` is preserved, arrays are ReadonlyArray-compatible; schema `$id` is exact and `$defs` support Ajv 2020-12 refs. Do not hand-edit generated declarations.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Both artifacts regenerate from the merged Python contract with byte-stable output
+- [ ] `npm run build` compiles every generated type and validates exact nullable types without `any`/unsafe casts.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 1,"
+"[FS-11] [Frontend] Implement the contract-validating API client,"ALREADY CREATED in Linear as SCR-21: https://linear.app/scrum-agent/issue/SCR-21/fs-11-frontend-implement-the-contract-validating-api-client
+
+## [FS-11] [Frontend] Implement the contract-validating API client
+
+- **Target Git Branch:** `codex/feat/fs-11-api-client`
+- **Target File Paths:**
+  - `frontend/src/lib/api/client.ts`
+  - `frontend/src/lib/api/client.test.ts`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-10
+
+### I/O & Algorithmic Logic
+
+Export exactly `validateRecommendationResponse(payload: unknown): RecommendationResponse`, `validateCropCatalogResponse(payload: unknown): CropCatalogResponse`, `recommendRotation(request: RecommendationRequest, signal?: AbortSignal): Promise<RecommendationResponse>`, `fetchCropCatalog(regionId: 'punjab_pk_demo_v1', signal?: AbortSignal): Promise<CropCatalogResponse>`, and `ApiError extends Error` with readonly `status: number` and `envelope: ErrorEnvelope | null`. Validate using Ajv draft-2020-12 and ajv-formats. Call same-origin POST `/api/recommend-rotation` and GET `/api/recommend-rotation?region_id=...`; keep null distinct from absent.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Tests cover valid payload, invalid/missing fields, typed API errors, HTTP failures, malformed JSON and AbortSignal
+- [ ] browser client contains no backend URL or `as RecommendationResponse` cast.,"High,"Backlog,","2026-09-26,","Feature, Phase 1,"
+"[FS-12] [Backend] Expose a deterministic contract-valid mock API,"ALREADY CREATED in Linear as SCR-19: https://linear.app/scrum-agent/issue/SCR-19/fs-12-backend-expose-a-deterministic-contract-valid-mock-api
+
+## [FS-12] [Backend] Expose a deterministic contract-valid mock API
+
+- **Target Git Branch:** `codex/feat/fs-12-mock-api`
+- **Target File Paths:**
+  - `backend/app/mock_server.py`
+  - `backend/tests/test_mock_server.py`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md @agent_docs/ARCHITECTURE.md
+- **Depends on:** FS-08
+
+### I/O & Algorithmic Logic
+
+Export FastAPI instance `app: FastAPI` at import path `app.mock_server:app`; implement GET `/api/v1/crops?region_id=punjab_pk_demo_v1` returning `CropCatalogResponse` and POST `/api/v1/recommend-rotation` accepting `RecommendationRequest` and returning `RecommendationResponse`. Responses are clearly synthetic, use `DEMO_FIXTURE`, preserve all nullable keys/source entries and deterministic request data. Never call a provider or read success-shaped observation archives.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_mock_server.py`
+
+### Acceptance Criteria
+
+- [ ] HTTPX ASGI tests validate status/content schemas for both routes
+- [ ] the same output is byte-stable for the same request apart from UUID/timestamp
+- [ ] unknown regions return the strict 422 ErrorEnvelope
+- [ ] provider sockets are never opened.,"High,"Backlog,","2026-09-26,","Feature, Phase 1,"
+"[FS-13] [Backend] Add bounded async JSON provider transport,"ALREADY CREATED in Linear as SCR-22: https://linear.app/scrum-agent/issue/SCR-22/fs-13-backend-add-bounded-async-json-provider-transport
+
+## [FS-13] [Backend] Add bounded async JSON provider transport
+
+- **Target Git Branch:** `codex/feat/fs-13-http-transport`
+- **Target File Paths:**
+  - `backend/app/providers/http.py`
+  - `backend/tests/test_http.py`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/PARALLEL_EXECUTION.md @.cursorrules
+- **Depends on:** FS-09
+
+### I/O & Algorithmic Logic
+
+Export `class HttpxJsonFetcher(JsonFetcher)` with constructor `__init__(self, client: httpx.AsyncClient, cache: MutableMapping[str, HttpPayload], clock: Callable[[], float] = time.monotonic) -> None` and the exact Protocol `fetch_json(self, *, provider: Literal['power','soilgrids'], url: str, params: tuple[tuple[str,str],...], deadline: float) -> HttpPayload`. Allow only the two fixed HTTPS hosts; use params=, connect/read/write/pool timeout ceilings 2/4/2/1 seconds, bounded retry for timeout/429/5xx, honor in-budget Retry-After, and verify TLS. Canonical cache key includes provider, URL, sorted parameters. Fixture/cache reads are injected; no module-global session.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_http.py`
+
+### Acceptance Criteria
+
+- [ ] HTTPX MockTransport tests cover host denial, query encoding, 2-attempt cap, remaining absolute monotonic deadline, 4xx no retry, redacted errors, cache key isolation and exact `HttpPayload` return type.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-14] [Backend] Implement the NASA POWER daily provider,"ALREADY CREATED in Linear as SCR-26: https://linear.app/scrum-agent/issue/SCR-26/fs-14-backend-implement-the-nasa-power-daily-provider
+
+## [FS-14] [Backend] Implement the NASA POWER daily provider
+
+- **Target Git Branch:** `codex/feat/fs-14-power-provider`
+- **Target File Paths:**
+  - `backend/app/providers/power.py`
+  - `backend/tests/test_power_provider.py`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/PARALLEL_EXECUTION.md @.cursorrules
+- **Depends on:** FS-03, FS-09, FS-13
+
+### I/O & Algorithmic Logic
+
+Export `class NasaPowerProvider(PowerProvider)` implementing `async get_daily(self, location: Location, start: date, end: date, *, deadline: float) -> PowerSeries`; constructor accepts injected `JsonFetcher`. GET `/api/temporal/daily/point` with `parameters=PRECTOTCORR,T2M`, `community=AG`, `format=JSON`, `time-standard=UTC`, exact lat/lon and YYYYMMDD start/end. Parse `properties.parameter[name][YYYYMMDD]`, declared units and header fill value; sort dates and emit one `Source` with provider-native spatial metadata. Keep baseline archive requests offline/cache-backed.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_power_provider.py`
+
+### Acceptance Criteria
+
+- [ ] Fixture-replay tests cover exact URL/params, known daily conversion, inclusive dates, sentinels→null, malformed body and finite/location checks
+- [ ] no live call occurs in tests.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-15] [Backend] Implement the ISRIC SoilGrids point adapter,"ALREADY CREATED in Linear as SCR-27: https://linear.app/scrum-agent/issue/SCR-27/fs-15-backend-implement-the-isric-soilgrids-point-adapter
+
+## [FS-15] [Backend] Implement the ISRIC SoilGrids point adapter
+
+- **Target Git Branch:** `codex/feat/fs-15-soil-provider`
+- **Target File Paths:**
+  - `backend/app/providers/soilgrids.py`
+  - `backend/tests/test_soilgrids_provider.py`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md @.cursorrules
+- **Depends on:** FS-04, FS-09, FS-13
+
+### I/O & Algorithmic Logic
+
+Export `class IsricSoilProvider(SoilProvider)` implementing `async get_topsoil(self, location: Location, *, deadline: float) -> SoilProfile`; constructor accepts injected `JsonFetcher` and `rest_enabled: bool`. When enabled, request the documented `/soilgrids/v2.0/properties/query` using repeated property/depth/value parameters and exact coordinates; parse by `properties.layers[].depths[].values` names, retain all raw means/quantiles/factors. When disabled, return the typed `ProviderError` indicating REST is paused; WCS/WebDAV captured rasters enter via the Phase 4 fixture provider.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_soilgrids_provider.py`
+
+### Acceptance Criteria
+
+- [ ] Mock responses prove shape lookup by property/depth names, source metadata, pause guard, malformed response→ProviderError and preservation of raw quantiles
+- [ ] parser never reports total N as available N.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-16] [Backend] Read quality-filtered SMAP fixture series,"ALREADY CREATED in Linear as SCR-29: https://linear.app/scrum-agent/issue/SCR-29/fs-16-backend-read-quality-filtered-smap-fixture-series
+
+## [FS-16] [Backend] Read quality-filtered SMAP fixture series
+
+- **Target Git Branch:** `codex/feat/fs-16-smap-provider`
+- **Target File Paths:**
+  - `backend/app/providers/smap.py`
+  - `backend/tests/test_smap_provider.py`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/AGRONOMY_RULES.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-05, FS-09
+
+### I/O & Algorithmic Logic
+
+Export `class SmapArchiveProvider(SmapProvider)` with `__init__(self, archive_path: Path) -> None` and `async get_surface(self, location: Location, assessment_end: date, *, deadline: float) -> SmapSeries | None`. Read only the exact verified manifest archive; require SPL3SMP_E V6 and the captured native cell; return AM observations with valid m³/m³ and original retrieval flags, including raw reference rows. Missing/unavailable archive returns None; never fetch or fabricate HDF5 data in the API process.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_smap_provider.py`
+
+### Acceptance Criteria
+
+- [ ] Tests load a checksum-approved archive, reject product/version/cell mismatch and preserve flags
+- [ ] unavailable/missing archives return None
+- [ ] no NASA Earthdata request or generated moisture value occurs.,"High,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-17] [Backend] Compute matched-period climate anomalies,"ALREADY CREATED in Linear as SCR-23: https://linear.app/scrum-agent/issue/SCR-23/fs-17-backend-compute-matched-period-climate-anomalies
+
+## [FS-17] [Backend] Compute matched-period climate anomalies
+
+- **Target Git Branch:** `codex/feat/fs-17-climate-features`
+- **Target File Paths:**
+  - `backend/app/features/climate.py`
+  - `backend/tests/test_climate_features.py`
+- **Context References:** @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-09
+
+### I/O & Algorithmic Logic
+
+Export `calculate_climate_features(observations: PowerSeries, baseline: PowerSeries, assessment_end: date, slots: tuple[Slot,...]) -> ClimateResult`. Match the 90 inclusive observed dates and calendar-equivalent dates over 1991–2020, omit Feb 29, separate rain/temp masks, require 90% accepted coverage and ≥25 qualifying baseline years. Aggregate daily corrected rainfall mm and T2M °C as signed anomalies; null rain anomaly for baseline<10mm. Emit each slot's matched seasonal historical-stress scenario, coverage years, threshold bands and warning codes from AGRONOMY_RULES.md.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_climate_features.py`
+
+### Acceptance Criteria
+
+- [ ] Boundary tests cover cross-year/leap-day masks, 90%/25-year thresholds, -40/-20/20/40 rainfall bands, 1/2°C heat bands, baseline<10mm, partial coverage and identical deterministic outputs.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-18] [Backend] Normalize SoilGrids layers and farmer overrides,"ALREADY CREATED in Linear as SCR-24: https://linear.app/scrum-agent/issue/SCR-24/fs-18-backend-normalize-soilgrids-layers-and-farmer-overrides
+
+## [FS-18] [Backend] Normalize SoilGrids layers and farmer overrides
+
+- **Target Git Branch:** `codex/feat/fs-18-soil-features`
+- **Target File Paths:**
+  - `backend/app/features/soil.py`
+  - `backend/tests/test_soil_features.py`
+- **Context References:** @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-04, FS-08, FS-09
+
+### I/O & Algorithmic Logic
+
+Export `build_soil_result(profile: SoilProfile | None, override: SoilOverride | None) -> SoilResult`. Convert mapped phh2o,soc,nitrogen,sand/silt/clay using verified factors once; calculate complete 0–30 cm depth-weighted average `(5*x0_5+10*x5_15+15*x15_30)/30`; null a property if any layer is missing. Replace each map field independently with a dated 0–30 cm farmer override and mark `SoilFieldSources`; flag texture totals >2 points off 100.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_soil_features.py`
+
+### Acceptance Criteria
+
+- [ ] Tests verify all conversions, weighted layers, field-level override provenance, missing-layer nulls, texture warnings and no mineral/plant-available-N inference.,"High,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-19] [Backend] Derive conservative SMAP moisture context,"ALREADY CREATED in Linear as SCR-25: https://linear.app/scrum-agent/issue/SCR-25/fs-19-backend-derive-conservative-smap-moisture-context
+
+## [FS-19] [Backend] Derive conservative SMAP moisture context
+
+- **Target Git Branch:** `codex/feat/fs-19-moisture-features`
+- **Target File Paths:**
+  - `backend/app/features/moisture.py`
+  - `backend/tests/test_moisture_features.py`
+- **Context References:** @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-05, FS-09
+
+### I/O & Algorithmic Logic
+
+Export `build_moisture_result(series: SmapSeries | None, assessment_end: date) -> MoistureResult`. Accept only AM SPL3SMP_E recommended quality flags 0/8 with valid values; compute surface mean from ≥3 observations in the previous 14 days and require newest within 7 days. Compute percentile only from ≥30 prior same-cell/same-pass observations across ≥5 prior years in ±15 calendar days. Return nulls plus warnings whenever coverage/quality is insufficient.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_moisture_features.py`
+
+### Acceptance Criteria
+
+- [ ] Tests exercise quality/fill flags, AM filtering, 3-observation and age cutoffs, reference count/year cutoffs, percentile formula and null instead of dry/zero inference.,"High,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-20] [Backend] Load the cited regional crop registry,"ALREADY CREATED in Linear as SCR-28: https://linear.app/scrum-agent/issue/SCR-28/fs-20-backend-load-the-cited-regional-crop-registry
+
+## [FS-20] [Backend] Load the cited regional crop registry
+
+- **Target Git Branch:** `codex/feat/fs-20-crop-registry`
+- **Target File Paths:**
+  - `backend/app/catalog/registry.py`
+  - `backend/tests/test_crop_registry.py`
+- **Context References:** @agent_docs/PARALLEL_EXECUTION.md @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md
+- **Depends on:** FS-06, FS-08
+
+### I/O & Algorithmic Logic
+
+Export `load_crop_catalog(path: Path, region_id: str) -> CropCatalogResponse`; load exact `backend/data/punjab_crops.json` through Pydantic `Crop` validation, require the requested region to be registered, reject duplicate IDs or incomplete source URLs and return catalog version plus 1–12 crops. Unknown region raises a typed `ValueError` mapped by the API to the documented 422 error.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_crop_registry.py`
+
+### Acceptance Criteria
+
+- [ ] Registry tests read the Phase 0 catalog, assert immutable crop order and exact version, reject unknown region/IDs/invalid thresholds and prove response serializes to the catalog contract.,"High,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-21] [Backend] Filter rotations by hard agronomic constraints,"ALREADY CREATED in Linear as SCR-31: https://linear.app/scrum-agent/issue/SCR-31/fs-21-backend-filter-rotations-by-hard-agronomic-constraints
+
+## [FS-21] [Backend] Filter rotations by hard agronomic constraints
+
+- **Target Git Branch:** `codex/feat/fs-21-rotation-constraints`
+- **Target File Paths:**
+  - `backend/app/engine/constraints.py`
+  - `backend/tests/test_rotation_constraints.py`
+- **Context References:** @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-08, FS-20
+
+### I/O & Algorithmic Logic
+
+Export `check_rotation(crop_ids: tuple[str,...], request: RecommendationRequest, catalog: CropCatalogResponse, soil: Soil) -> tuple[Exclusion,...]`. Require exactly one candidate per requested slot; evaluate IDs, allowed/excluded lists, inclusive dates, MMDD calendars including year-crossing windows, maturity-days-in-slot, rainfed irrigation requirement, pH ranges and documented family-break crops across history plus plan. Empty tuple means feasible; each exclusion is a stable slot/crop/code-sorted record.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_rotation_constraints.py`
+
+### Acceptance Criteria
+
+- [ ] Parametrized tests hit exact calendar/date/pH/maturity boundaries and one value each side
+- [ ] family breaks inspect completed history and plan
+- [ ] unknown pH warns without excluding
+- [ ] no infeasible candidate passes.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-22] [Backend] Score nitrogen, roots, water, temperature and soil,"ALREADY CREATED in Linear as SCR-30: https://linear.app/scrum-agent/issue/SCR-30/fs-22-backend-score-nitrogen-roots-water-temperature-and-soil
+
+## [FS-22] [Backend] Score nitrogen, roots, water, temperature and soil
+
+- **Target Git Branch:** `codex/feat/fs-22-component-scoring`
+- **Target File Paths:**
+  - `backend/app/engine/scoring.py`
+  - `backend/tests/test_rotation_scoring.py`
+- **Context References:** @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-17, FS-18, FS-19, FS-20
+
+### I/O & Algorithmic Logic
+
+Export `score_rotation(crop_ids: tuple[str,...], request: RecommendationRequest, catalog: CropCatalogResponse, features: Features) -> ScoredRotation`. Implement the fixed component transitions/weights and null handling in AGRONOMY_RULES.md. Keep unrounded score as Decimal for ranking; include component scores, renormalized weights, stable reasons/warnings and no yield or fertilizer units.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_rotation_scoring.py`
+
+### Acceptance Criteria
+
+- [ ] Golden tests independently calculate each component, threshold deduction, null/partial weight renormalization and Decimal score
+- [ ] unknown residue and history use their explicit rules
+- [ ] equal inputs return equal components/reasons.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-23] [Backend] Enumerate and deterministically rank feasible rotations,"ALREADY CREATED in Linear as SCR-32: https://linear.app/scrum-agent/issue/SCR-32/fs-23-backend-enumerate-and-deterministically-rank-feasible-rotations
+
+## [FS-23] [Backend] Enumerate and deterministically rank feasible rotations
+
+- **Target Git Branch:** `codex/feat/fs-23-rotation-ranking`
+- **Target File Paths:**
+  - `backend/app/engine/ranking.py`
+  - `backend/tests/test_rotation_ranking.py`
+- **Context References:** @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-21, FS-22
+
+### I/O & Algorithmic Logic
+
+Export `rank_rotations(request: RecommendationRequest, catalog: CropCatalogResponse, features: Features) -> RankingResult`. Enumerate the ordered Cartesian product of available crop IDs for the request's 1–4 slots (maximum 12^4); pass each through `check_rotation`, score only feasible sequences with `score_rotation`, return top_k≤3 sorted by unrounded Decimal descending then crop-ID tuple, contiguous ranks, stable SHA-256 rotation IDs, total feasible count and sorted exclusions.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_rotation_ranking.py`
+
+### Acceptance Criteria
+
+- [ ] Tests prove hard constraints precede score, ties have stable lexical order, requested top_k and feasible count are correct, IDs are reproducible and identical input yields identical serialized rankings.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-24] [Backend] Orchestrate recommendation features and ranking,"ALREADY CREATED in Linear as SCR-33: https://linear.app/scrum-agent/issue/SCR-33/fs-24-backend-orchestrate-recommendation-features-and-ranking
+
+## [FS-24] [Backend] Orchestrate recommendation features and ranking
+
+- **Target Git Branch:** `codex/feat/fs-24-recommendation-service`
+- **Target File Paths:**
+  - `backend/app/services/recommendation.py`
+  - `backend/tests/test_recommendation_service.py`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md @.cursorrules
+- **Depends on:** FS-14, FS-15, FS-16, FS-17, FS-18, FS-19, FS-20, FS-23
+
+### I/O & Algorithmic Logic
+
+Export `async build_recommendation_response(request: RecommendationRequest, providers: ProviderBundle, *, request_id: UUID, generated_at: datetime) -> RecommendationResponse`. Assemble only pinned/cache-approved observations, baseline, soil and optional SMAP; validate source match against request; call pure feature builders/registry/ranker; set schema/rules/catalog versions, source usage pointers, quality/status/warnings and all response fields. Required POWER/baseline failure raises `RequiredDataUnavailable`; soil/SMAP provider failures degrade response; no feasible crops remains valid HTTP-200 response. Do not call 1991–2020 backfills on the route.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_recommendation_service.py`
+
+### Acceptance Criteria
+
+- [ ] Injected fake ProviderBundle tests verify call bounds/deadline propagation, wrong point/period rejection, complete/degraded/no-feasible envelopes, provider exception policy, request metadata and no live network.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-25] [Backend] Expose versioned crop and recommendation routes,"ALREADY CREATED in Linear as SCR-34: https://linear.app/scrum-agent/issue/SCR-34/fs-25-backend-expose-versioned-crop-and-recommendation-routes
+
+## [FS-25] [Backend] Expose versioned crop and recommendation routes
+
+- **Target Git Branch:** `codex/feat/fs-25-api-routes`
+- **Target File Paths:**
+  - `backend/app/api/v1/recommendations.py`
+  - `backend/tests/test_recommendation_routes.py`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/ARCHITECTURE.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-12, FS-20, FS-24
+
+### I/O & Algorithmic Logic
+
+Export `router: APIRouter` implementing GET `/api/v1/crops` with required `region_id` and response `CropCatalogResponse`, and POST `/api/v1/recommend-rotation` with `RecommendationRequest` and `RecommendationResponse`. Inject `ProviderBundle` through an overridable FastAPI dependency; create UUID request ID and UTC timestamp; map validation, `RequiredDataUnavailable`, `FixtureMismatch` and unexpected errors to the exact `ErrorEnvelope`/HTTP statuses in DATA_SCHEMA.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_recommendation_routes.py`
+
+### Acceptance Criteria
+
+- [ ] HTTPX ASGI tests verify both OpenAPI signatures, strict request rejection, request ID header/body, all error mappings, nullable success payload serialization and injected providers with no live API calls.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 2,"
+"[FS-26] [Frontend] Build the accessible Leaflet coordinate picker,"ALREADY CREATED in Linear as SCR-35: https://linear.app/scrum-agent/issue/SCR-35/fs-26-frontend-build-the-accessible-leaflet-coordinate-picker
+
+## [FS-26] [Frontend] Build the accessible Leaflet coordinate picker
+
+- **Target Git Branch:** `codex/feat/fs-26-field-map`
+- **Target File Paths:**
+  - `frontend/src/components/field-map.tsx`
+  - `frontend/src/components/field-map.test.tsx`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-02, FS-10
+
+### I/O & Algorithmic Logic
+
+Export `FieldMapProps` with `initialLocation: Location | null`, `onChange: (location: Location) => void`, and `disabled: boolean`; export `function FieldMap(props: FieldMapProps): ReactElement`. Load Leaflet client-only with SSR disabled, honor OSM attribution, translate Leaflet `[lat,lon]` to wire `{latitude,longitude}`, validate WGS84 bounds, permit keyboard latitude/longitude entry, and keep form available if tiles fail.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Vitest covers click-coordinate order, bounds, keyboard update, disabled state and tile error
+- [ ] map module imports no provider API or scoring code
+- [ ] npm build typechecks and compiles the client-only Leaflet wrapper.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 3,"
+"[FS-27] [Frontend] Build the validated planting rotation form,"ALREADY CREATED in Linear as SCR-36: https://linear.app/scrum-agent/issue/SCR-36/fs-27-frontend-build-the-validated-planting-rotation-form
+
+## [FS-27] [Frontend] Build the validated planting rotation form
+
+- **Target Git Branch:** `codex/feat/fs-27-recommendation-form`
+- **Target File Paths:**
+  - `frontend/src/components/recommendation-form.tsx`
+  - `frontend/src/components/recommendation-form.test.tsx`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md @agent_docs/AGRONOMY_RULES.md
+- **Depends on:** FS-10, FS-11
+
+### I/O & Algorithmic Logic
+
+Export `RecommendationFormProps` with `catalog: CropCatalogResponse`, `initialLocation: Location | null`, `submitting: boolean`, and `onSubmit: (request: RecommendationRequest) => void`; export `function RecommendationForm(props: RecommendationFormProps): ReactElement`. Capture region, assessment date, one to four ordered date slots, known crop history/residue management, irrigation and optional soil override; validate the DATA_SCHEMA constraints and pass a typed request to onSubmit without calling fetch directly.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Accessible controls and inline errors cover dates, 4-slot maximum, known crop IDs and optional soil fields
+- [ ] valid form JSON matches RecommendationRequest and tests distinguish valid zero from missing/null.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 3,"
+"[FS-28] [Frontend] Draw returned crop choices on the seasonal timeline,"ALREADY CREATED in Linear as SCR-37: https://linear.app/scrum-agent/issue/SCR-37/fs-28-frontend-draw-returned-crop-choices-on-the-seasonal-timeline
+
+## [FS-28] [Frontend] Draw returned crop choices on the seasonal timeline
+
+- **Target Git Branch:** `codex/feat/fs-28-rotation-timeline`
+- **Target File Paths:**
+  - `frontend/src/components/rotation-timeline.tsx`
+  - `frontend/src/components/rotation-timeline.test.tsx`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-10
+
+### I/O & Algorithmic Logic
+
+Export `RotationTimelineProps` with `recommendation: Recommendation`; export `function RotationTimeline(props: RotationTimelineProps): ReactElement`. Render each returned `PlannedCrop` against its exact start/end dates in request order, with crop names and season labels; do not infer dates or recalculate ranking.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Tests verify exact returned dates/order and an accessible textual table equivalent
+- [ ] one-slot and four-slot rotations render
+- [ ] build imports generated types and no server data client.,"High,"Backlog,","2026-09-26,","Feature, Phase 3,"
+"[FS-29] [Frontend] Visualize rainfall and temperature anomalies,"ALREADY CREATED in Linear as SCR-39: https://linear.app/scrum-agent/issue/SCR-39/fs-29-frontend-visualize-rainfall-and-temperature-anomalies
+
+## [FS-29] [Frontend] Visualize rainfall and temperature anomalies
+
+- **Target Git Branch:** `codex/feat/fs-29-climate-charts`
+- **Target File Paths:**
+  - `frontend/src/components/climate-charts.tsx`
+  - `frontend/src/components/climate-charts.test.tsx`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/AGRONOMY_RULES.md
+- **Depends on:** FS-10
+
+### I/O & Algorithmic Logic
+
+Export `ClimateChartsProps` with `climate: Climate` and `scenarios: ReadonlyArray<SlotScenario>`; export `function ClimateCharts(props: ClimateChartsProps): ReactElement`. Use Recharts to show observed versus baseline rainfall (mm), observed versus baseline mean temperature (°C), signed anomaly bands and dated `historical_stress_scenario` slots. Nulls display as unavailable; no label claims forecast or precipitation prediction.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Tests verify units, signed anomalies, nulls, band labels, dated stress-scenario caption and chart data table
+- [ ] charts do not contain substituted zeros or future-as-forecast labels.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 3,"
+"[FS-30] [Frontend] Render source-aware soil property radar and table,"ALREADY CREATED in Linear as SCR-38: https://linear.app/scrum-agent/issue/SCR-38/fs-30-frontend-render-source-aware-soil-property-radar-and-table
+
+## [FS-30] [Frontend] Render source-aware soil property radar and table
+
+- **Target Git Branch:** `codex/feat/fs-30-soil-radar`
+- **Target File Paths:**
+  - `frontend/src/components/soil-radar.tsx`
+  - `frontend/src/components/soil-radar.test.tsx`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/AGRONOMY_RULES.md
+- **Depends on:** FS-10
+
+### I/O & Algorithmic Logic
+
+Export `SoilRadarProps` with `soil: Soil`; export `function SoilRadar(props: SoilRadarProps): ReactElement`. Render the available pH, SOC, total N and sand/silt/clay on fixed display-only axis transforms documented in component labels; list exact raw values/units and each `SoilFieldSources` provenance in a companion table. Omit null axes and never use a soil score or add P/K.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Tests cover independent field source, every display unit, incomplete texture, each null property and axis scaling
+- [ ] companion table always exposes raw values and missing fields without zero substitution.,"High,"Backlog,","2026-09-26,","Feature, Phase 3,"
+"[FS-31] [Frontend] Present ranked alternatives and data-quality reasons,"ALREADY CREATED in Linear as SCR-40: https://linear.app/scrum-agent/issue/SCR-40/fs-31-frontend-present-ranked-alternatives-and-data-quality-reasons
+
+## [FS-31] [Frontend] Present ranked alternatives and data-quality reasons
+
+- **Target Git Branch:** `codex/feat/fs-31-recommendation-results`
+- **Target File Paths:**
+  - `frontend/src/components/recommendation-results.tsx`
+  - `frontend/src/components/recommendation-results.test.tsx`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/ARCHITECTURE.md @agent_docs/AGRONOMY_RULES.md
+- **Depends on:** FS-10
+
+### I/O & Algorithmic Logic
+
+Export `RecommendationResultsProps` with `recommendations: ReadonlyArray<Recommendation>`, `feasibleRotationCount: number`, `dataQuality: 'complete' | 'limited'`, `sources: ReadonlyArray<Source>`, `warnings: ReadonlyArray<Message>`, `exclusions: ReadonlyArray<Exclusion>`; export `function RecommendationResults(props: RecommendationResultsProps): ReactElement`. Show ranked score, five component values/effective weights, reason messages, fixture/cache/live source modes, warnings, exclusions and an explicit empty state.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Tests assert score/rank/weights, provenance badges, warning/exclusion text, null component presentation and empty state
+- [ ] interface creates no numerical scores or fabricated recommendation.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 3,"
+"[FS-32] [Backend] Enforce hash-pinned zero-network fixture mode,"ALREADY CREATED in Linear as SCR-41: https://linear.app/scrum-agent/issue/SCR-41/fs-32-backend-enforce-hash-pinned-zero-network-fixture-mode
+
+## [FS-32] [Backend] Enforce hash-pinned zero-network fixture mode
+
+- **Target Git Branch:** `codex/feat/fs-32-offline-fixtures`
+- **Target File Paths:**
+  - `backend/app/providers/fixtures.py`
+  - `backend/tests/test_offline_fixtures.py`
+- **Context References:** @agent_docs/PARALLEL_EXECUTION.md @agent_docs/ARCHITECTURE.md @.cursorrules @agent_docs/DATA_SCHEMA.md
+- **Depends on:** FS-07, FS-14, FS-15, FS-16
+
+### I/O & Algorithmic Logic
+
+Export `load_fixture_manifest(root: Path) -> FixtureManifest` and `create_fixture_provider_bundle(root: Path, location: Location, *, enabled: bool) -> ProviderBundle`. Verify each manifest/archive SHA-256 at load; implement exact PowerProvider, SoilProvider and SmapProvider methods using pinned archives. Require `enabled is True`, exact point and requested dates inside archive coverage. Unavailable soil/SMAP stay typed unavailable. Fixture mode must construct no HTTP client/socket and reject unknown point/period with FixtureMismatch; no demo archive is used in auto mode.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_offline_fixtures.py`
+
+### Acceptance Criteria
+
+- [ ] Tests corrupt each archive hash, point/date, disabled mode, unavailable optional source and missing required POWER
+- [ ] all fail with exact typed errors
+- [ ] an authorized farm returns the same responses after external networking is blocked and never borrows nearby observations.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 4,"
+"[FS-33] [Backend] Wire production FastAPI app and lifespan providers,"ALREADY CREATED in Linear as SCR-42: https://linear.app/scrum-agent/issue/SCR-42/fs-33-backend-wire-production-fastapi-app-and-lifespan-providers
+
+## [FS-33] [Backend] Wire production FastAPI app and lifespan providers
+
+- **Target Git Branch:** `codex/feat/fs-33-production-app`
+- **Target File Paths:**
+  - `backend/app/main.py`
+  - `backend/tests/test_main.py`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/PARALLEL_EXECUTION.md @agent_docs/DATA_SCHEMA.md @.cursorrules
+- **Depends on:** FS-13, FS-24, FS-25, FS-32
+
+### I/O & Algorithmic Logic
+
+Export `app: FastAPI` at `app.main:app`; mount the Phase 2 router; implement an async lifespan that owns/injects one shared HTTPX AsyncClient and closes it. Read server-only `BACKEND_DATA_DIR` and `ENABLE_DEMO_FIXTURES`; fixture bundle is disabled by default and is constructed only for explicit configured fixture mode. Add explicit origin allowlist CORS, 64-KiB JSON body limit, readiness/liveness endpoints and request-ID middleware.
+
+### Definition of Done
+
+`pytest -q backend/tests/test_main.py`
+
+### Acceptance Criteria
+
+- [ ] ASGI tests verify route mounted, dependency injection/lifespan close, no fixture enabled by default, max body rejection, configured-origin CORS, request ID propagation and no provider secrets in error/log payloads.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 4,"
+"[FS-34] [Frontend] Add the safe same-origin recommendation proxy,"ALREADY CREATED in Linear as SCR-43: https://linear.app/scrum-agent/issue/SCR-43/fs-34-frontend-add-the-safe-same-origin-recommendation-proxy
+
+## [FS-34] [Frontend] Add the safe same-origin recommendation proxy
+
+- **Target Git Branch:** `codex/feat/fs-34-api-proxy`
+- **Target File Paths:**
+  - `frontend/app/api/recommend-rotation/route.ts`
+  - `frontend/app/api/recommend-rotation/route.test.ts`
+- **Context References:** @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md @.cursorrules
+- **Depends on:** FS-11, FS-25, FS-33
+
+### I/O & Algorithmic Logic
+
+Export App Router `GET(request: Request): Promise<Response>` and `POST(request: Request): Promise<Response>` handlers. GET reads only `region_id=punjab_pk_demo_v1` and forwards to backend `/api/v1/crops`; POST validates a RecommendationRequest body and forwards to `/api/v1/recommend-rotation`. Use server-only `BACKEND_BASE_URL` default `http://127.0.0.1:8000`, permit only configured loopback/deployment origin, cap body 64KiB and propagate AbortSignal/status/JSON/request ID. Never accept a client-supplied host.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Injected-fetch tests cover both path mappings, schema failures, body limit, abort, backend 4xx/5xx propagation and arbitrary-host denial
+- [ ] browser bundle contains no backend URL or credentials.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 4,"
+"[FS-35] [Frontend] Wire the full farmer recommendation dashboard,"ALREADY CREATED in Linear as SCR-44: https://linear.app/scrum-agent/issue/SCR-44/fs-35-frontend-wire-the-full-farmer-recommendation-dashboard
+
+## [FS-35] [Frontend] Wire the full farmer recommendation dashboard
+
+- **Target Git Branch:** `codex/feat/fs-35-integrated-dashboard`
+- **Target File Paths:**
+  - `frontend/app/page.tsx`
+  - `frontend/app/page.integration.test.tsx`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/DATA_SCHEMA.md @agent_docs/AGRONOMY_RULES.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-26, FS-27, FS-28, FS-29, FS-30, FS-31, FS-34
+
+### I/O & Algorithmic Logic
+
+Export `default function HomePage(): ReactElement`; compose `FieldMap`, `RecommendationForm`, `RotationTimeline`, `ClimateCharts`, `SoilRadar`, `RecommendationResults` and typed client. Pass only API returned data to visualizations. Abort the prior POST when a changed field submits; set `data_mode='fixture'` only on an explicit pinned-demo action with visible label; otherwise use auto. Disable submission during pending/error validation; keep input usable on chart/tile failure.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Offline integration test starts at field selection, submits exact contract JSON through a mocked same-origin endpoint, renders all returned components/source warnings and a zero-result state
+- [ ] coordinate change cancels prior request and arbitrary point never receives pinned fixture data.,"Urgent,"Backlog,","2026-09-26,","Feature, Phase 4,"
+"[FS-36] [Pitch] Write and verify the three-minute judge story,"ALREADY CREATED in Linear as SCR-45: https://linear.app/scrum-agent/issue/SCR-45/fs-36-pitch-write-and-verify-the-three-minute-judge-story
+
+## [FS-36] [Pitch] Write and verify the three-minute judge story
+
+- **Target Git Branch:** `codex/feat/fs-36-judge-story`
+- **Target File Paths:**
+  - `agent_docs/JUDGE_DEMO.md`
+  - `backend/scripts/test_demo_story.py`
+- **Context References:** @agent_docs/ARCHITECTURE.md @agent_docs/AGRONOMY_RULES.md @agent_docs/DATA_SCHEMA.md @agent_docs/PARALLEL_EXECUTION.md
+- **Depends on:** FS-23, FS-35
+
+### I/O & Algorithmic Logic
+
+Document a timed 180-second Faisalabad farmer journey: select point/history/dated Rabi slot, show verified rainfall/temperature anomaly provenance, compare deterministic crop alternatives and explain nitrogen/root transitions, then disclose unavailable/stale/fixture sources and heuristic limits. Include source product citations and concrete manifest IDs/routes; claim no unsupported yield/revenue/water savings. In the test script export `validate_demo_script(path: Path) -> None`, asserting required timing, exact UI action order and provenance/limitation sections.
+
+### Definition of Done
+
+`pytest -q backend/scripts/test_demo_story.py`
+
+### Acceptance Criteria
+
+- [ ] Timing segments total 180 seconds, every showcased value/action maps to an accepted contract field/source manifest, the failed-tile/SMAP-unavailable fallback is explicit and no prohibited savings claim appears.,"High,"Backlog,","2026-09-26,","Feature, Phase 4,"
+"[FS-37] [Release] Commit reproducible Python and frontend locks,"ALREADY CREATED in Linear as SCR-46: https://linear.app/scrum-agent/issue/SCR-46/fs-37-release-commit-reproducible-python-and-frontend-locks
+
+## [FS-37] [Release] Commit reproducible Python and frontend locks
+
+- **Target Git Branch:** `codex/feat/fs-37-dependency-locks`
+- **Target File Paths:**
+  - `uv.lock`
+  - `frontend/package-lock.json`
+- **Context References:** @agent_docs/PARALLEL_EXECUTION.md @.cursorrules
+- **Depends on:** FS-01, FS-10, FS-33, FS-35
+
+### I/O & Algorithmic Logic
+
+Generate `uv.lock` from root Python 3.11 `pyproject.toml` with all direct/transitive dependencies pinned and `frontend/package-lock.json` from `frontend/package.json` using Node 22/npm lockfile v3. Commit no manifest changes, update only these two exact files, and include platform-compatible integrity hashes; runtime install is reproducible with `uv sync --frozen` and `npm ci`.
+
+### Definition of Done
+
+`npm run build --prefix frontend`
+
+### Acceptance Criteria
+
+- [ ] Both lockfiles resolve the frozen manifests, record integrity/version data with no floating dependency, npm build passes against lock-installed dependencies, and a clean environment resolves without writing dependency files.,"High,"Backlog,","2026-09-26,","Feature, Phase 4,"
+

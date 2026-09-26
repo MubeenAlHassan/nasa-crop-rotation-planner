@@ -1,0 +1,57 @@
+# Field Shift — mandatory agent rules
+
+## Authority and scope
+
+- Read `agent_docs/ARCHITECTURE.md`, `DATA_SCHEMA.md`, and `AGRONOMY_RULES.md` before changing behavior. These files define the intended implementation; they do not imply it already exists.
+- Deliver an explainable crop-rotation decision aid. Scores are heuristic suitability, never yield forecasts, fertilizer prescriptions, or calibrated probabilities.
+- Keep API, fixtures, generated frontend types, documentation, and rule versions consistent. Never change a public field silently.
+
+## Engineering standards
+
+- Backend: Python 3.11, FastAPI, Pydantic v2, HTTPX, Pandas. Type every public function; use Ruff and pytest. Use timezone-aware UTC timestamps and ISO dates.
+- Frontend: Next.js App Router, strict TypeScript, Tailwind, Leaflet, Recharts. Use ESLint and `tsc --noEmit`. Keep Leaflet in a client component loaded with `ssr: false` from a client wrapper.
+- Separate routes, provider adapters, normalization, features, and pure scoring functions. Inject providers, clock, cache, and rules; routes only orchestrate.
+- Own one `httpx.AsyncClient` per application lifespan. Use explicit timeouts, bounded concurrency, verified TLS, and `params=` instead of interpolated URLs. Move heavy Pandas work to a worker/thread.
+- All Pydantic wire models forbid unknown fields and nonfinite floats. Reject coercion of numeric strings and booleans into numbers. Parse ISO dates explicitly; do not enable strict date validation that rejects valid JSON date strings.
+- Generate TypeScript types from committed FastAPI OpenAPI. Validate unknown HTTP responses at runtime against the same JSON schema. No handwritten duplicate wire interfaces or `as RecommendationResponse` casts.
+- Keep provider hosts allowlisted and credentials server-side. Configure explicit CORS origins, request size limits, service rate limits, and dependency versions. Logs contain request IDs and provider outcomes, not full farm coordinates or credentials.
+
+## External payload patterns
+
+```python
+power_params = {
+    "parameters": "PRECTOTCORR,T2M",
+    "community": "AG", "format": "JSON", "time-standard": "UTC",
+    "latitude": latitude, "longitude": longitude,
+    "start": start.strftime("%Y%m%d"), "end": end.strftime("%Y%m%d"),
+}
+soil_params = [
+    ("lat", str(latitude)), ("lon", str(longitude)),
+    *[("property", p) for p in ("phh2o", "soc", "nitrogen", "sand", "silt", "clay")],
+    *[("depth", d) for d in ("0-5cm", "5-15cm", "15-30cm")],
+    ("value", "mean"), ("value", "Q0.05"), ("value", "Q0.95"),
+]
+```
+
+- POWER: read `properties.parameter[parameter][YYYYMMDD]`; inspect declared units and `header.fill_value`. Replace fill values with missing data before arithmetic. `PRECTOTCORR` daily mm/day accumulates to mm; `T2M` is °C.
+- SoilGrids: read `properties.layers[].depths[].values` by property/depth names, never list position. Apply verified unit conversion once and preserve source quantiles. REST is currently documented as paused; keep its adapter disabled until a Phase 0 probe succeeds.
+- SMAP: use a separately prepared, versioned Earthdata point series. Never invent a POWER parameter or simple public SMAP point endpoint. Preserve retrieval flags, grid cell, date, product/version, and m³/m³ units.
+- Longitude/latitude are WGS84. GeoJSON is `[longitude, latitude]`; Leaflet tuples are `[latitude, longitude]`.
+
+## Failure and fallback policy
+
+- Request deadline: 8 seconds. HTTPX defaults: connect 2s, read 4s, write 2s, pool 1s; all calls/retries share the deadline. Maximum two attempts for idempotent provider GETs only.
+- Retry connection errors, timeouts, 429, and 5xx with bounded jitter; honor `Retry-After` only if it fits the deadline. Do not retry invalid payloads or other 4xx. Never sleep through the request budget.
+- Use provider-specific cache keys, single-flight requests, circuit breakers, and rate limits. Enforce SoilGrids' documented ceiling of five calls/minute across workers; POWER maximum five simultaneous upstream requests across workers.
+- Production: valid cache → enabled live provider → matching bounded-stale cache → missing source. A valid baseline snapshot is required; never download decades of history inside the recommendation route.
+- Fixture mode is explicit and server-enabled. Match location, periods, profile, and version exactly; never substitute a nearby demonstration farm silently. Label all fixture output as demonstration data.
+- Missing SMAP or soil yields nullable features, renormalized component weights, explicit warnings, and degraded quality. Missing usable POWER/baseline yields 503. No valid rotations yields HTTP 200 with `status="no_feasible_rotation"`.
+- Return the documented error envelope for all expected failures. Preserve upstream failures in logs; catch narrow exceptions. Expose no stack traces or upstream credentials.
+
+## Required verification and banned patterns
+
+- Verify coordinate bounds/order, date ranges, zero-baseline anomalies, unit conversions, missing-value handling, threshold boundaries, unavailable sources, hard constraints, stable ranking, and contract examples.
+- CI runs offline using verified fixtures/mocks. Live probes are opt-in; do not make tests depend on NASA/ISRIC uptime.
+- Ban `requests`/blocking I/O in async routes, `verify=False`, bare `except`, unbounded retries, random recommendations, `fillna(0)` for observations, frontend scoring, arbitrary fixture substitution, and hardcoded API secrets.
+- Ban treating SoilGrids total nitrogen as available nitrogen, surface SMAP as root-zone water, seasonal climatology as a weather forecast, or a 9 km posting grid as farm-scale measurement.
+- Ban claimed yield/revenue/water/fertilizer savings without a validated calculation and evidence. Do not use an LLM to determine numerical ranking or override hard constraints.
