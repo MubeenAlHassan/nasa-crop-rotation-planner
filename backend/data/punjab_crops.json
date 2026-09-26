@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "region_id": "punjab_pk_demo_v1",
+  "crops": [
+    {
+      "crop_id": "wheat",
+      "crop_name": "Wheat",
+      "family": "Poaceae",
+      "region_ids": ["punjab_pk_demo_v1"],
+      "planting_windows": [
+        {"start": "1101", "end": "1215"}
+      ],
+      "maturity_min_days": 120,
+      "maturity_max_days": 150,
+      "nitrogen_demand": "high",
+      "legume": false,
+      "root_class": "fibrous",
+      "rainfall_min_mm": 200,
+      "rainfall_max_mm": 500,
+      "temperature_min_c": 10.0,
+      "temperature_max_c": 25.0,
+      "ph_min": 6.0,
+      "ph_max": 7.5,
+      "drought_tolerant": false,
+      "waterlogging_tolerant": false,
+      "irrigation_required": true,
+      "family_break_crops": 0,
+      "references": [
+        "https://www.fao.org/land-water/databases-and-software/crop-information/wheat/en/",
+        "https://agriculture.punjab.gov.pk/wheat"
+      ]
+    },
+    {
+      "crop_id": "chickpea",
+      "crop_name": "Chickpea",
+      "family": "Fabaceae",
+      "region_ids": ["punjab_pk_demo_v1"],
+      "planting_windows": [
+        {"start": "1015", "end": "1115"}
+      ],
+      "maturity_min_days": 90,
+      "maturity_max_days": 130,
+      "nitrogen_demand": "low",
+      "legume": true,
+      "root_class": "tap",
+      "rainfall_min_mm": 150,
+      "rainfall_max_mm": 400,
+      "temperature_min_c": 15.0,
+      "temperature_max_c": 30.0,
+      "ph_min": 6.0,
+      "ph_max": 8.0,
+      "drought_tolerant": true,
+      "waterlogging_tolerant": false,
+      "irrigation_required": false,
+      "family_break_crops": 2,
+      "references": [
+        "https://www.fao.org/land-water/databases-and-software/crop-information/chickpea/en/",
+        "https://agriculture.punjab.gov.pk/chickpea"
+      ]
+    },
+    {
+      "crop_id": "maize",
+      "crop_name": "Maize",
+      "family": "Poaceae",
+      "region_ids": ["punjab_pk_demo_v1"],
+      "planting_windows": [
+        {"start": "0201", "end": "0315"},
+        {"start": "0701", "end": "0815"}
+      ],
+      "maturity_min_days": 90,
+      "maturity_max_days": 120,
+      "nitrogen_demand": "high",
+      "legume": false,
+      "root_class": "fibrous",
+      "rainfall_min_mm": 500,
+      "rainfall_max_mm": 800,
+      "temperature_min_c": 20.0,
+      "temperature_max_c": 35.0,
+      "ph_min": 5.5,
+      "ph_max": 7.5,
+      "drought_tolerant": false,
+      "waterlogging_tolerant": false,
+      "irrigation_required": true,
+      "family_break_crops": 0,
+      "references": [
+        "https://www.fao.org/land-water/databases-and-software/crop-information/maize/en/",
+        "https://agriculture.punjab.gov.pk/maize"
+      ]
+    }
+  ]
+}
