@@ -545,4 +545,22 @@ class ContractDocument(WireModel):
 
 
 def contract_json_schema() -> dict[str, JsonValue]:
-    return ContractDocument.model_json_schema(mode="validation")
+    schema = ContractDocument.model_json_schema(mode="validation")
+
+    def remove_property_titles(node: JsonValue) -> None:
+        if isinstance(node, dict):
+            properties = node.get("properties")
+            if isinstance(properties, dict):
+                for child in properties.values():
+                    if isinstance(child, dict):
+                        child.pop("title", None)
+            for child in node.values():
+                remove_property_titles(child)
+        elif isinstance(node, list):
+            for child in node:
+                remove_property_titles(child)
+
+    # json-schema-to-typescript otherwise claims model names such as Message
+    # for similarly titled scalar properties and renames the public interface.
+    remove_property_titles(schema)
+    return schema
