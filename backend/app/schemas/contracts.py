@@ -547,20 +547,28 @@ class ContractDocument(WireModel):
 def contract_json_schema() -> dict[str, JsonValue]:
     schema = ContractDocument.model_json_schema(mode="validation")
 
-    def remove_property_titles(node: JsonValue) -> None:
+    def normalize_schema(node: JsonValue) -> None:
         if isinstance(node, dict):
+            for source, target in (
+                ("ge", "minimum"), ("le", "maximum"),
+                ("gt", "exclusiveMinimum"), ("lt", "exclusiveMaximum"),
+            ):
+                if source in node:
+                    node[target] = node.pop(source)
             properties = node.get("properties")
             if isinstance(properties, dict):
                 for child in properties.values():
                     if isinstance(child, dict):
                         child.pop("title", None)
             for child in node.values():
-                remove_property_titles(child)
+                normalize_schema(child)
         elif isinstance(node, list):
             for child in node:
-                remove_property_titles(child)
+                normalize_schema(child)
 
     # json-schema-to-typescript otherwise claims model names such as Message
     # for similarly titled scalar properties and renames the public interface.
-    remove_property_titles(schema)
+    # Pydantic's nullable Annotated-number union can also emit Field's ge/le
+    # metadata verbatim; translate it to standard draft-2020-12 keywords.
+    normalize_schema(schema)
     return schema
