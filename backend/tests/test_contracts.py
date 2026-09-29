@@ -76,6 +76,10 @@ def test_schema_id_and_definitions():
     assert ContractDocument.model_json_schema()["$defs"].keys() == schema["$defs"].keys()
     assert schema["$defs"]["Message"]["title"] == "Message"
     assert "title" not in schema["$defs"]["Message"]["properties"]["message"]
+    assert schema["$defs"]["Climate"]["properties"]["rainfall_observed_mm"]["anyOf"][0]["minimum"] == 0
+    assert schema["$defs"]["Components"]["properties"]["nitrogen"]["anyOf"][0]["maximum"] == 100
+    assert not any(f'"{keyword}"' in json.dumps(schema)
+                   for keyword in ("ge", "le", "gt", "lt"))
 
 
 @pytest.mark.parametrize("field,value", [
