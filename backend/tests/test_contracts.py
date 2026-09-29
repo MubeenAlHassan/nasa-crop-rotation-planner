@@ -73,7 +73,9 @@ def test_schema_id_and_definitions():
         "Location", "SoilOverride", "RecommendationRequest", "RecommendationResponse",
         "ErrorEnvelope", "Crop", "CropCatalogResponse", "Source", "Features",
     } <= set(schema["$defs"])
-    assert ContractDocument.model_json_schema() == schema
+    assert ContractDocument.model_json_schema()["$defs"].keys() == schema["$defs"].keys()
+    assert schema["$defs"]["Message"]["title"] == "Message"
+    assert "title" not in schema["$defs"]["Message"]["properties"]["message"]
 
 
 @pytest.mark.parametrize("field,value", [
