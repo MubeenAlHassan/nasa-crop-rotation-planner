@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "vitest run --passWithNoTests && next typegen && tsc --noEmit && next build",
+    "build": "vitest run --passWithNoTests && next typegen && tsc --noEmit && next build --webpack",
     "start": "next start",
     "test": "vitest",
     "lint": "eslint"
