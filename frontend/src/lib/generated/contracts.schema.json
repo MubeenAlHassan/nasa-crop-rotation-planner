@@ -23,7 +23,7 @@
         "rainfall_anomaly_pct": {
           "anyOf": [
             {
-              "ge": -100,
+              "minimum": -100,
               "type": "number"
             },
             {
@@ -45,7 +45,7 @@
         "rainfall_baseline_mm": {
           "anyOf": [
             {
-              "ge": 0,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -66,7 +66,7 @@
         "rainfall_observed_mm": {
           "anyOf": [
             {
-              "ge": 0,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -150,8 +150,8 @@
         "nitrogen": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -162,8 +162,8 @@
         "roots": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -174,8 +174,8 @@
         "soil": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -186,8 +186,8 @@
         "temperature": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -198,8 +198,8 @@
         "water": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -658,8 +658,8 @@
         "percentile": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -670,8 +670,8 @@
         "surface_m3_m3": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 1,
+              "maximum": 1,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1017,7 +1017,7 @@
         "rainfall_mm": {
           "anyOf": [
             {
-              "ge": 0,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1066,8 +1066,8 @@
         "clay_pct": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1089,8 +1089,8 @@
         "ph": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 14,
+              "maximum": 14,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1101,8 +1101,8 @@
         "sand_pct": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1113,8 +1113,8 @@
         "silt_pct": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1125,8 +1125,8 @@
         "soc_g_kg": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 1000,
+              "maximum": 1000,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1137,8 +1137,8 @@
         "total_n_g_kg": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 1000,
+              "maximum": 1000,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1230,8 +1230,8 @@
         "clay_pct": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1251,8 +1251,8 @@
         "ph": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 14,
+              "maximum": 14,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1268,8 +1268,8 @@
         "sand_pct": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1281,8 +1281,8 @@
         "silt_pct": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 100,
+              "maximum": 100,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1294,8 +1294,8 @@
         "soc_g_kg": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 1000,
+              "maximum": 1000,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1307,8 +1307,8 @@
         "total_n_g_kg": {
           "anyOf": [
             {
-              "ge": 0,
-              "le": 1000,
+              "maximum": 1000,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -1342,7 +1342,7 @@
         "grid_resolution_km": {
           "anyOf": [
             {
-              "gt": 0,
+              "exclusiveMinimum": 0,
               "type": "number"
             },
             {
