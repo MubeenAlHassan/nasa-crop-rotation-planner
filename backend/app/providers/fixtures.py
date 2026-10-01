@@ -84,7 +84,12 @@ def _read_archives(root: Path) -> tuple[FixtureManifest, dict[str, dict]]:
         archives: dict[str, dict] = {}
         for record in manifest.files:
             path = root / record.path
-            raw = path.read_bytes()
+            try:
+                raw = path.read_bytes()
+            except OSError as exc:
+                if record.provider == "power":
+                    raise RequiredDataUnavailable("Pinned POWER archive is missing.", False) from exc
+                raise FixtureMismatch(f"{record.provider} fixture archive is missing") from exc
             if hashlib.sha256(raw).hexdigest() != record.sha256:
                 raise FixtureMismatch(f"{record.provider} fixture digest mismatch")
             archive = _json_bytes(raw)
@@ -97,6 +102,8 @@ def _read_archives(root: Path) -> tuple[FixtureManifest, dict[str, dict]]:
             archives[record.provider] = archive
         return manifest, archives
     except FixtureMismatch:
+        raise
+    except RequiredDataUnavailable:
         raise
     except (OSError, ValueError, TypeError, ValidationError) as exc:
         raise FixtureMismatch("Invalid or missing pinned fixture manifest/archive") from exc

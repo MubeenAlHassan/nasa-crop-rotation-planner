@@ -105,7 +105,7 @@ def test_missing_required_power_and_synthetic_manifest(tmp_path: Path) -> None:
     manifest_path.write_text(json.dumps(manifest))
     power = root / "backend/tests/fixtures/power_archive.json"
     power.unlink()
-    with pytest.raises(FixtureMismatch, match="manifest"):
+    with pytest.raises(RequiredDataUnavailable, match="POWER archive is missing"):
         create_fixture_provider_bundle(root, POINT, enabled=True)
 
 
