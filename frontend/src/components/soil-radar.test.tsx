@@ -46,6 +46,18 @@ describe("SoilRadar", () => {
     expect(screen.queryByText("0")).not.toBeInTheDocument();
   });
 
+  it.each([
+    ["ph", "pH"], ["soc_g_kg", "Soil organic carbon"], ["total_n_g_kg", "Total nitrogen"],
+    ["sand_pct", "Sand"], ["silt_pct", "Silt"], ["clay_pct", "Clay"],
+  ] as const)("keeps a null %s unavailable and off the radar", (key, label) => {
+    const missing: Soil = { ...soil, [key]: null, field_sources: { ...soil.field_sources, [key]: "unavailable" } };
+    render(<SoilRadar soil={missing} />);
+    const row = screen.getByRole("row", { name: new RegExp(label) });
+    expect(within(row).getByText("Unavailable")).toBeInTheDocument();
+    expect(within(row).getByText("unavailable")).toBeInTheDocument();
+    expect(radarData.mock.calls[0][0].map((axis: { axis: string }) => axis.axis)).not.toContain(label);
+  });
+
   it("caps only the radar display axis while keeping the original value", () => {
     render(<SoilRadar soil={{ ...soil, soc_g_kg: 80 }} />);
     expect(radarData.mock.calls[0][0][1]).toMatchObject({ display: 100, raw: 80 });
