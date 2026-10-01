@@ -17,6 +17,7 @@ REQUIRED = (
     "/api/v1/recommend-rotation", "features.climate.rainfall_anomaly_pct",
     "features.climate.temperature_anomaly_c", "features.slot_scenarios[0]",
     "recommendations", "components", "effective_weights", "exclusions",
+    "feasible_rotation_count=0", "one wheat option", "farmer-input counterfactual",
     "DEMO_FIXTURE", "SMAP_UNAVAILABLE", "SOURCE_STALE",
     "features.moisture.surface_m3_m3", "failed map tile", "Unavailable",
     "https://power.larc.nasa.gov/docs/services/api/temporal/daily/",
@@ -26,7 +27,8 @@ REQUIRED = (
 ACTION_ORDER = (
     "Use pinned Faisalabad demo", "maize", "rabi_2025",
     "Authorized demo fixture", "submit", "Climate observations",
-    "ranked alternatives", "warnings",
+    "no-feasible-rotation", "Irrigation", "Available", "submit",
+    "Rotation timeline", "warnings",
 )
 PROHIBITED_CLAIMS = re.compile(
     r"\b(?:guaranteed|proven)\s+(?:yield|profit|revenue|water savings)\b|"
