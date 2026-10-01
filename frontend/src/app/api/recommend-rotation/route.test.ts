@@ -55,6 +55,21 @@ describe("same-origin recommendation proxy", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
+  it("stops reading a chunked request at the body limit", async () => {
+    let pulls = 0;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulls += 1;
+        controller.enqueue(new Uint8Array(8192));
+        if (pulls === 100) controller.close();
+      },
+    });
+    const request = new Request(path, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: stream, duplex: "half" } as RequestInit & { duplex: "half" });
+    expect((await POST(request)).status).toBe(413);
+    expect(pulls).toBeLessThan(100);
+  });
+
   it("denies unapproved upstream origins and client host parameters", async () => {
     const fetcher = vi.fn();
     vi.stubGlobal("fetch", fetcher);

@@ -81,10 +81,33 @@ export async function POST(request: Request): Promise<Response> {
   const length = Number(request.headers.get("content-length") ?? "0");
   if (!Number.isSafeInteger(length) || length < 0) return error(422, "VALIDATION_ERROR", "Invalid Content-Length.");
   if (length > LIMIT) return error(413, "PAYLOAD_TOO_LARGE", "JSON body exceeds 64 KiB.");
-  const body = await request.text();
-  if (new TextEncoder().encode(body).byteLength > LIMIT) {
-    return error(413, "PAYLOAD_TOO_LARGE", "JSON body exceeds 64 KiB.");
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  const reader = request.body?.getReader();
+  try {
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > LIMIT) {
+          await reader.cancel();
+          return error(413, "PAYLOAD_TOO_LARGE", "JSON body exceeds 64 KiB.");
+        }
+        chunks.push(value);
+      }
+    }
+  } catch {
+    return error(request.signal.aborted ? 499 : 422, "VALIDATION_ERROR", "Request body could not be read.");
+  } finally {
+    reader?.releaseLock();
   }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  let body: string;
+  try { body = new TextDecoder("utf-8", { fatal: true }).decode(bytes); }
+  catch { return error(422, "VALIDATION_ERROR", "Request body must be UTF-8 JSON."); }
   let payload: unknown;
   try { payload = JSON.parse(body); } catch { return error(422, "VALIDATION_ERROR", "Invalid JSON body."); }
   if (!requestSchema!(payload)) return error(422, "VALIDATION_ERROR", "Request does not match the contract.");
