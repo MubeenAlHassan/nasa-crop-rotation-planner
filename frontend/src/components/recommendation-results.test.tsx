@@ -38,8 +38,14 @@ describe("RecommendationResults", () => {
     expect(screen.getByText("SMAP is unavailable.")).toBeInTheDocument();
     expect(screen.getByText(/Outside planting window/)).toBeInTheDocument();
     expect(screen.getByText(/demo fixture faisalabad_2025/)).toBeInTheDocument();
-    expect(screen.getByText("cache")).toBeInTheDocument();
+    expect(screen.getByText("cache")).toHaveClass("rounded");
     expect(screen.getByText("unavailable")).toBeInTheDocument();
+  });
+
+  it("shows live provider mode as a provenance badge", () => {
+    const live = [{ ...sources[0], mode: "live" as const, fixture_id: null }, ...sources.slice(1)];
+    render(<RecommendationResults recommendations={[]} feasibleRotationCount={0} dataQuality="limited" sources={live} warnings={[]} exclusions={[]} />);
+    expect(screen.getByText("live")).toHaveClass("rounded");
   });
 
   it("shows an explicit empty state without fabricating a recommendation", () => {

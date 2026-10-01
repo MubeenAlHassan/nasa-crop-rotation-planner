@@ -37,7 +37,7 @@ export function RecommendationResults({ recommendations, feasibleRotationCount, 
       <section aria-label="Data provenance">
         <h3>Sources</h3>
         <ul>{sources.map((source) => <li key={source.provider}>
-          <strong>{label(source.provider)}</strong>: <span>{label(source.mode)}</span>
+          <strong>{label(source.provider)}</strong>: <span className="inline-flex rounded bg-slate-100 px-2 py-1 text-xs">{label(source.mode)}</span>
           {source.product && <> · {source.product}</>}
           {source.retrieved_at && <> · retrieved {source.retrieved_at}</>}
           {source.fixture_id && <> · demo fixture {source.fixture_id}</>}
