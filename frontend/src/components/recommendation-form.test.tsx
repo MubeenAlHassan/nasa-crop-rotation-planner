@@ -68,6 +68,15 @@ describe("RecommendationForm", () => {
     expect(screen.getByText(/Sand, silt and clay must all/)).toBeInTheDocument();
   });
 
+  it("uses a newly selected map location on the next submission", () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(<RecommendationForm catalog={catalog} initialLocation={{ latitude: 31, longitude: 73 }} submitting={false} onSubmit={onSubmit} />);
+    base();
+    rerender(<RecommendationForm catalog={catalog} initialLocation={{ latitude: 0, longitude: 0 }} submitting={false} onSubmit={onSubmit} />);
+    submit();
+    expect(onSubmit.mock.calls[0][0].location).toEqual({ latitude: 0, longitude: 0 });
+  });
+
   it("disables the form while submitting", () => {
     render(<RecommendationForm catalog={catalog} initialLocation={null} submitting={true} onSubmit={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Submitting…" })).toBeDisabled();

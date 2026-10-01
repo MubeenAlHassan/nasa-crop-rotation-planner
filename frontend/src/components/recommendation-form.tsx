@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent, type ReactElement } from "react";
+import { useState, type FormEvent, type ReactElement } from "react";
 import type { CropCatalogResponse, History, Location, RecommendationRequest, Slot, SoilOverride } from "@/lib/generated/contracts";
 
 export interface RecommendationFormProps {
@@ -53,10 +53,12 @@ export function RecommendationForm({ catalog, initialLocation, submitting, onSub
   const [errors, setErrors] = useState<Errors>({});
   const cropIds = new Set(catalog.crops.map((crop) => crop.crop_id));
 
-  useEffect(() => {
+  const [external, setExternal] = useState({ latitude: initialLocation?.latitude, longitude: initialLocation?.longitude });
+  if (external.latitude !== initialLocation?.latitude || external.longitude !== initialLocation?.longitude) {
+    setExternal({ latitude: initialLocation?.latitude, longitude: initialLocation?.longitude });
     setLatitude(initialLocation?.latitude.toString() ?? "");
     setLongitude(initialLocation?.longitude.toString() ?? "");
-  }, [initialLocation?.latitude, initialLocation?.longitude]);
+  }
 
   function updateSlot(index: number, key: keyof Slot, value: string): void {
     setSlots((current) => current.map((slot, at) => at === index ? { ...slot, [key]: value } : slot));
