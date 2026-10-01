@@ -74,6 +74,14 @@ export function FieldMap({ initialLocation, onChange, disabled }: FieldMapProps)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const initialLatitude = initialLocation?.latitude;
+  const initialLongitude = initialLocation?.longitude;
+  useEffect(() => {
+    if (initialLatitude !== undefined && initialLongitude !== undefined) {
+      mapRef.current?.setView([initialLatitude, initialLongitude]);
+    }
+  }, [initialLatitude, initialLongitude]);
+
   function update(nextLatitude: string, nextLongitude: string): void {
     setLatitude(nextLatitude);
     setLongitude(nextLongitude);

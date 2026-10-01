@@ -57,6 +57,7 @@ describe("FieldMap", () => {
     rerender(<FieldMap initialLocation={{ latitude: 0, longitude: 0 }} onChange={onChange} disabled={false} />);
     expect(screen.getByLabelText("Latitude")).toHaveValue(0);
     expect(screen.getByLabelText("Longitude")).toHaveValue(0);
+    expect(leaf.map.setView).toHaveBeenLastCalledWith([0, 0]);
     click({ latlng: { lat: 31, lng: 73 } });
     expect(onChange).toHaveBeenCalledWith({ latitude: 31, longitude: 73 });
     const tileError = leaf.tile.on.mock.calls.find(([name]) => name === "tileerror")?.[1];
