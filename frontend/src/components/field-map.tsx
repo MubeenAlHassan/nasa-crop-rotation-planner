@@ -26,13 +26,17 @@ export function FieldMap({ initialLocation, onChange, disabled }: FieldMapProps)
   const mapRef = useRef<LeafletMap | null>(null);
   const callbackRef = useRef(onChange);
   const disabledRef = useRef(disabled);
-  callbackRef.current = onChange;
-  disabledRef.current = disabled;
-
-  useEffect(() => {
+  const [external, setExternal] = useState({ latitude: initialLocation?.latitude, longitude: initialLocation?.longitude });
+  if (external.latitude !== initialLocation?.latitude || external.longitude !== initialLocation?.longitude) {
+    setExternal({ latitude: initialLocation?.latitude, longitude: initialLocation?.longitude });
     setLatitude(initialLocation?.latitude.toString() ?? "");
     setLongitude(initialLocation?.longitude.toString() ?? "");
-  }, [initialLocation?.latitude, initialLocation?.longitude]);
+  }
+
+  useEffect(() => {
+    callbackRef.current = onChange;
+    disabledRef.current = disabled;
+  }, [onChange, disabled]);
 
   useEffect(() => {
     let mounted = true;

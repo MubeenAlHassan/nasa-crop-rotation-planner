@@ -54,7 +54,11 @@ describe("FieldMap", () => {
     click({ latlng: { lat: 31, lng: 73 } });
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByLabelText("Latitude")).toBeDisabled();
-    rerender(<FieldMap initialLocation={null} onChange={onChange} disabled={false} />);
+    rerender(<FieldMap initialLocation={{ latitude: 0, longitude: 0 }} onChange={onChange} disabled={false} />);
+    expect(screen.getByLabelText("Latitude")).toHaveValue(0);
+    expect(screen.getByLabelText("Longitude")).toHaveValue(0);
+    click({ latlng: { lat: 31, lng: 73 } });
+    expect(onChange).toHaveBeenCalledWith({ latitude: 31, longitude: 73 });
     const tileError = leaf.tile.on.mock.calls.find(([name]) => name === "tileerror")?.[1];
     tileError();
     expect(await screen.findByText(/Coordinate entry remains available/)).toBeInTheDocument();
