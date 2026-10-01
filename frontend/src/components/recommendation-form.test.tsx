@@ -2,12 +2,19 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { readFileSync } from "node:fs";
+import Ajv2020 from "ajv/dist/2020";
+import addFormats from "ajv-formats";
+import contractSchema from "../lib/generated/contracts.schema.json";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CropCatalogResponse } from "@/lib/generated/contracts";
 import { RecommendationForm } from "./recommendation-form";
 
 const catalog = JSON.parse(readFileSync(resolve(process.cwd(), "../backend/data/punjab_crops.json"), "utf8")) as CropCatalogResponse;
+const ajv = new Ajv2020({ strict: true });
+addFormats(ajv);
+ajv.addSchema(contractSchema);
+const validateRequest = ajv.getSchema("https://field-shift.local/contracts/1.0.0.json#/$defs/RecommendationRequest");
 afterEach(cleanup);
 function setup() {
   const onSubmit = vi.fn();
@@ -35,6 +42,8 @@ describe("RecommendationForm", () => {
       soil_override: { ph: 0, depth_top_cm: 0, depth_bottom_cm: 30 }, irrigation: "rainfed",
     });
     expect(onSubmit.mock.calls[0][0].soil_override.soc_g_kg).toBeUndefined();
+    expect(validateRequest).toBeDefined();
+    expect(validateRequest?.(onSubmit.mock.calls[0][0])).toBe(true);
   });
 
   it("requires location and valid ordered dates, with a hard four-slot cap", () => {
