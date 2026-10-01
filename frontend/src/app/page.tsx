@@ -1,140 +1,128 @@
 "use client";
 
-import { useState } from "react";
-import { fetchRotationPlan } from "@/lib/api";
-import { RecommendationRequest, RecommendationResponse } from "@/types/api";
-import { Leaf, Map, History as HistoryIcon, Beaker } from "lucide-react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
+import { ClimateCharts } from "../components/climate-charts";
+import { FieldMap } from "../components/field-map";
+import { RecommendationForm } from "../components/recommendation-form";
+import { RecommendationResults } from "../components/recommendation-results";
+import { RotationTimeline } from "../components/rotation-timeline";
+import { SoilRadar } from "../components/soil-radar";
+import { fetchCropCatalog, recommendRotation } from "../lib/api/client";
+import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse } from "../lib/generated/contracts";
 
-export default function Home() {
-  const [loading, setLoading] = useState(false);
+const DEMO_POINT: Location = { latitude: 31.4504, longitude: 73.135 };
+
+function samePoint(first: Location, second: Location): boolean {
+  return first.latitude === second.latitude && first.longitude === second.longitude;
+}
+
+export default function HomePage(): ReactElement {
+  const [catalog, setCatalog] = useState<CropCatalogResponse | null>(null);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [catalogAttempt, setCatalogAttempt] = useState(0);
+  const [location, setLocation] = useState<Location | null>(null);
+  const [demoArmed, setDemoArmed] = useState(false);
   const [response, setResponse] = useState<RecommendationResponse | null>(null);
+  const [requestError, setRequestError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const active = useRef<AbortController | null>(null);
+  const generation = useRef(0);
 
-  const handleTestApi = async () => {
-    setLoading(true);
-    try {
-      const payload: RecommendationRequest = {
-        location: { latitude: 31.52, longitude: 74.35 },
-        region_id: "punjab_pk_demo_v1",
-        assessment_end: "2025-10-15",
-        slots: [
-          { slot_id: "rabi_2025", start_date: "2025-11-01", end_date: "2026-03-31" }
-        ],
-        crop_history: [
-          { crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "retained" }
-        ],
-        irrigation: "rainfed",
-        data_mode: "fixture",
-        top_k: 3
-      };
-      const data = await fetchRotationPlan(payload);
-      console.log("Mock API Response:", data);
-      setResponse(data);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch from API. Is the backend running?");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    setCatalog(null);
+    setCatalogError(null);
+    void fetchCropCatalog("punjab_pk_demo_v1", controller.signal).then(setCatalog).catch((failure: unknown) => {
+      if (!controller.signal.aborted) {
+        setCatalogError(failure instanceof Error ? failure.message : "Crop catalog is unavailable.");
+      }
+    });
+    return () => controller.abort();
+  }, [catalogAttempt]);
+
+  useEffect(() => () => active.current?.abort(), []);
+
+  function selectLocation(next: Location): void {
+    if (location && samePoint(location, next)) return;
+    active.current?.abort();
+    active.current = null;
+    generation.current += 1;
+    setPending(false);
+    setResponse(null);
+    setRequestError(null);
+    if (!samePoint(next, DEMO_POINT)) setDemoArmed(false);
+    setLocation(next);
+  }
+
+  function armDemo(): void {
+    selectLocation(DEMO_POINT);
+    setDemoArmed(true);
+    setRequestError(null);
+  }
+
+  function submit(request: RecommendationRequest): void {
+    if (request.data_mode === "fixture" && (!demoArmed || !samePoint(request.location, DEMO_POINT) ||
+        request.assessment_end !== "2025-10-15" || request.slots.length !== 1 ||
+        request.slots[0].slot_id !== "rabi_2025" ||
+        request.slots[0].start_date !== "2025-11-01" || request.slots[0].end_date !== "2026-03-31")) {
+      setRequestError("Use the pinned Faisalabad demo action, assessment date 2025-10-15, and Rabi 2025 slot from 2025-11-01 to 2026-03-31.");
+      setResponse(null);
+      return;
     }
-  };
+    active.current?.abort();
+    const controller = new AbortController();
+    active.current = controller;
+    const current = ++generation.current;
+    setPending(true);
+    setRequestError(null);
+    setResponse(null);
+    void recommendRotation(request, controller.signal).then((result) => {
+      if (current === generation.current && !controller.signal.aborted) setResponse(result);
+    }).catch((failure: unknown) => {
+      if (current === generation.current && !controller.signal.aborted) {
+        setRequestError(failure instanceof Error ? failure.message : "Recommendation request failed.");
+      }
+    }).finally(() => {
+      if (current === generation.current) {
+        active.current = null;
+        setPending(false);
+      }
+    });
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center shadow-sm">
-        <Leaf className="text-emerald-600 mr-3 h-6 w-6" />
-        <h1 className="text-xl font-bold tracking-tight text-slate-800">Field Shift - NASA Earth Observation Crop Decision Engine</h1>
+    <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 text-slate-900">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-bold">Field Shift</h1>
+        <p>Explore crop rotation choices using observed climate, local soil context, and transparent agronomic rules.</p>
       </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Column: Map/Input Controls Placeholder */}
-          <div className="w-full lg:w-1/3 flex flex-col gap-6">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-              <div className="bg-slate-100 p-4 border-b border-slate-200 flex items-center">
-                <Map className="text-slate-500 mr-2 h-5 w-5" />
-                <h2 className="font-semibold text-slate-700">Location & Parameters</h2>
-              </div>
-              <div className="p-6 flex-grow flex flex-col items-center justify-center min-h-[300px] text-center border-dashed border-2 border-slate-100 m-4 rounded-lg bg-slate-50">
-                <p className="text-slate-500 mb-4 text-sm">Map and parameter selection will appear here.</p>
-                <button 
-                  onClick={handleTestApi} 
-                  disabled={loading}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-6 rounded-lg transition-colors flex items-center"
-                >
-                  {loading ? "Fetching..." : "Test Rotation Plan API"}
-                </button>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-              <div className="bg-slate-100 p-4 border-b border-slate-200 flex items-center">
-                <HistoryIcon className="text-slate-500 mr-2 h-5 w-5" />
-                <h2 className="font-semibold text-slate-700">Crop History & Soil</h2>
-              </div>
-              <div className="p-6 flex-grow flex flex-col items-center justify-center min-h-[200px] text-center border-dashed border-2 border-slate-100 m-4 rounded-lg bg-slate-50">
-                 <Beaker className="text-slate-300 h-8 w-8 mb-2" />
-                 <p className="text-slate-400 text-sm">Farmer inputs configuration</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Timeline Cards Placeholder */}
-          <div className="w-full lg:w-2/3">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 h-full overflow-hidden flex flex-col">
-              <div className="bg-slate-100 p-4 border-b border-slate-200 flex items-center justify-between">
-                <h2 className="font-semibold text-slate-700">Recommended Rotation Paths</h2>
-                {response && <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full font-medium">{response.status.toUpperCase()}</span>}
-              </div>
-              
-              <div className="p-6 flex-grow">
-                {response ? (
-                  <div className="space-y-4">
-                    {response.recommendations.map((rec) => (
-                      <div key={rec.rotation_id} className="border border-emerald-100 bg-emerald-50/30 rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-3">
-                          <h3 className="font-bold text-lg text-emerald-900">Rank #{rec.rank} - Score: {rec.score.toFixed(1)}</h3>
-                        </div>
-                        <div className="space-y-2">
-                          {rec.slots.map(slot => (
-                            <div key={slot.slot_id} className="bg-white p-3 rounded border border-slate-100 shadow-sm flex items-center justify-between">
-                              <div>
-                                <span className="font-semibold text-slate-800">{slot.crop_name}</span>
-                                <span className="text-slate-500 text-sm ml-2">({slot.start_date} to {slot.end_date})</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-4 text-sm text-slate-600 bg-white p-3 rounded border border-slate-100">
-                          <span className="font-semibold">Reasons:</span>
-                          <ul className="list-disc pl-5 mt-1 space-y-1">
-                            {rec.reasons.map((r, i) => (
-                              <li key={i}>{r.message}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    <div className="mt-6 pt-4 border-t border-slate-100">
-                       <h4 className="text-sm font-semibold text-slate-700 mb-2">Raw API Response Context:</h4>
-                       <pre className="bg-slate-800 text-emerald-400 p-4 rounded text-xs overflow-auto max-h-[300px]">
-                         {JSON.stringify(response, null, 2)}
-                       </pre>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center border-dashed border-2 border-slate-200 rounded-lg bg-slate-50/50 p-12">
-                    <Leaf className="text-slate-300 h-12 w-12 mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">No Plans Generated Yet</h3>
-                    <p className="text-slate-500 text-center max-w-md">
-                      Configure your location, target seasons, and historical data on the left to generate NASA data-backed crop rotation pathways.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+      <section aria-label="Pinned demonstration" className="rounded border border-amber-300 bg-amber-50 p-4">
+        <h2 className="font-semibold">Pinned Faisalabad demonstration</h2>
+        <p>Only the documented farm at 31.4504° N, 73.1350° E has captured fixture data. Assessment: 2025-10-15; Rabi 2025: 2025-11-01 to 2026-03-31. SoilGrids and SMAP were unavailable in this capture.</p>
+        <button type="button" onClick={armDemo} className="mt-2 rounded bg-amber-800 px-3 py-2 text-white">Use pinned Faisalabad demo</button>
+        {demoArmed && <p role="status">Pinned demo selected. Choose “Authorized demo fixture” in the form after entering the listed dates.</p>}
+      </section>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+        <div className="space-y-6">
+          <FieldMap initialLocation={location} onChange={selectLocation} disabled={false} />
+          {catalogError && <section role="alert"><p>{catalogError}</p><button type="button" onClick={() => setCatalogAttempt((value) => value + 1)}>Retry crop catalog</button></section>}
+          {!catalog && !catalogError && <p role="status">Loading crop catalog…</p>}
+          {catalog && <RecommendationForm catalog={catalog} initialLocation={location} submitting={pending} onSubmit={submit} />}
         </div>
-      </main>
-    </div>
+        <div className="space-y-8" aria-live="polite">
+          {pending && <p role="status">Building recommendations…</p>}
+          {requestError && <p role="alert">{requestError}</p>}
+          {!response && !pending && !requestError && <p>Select a field and submit the form to see crop choices.</p>}
+          {response && <>
+            <RecommendationResults recommendations={response.recommendations}
+              feasibleRotationCount={response.feasible_rotation_count} dataQuality={response.data_quality}
+              sources={response.sources} warnings={response.warnings} exclusions={response.exclusions} />
+            {response.recommendations[0] && <RotationTimeline recommendation={response.recommendations[0]} />}
+            <ClimateCharts climate={response.features.climate} scenarios={response.features.slot_scenarios} />
+            <SoilRadar soil={response.features.soil} />
+          </>}
+        </div>
+      </div>
+    </main>
   );
 }
