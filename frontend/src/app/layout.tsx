@@ -22,7 +22,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-background text-on-surface">{children}</body>
+      <head>
+        <link rel="stylesheet" href="/vendor/leaflet.css" />
+      </head>
+      <body className="min-h-full flex flex-col bg-background text-on-surface">
+        {children}
+      </body>
     </html>
   );
 }

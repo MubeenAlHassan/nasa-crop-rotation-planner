@@ -36,10 +36,15 @@ export function Reveal({
   ...rest
 }: RevealProps): ReactElement {
   const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  // Immediate reveals must paint visible without waiting on effects (hydration / Strict Mode).
+  const [visible, setVisible] = useState(immediate);
 
   useEffect(() => {
-    if (immediate || !observerSupported()) {
+    if (immediate) {
+      setVisible(true);
+      return undefined;
+    }
+    if (!observerSupported()) {
       const timer = window.setTimeout(() => setVisible(true), 16);
       return () => window.clearTimeout(timer);
     }

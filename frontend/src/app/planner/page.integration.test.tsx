@@ -103,10 +103,12 @@ describe("farmer dashboard integration", () => {
   });
 
   it("cancels a pending request on coordinate change and switches custom points to current data", async () => {
-    let resolvePost: ((response: Response) => void) | undefined;
+    const resolvers: Array<(response: Response) => void> = [];
     const fetcher = vi.fn((url: string, init?: RequestInit) => {
       if (url.includes("?region_id=")) return Promise.resolve(Response.json(catalog));
-      if (init?.method === "POST") return new Promise<Response>((resolve) => { resolvePost = resolve; });
+      if (init?.method === "POST") {
+        return new Promise<Response>((resolve) => { resolvers.push(resolve); });
+      }
       return Promise.reject(new Error("Unexpected path"));
     });
     vi.stubGlobal("fetch", fetcher);
@@ -114,17 +116,38 @@ describe("farmer dashboard integration", () => {
     await screen.findByLabelText("Rotation request");
     fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
     expectPinnedFormFilled();
-    await waitFor(() => expect(resolvePost).toBeDefined());
+    await waitFor(() => expect(resolvers.length).toBe(1));
     const first = fetcher.mock.calls.find(([, init]) => init?.method === "POST");
+    // Field map latitude change auto-starts an irrigated live request for the custom point.
     fireEvent.change(screen.getAllByLabelText("Latitude")[0], { target: { value: "31.4505" } });
     expect(first?.[1]?.signal?.aborted).toBe(true);
-    resolvePost!(Response.json(samples[1]));
-    await waitFor(() => expect(screen.queryByRole("heading", { name: "Ranked alternatives" })).not.toBeInTheDocument());
-    expect(screen.getByLabelText("Data mode")).toHaveValue("auto");
+    await waitFor(() => expect(resolvers.length).toBe(2));
+    const secondBody = JSON.parse(
+      fetcher.mock.calls.filter(([, init]) => init?.method === "POST").at(-1)![1]!.body as string,
+    );
+    expect(secondBody.irrigation).toBe("available");
+    expect(secondBody.data_mode).toBe("auto");
+    resolvers[0]!(Response.json(samples[1]));
+    resolvers[1]!(Response.json(samples[1]));
+    await waitFor(() => expect(screen.getByLabelText("Data mode")).toHaveValue("auto"));
     expect(screen.getByText(/Custom location selected/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Data mode"), { target: { value: "fixture" } });
     fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
     expect(await screen.findByText(/Use the pinned Faisalabad demo action/)).toBeInTheDocument();
-    expect(fetcher.mock.calls.filter(([, init]) => init?.method === "POST")).toHaveLength(1);
+  });
+
+  it("auto-runs irrigated recommendations when a custom place is chosen on the map form path", async () => {
+    const fetcher = endpoint();
+    render(<PlannerPage />);
+    await screen.findByLabelText("Rotation request");
+    fireEvent.click(screen.getByRole("button", { name: /Sahiwal/i }));
+    await waitFor(() => {
+      const posts = fetcher.mock.calls.filter(([url, init]) => url === "/api/recommend-rotation" && init?.method === "POST");
+      expect(posts.length).toBeGreaterThanOrEqual(1);
+      const body = JSON.parse(posts[posts.length - 1]![1]!.body as string);
+      expect(body.irrigation).toBe("available");
+      expect(body.data_mode).toBe("auto");
+      expect(body.location).toEqual({ latitude: 30.6612, longitude: 73.1086 });
+    });
   });
 });

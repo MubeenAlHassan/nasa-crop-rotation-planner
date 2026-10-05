@@ -152,6 +152,18 @@ input.field-location-search-input:focus {
   padding-bottom: 0;
 }
 
+.field-map-canvas.leaflet-container,
+.field-map-canvas {
+  min-height: 16rem;
+  width: 100%;
+}
+
+.field-map-canvas .leaflet-tile-pane img,
+.field-map-canvas img.leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+}
+
 input:focus,
 select:focus,
 textarea:focus {

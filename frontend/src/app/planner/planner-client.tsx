@@ -32,6 +32,40 @@ const DEMO_REQUEST: RecommendationRequest = {
   top_k: 3,
 };
 
+function isoTodayUtc(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function addUtcDays(iso: string, days: number): string {
+  const time = Date.parse(`${iso}T00:00:00.000Z`);
+  return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
+}
+
+/** Live-data irrigated request for a custom map / search point (not the pinned fixture). */
+function customIrrigatedRequest(location: Location): RecommendationRequest {
+  const assessment = isoTodayUtc();
+  const year = Number(assessment.slice(0, 4));
+  const month = Number(assessment.slice(5, 7));
+  const startYear = month >= 11 ? year + 1 : year;
+  const start = `${startYear}-11-01`;
+  const end = `${startYear + 1}-03-31`;
+  const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
+  const slotEnd = end <= slotStart ? addUtcDays(slotStart, 120) : end;
+  return {
+    region_id: "punjab_pk_demo_v1",
+    location,
+    assessment_end: assessment,
+    slots: [{ slot_id: "rabi_slot", start_date: slotStart, end_date: slotEnd }],
+    crop_history: [],
+    irrigation: "available",
+    allowed_crop_ids: [],
+    excluded_crop_ids: [],
+    soil_override: null,
+    data_mode: "auto",
+    top_k: 3,
+  };
+}
+
 export default function PlannerClient(): ReactElement {
   const searchParams = useSearchParams();
   const [catalog, setCatalog] = useState<CropCatalogResponse | null>(null);
@@ -50,6 +84,7 @@ export default function PlannerClient(): ReactElement {
   const demoArmedRef = useRef(false);
   const resultsRef = useRef<HTMLDivElement | null>(null);
   const autoDemoStarted = useRef(false);
+  const pendingIrrigatedLocation = useRef<Location | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -122,6 +157,7 @@ export default function PlannerClient(): ReactElement {
   }
 
   function armDemo(irrigation: RecommendationRequest["irrigation"] = "rainfed"): void {
+    pendingIrrigatedLocation.current = null;
     selectLocation(DEMO_POINT);
     demoArmedRef.current = true;
     setDemoArmed(true);
@@ -135,15 +171,40 @@ export default function PlannerClient(): ReactElement {
     submit({ ...DEMO_REQUEST, irrigation });
   }
 
+  /** Map/search/preset location → irrigated run (fixture for Faisalabad, live for custom points). */
+  function runIrrigatedForLocation(next: Location): void {
+    if (samePoint(next, DEMO_POINT)) {
+      armDemo("available");
+      return;
+    }
+    if (!(location && samePoint(location, next))) {
+      selectLocation(next);
+    }
+    setRequestError(null);
+    if (!catalog) {
+      pendingIrrigatedLocation.current = next;
+      return;
+    }
+    pendingIrrigatedLocation.current = null;
+    submit(customIrrigatedRequest(next));
+  }
+
   function usePreset(id: FieldPresetId): void {
     const preset = getPreset(id);
     if (preset.kind === "fixture") {
       armDemo("available");
       return;
     }
-    selectLocation(preset.location);
-    setRequestError(null);
+    runIrrigatedForLocation(preset.location);
   }
+
+  useEffect(() => {
+    if (!catalog || !pendingIrrigatedLocation.current) return;
+    const next = pendingIrrigatedLocation.current;
+    pendingIrrigatedLocation.current = null;
+    submit(customIrrigatedRequest(next));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalog]);
 
   useEffect(() => {
     if (autoDemoStarted.current || !catalog) return;
@@ -205,7 +266,7 @@ export default function PlannerClient(): ReactElement {
                     <p className="mt-1 line-clamp-3 text-xs text-[var(--muted)]">{preset.summary}</p>
                     {selected && preset.kind === "custom" && (
                       <p role="status" className="mt-2 text-sm text-[var(--info-ink)]">
-                        {preset.name} selected. Review form dates, then submit with Current data.
+                        {preset.name} selected. Irrigated recommendations run automatically with Current data.
                       </p>
                     )}
                   </div>
@@ -273,9 +334,9 @@ export default function PlannerClient(): ReactElement {
         </Reveal>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start">
-          <Reveal delayMs={100} variant="left" className="space-y-6">
+          <Reveal immediate delayMs={100} variant="left" className="space-y-6">
             <div className="panel p-4 sm:p-5">
-              <FieldMap initialLocation={location} onChange={selectLocation} disabled={false} />
+              <FieldMap initialLocation={location} onChange={runIrrigatedForLocation} disabled={false} />
             </div>
             {!catalog && !catalogError && (
               <p role="status" className="panel px-4 py-3 text-sm text-[var(--on-surface-variant)]">Loading crop catalog…</p>
@@ -300,7 +361,7 @@ export default function PlannerClient(): ReactElement {
             <div ref={resultsRef} className="panel space-y-8 p-4 sm:p-6" aria-live="polite">
             {pending && (
               <p role="status" className="rounded-xl bg-[var(--info-bg)] px-4 py-3 text-[var(--info-ink)]">
-                Building recommendations…
+                Building irrigated recommendations…
               </p>
             )}
             {requestError && (
@@ -317,7 +378,8 @@ export default function PlannerClient(): ReactElement {
               <div className="rounded-xl border border-dashed border-[var(--outline-variant)] bg-[var(--surface-container-low)] px-4 py-10 text-center">
                 <p className="font-display text-xl text-[var(--primary)]">Ready when you are</p>
                 <p className="mt-2 text-sm text-[var(--on-surface-variant)]">
-                  Pick a custom map point, or run the irrigated demo to see a ranked wheat alternative.
+                  Search a place, use your location, or click the map — irrigated recommendations run automatically.
+                  Or start from the pinned Faisalabad irrigated demo.
                 </p>
                 <button type="button" className="btn-primary mt-4" onClick={() => armDemo("available")}>
                   Run irrigated demo (wheat)

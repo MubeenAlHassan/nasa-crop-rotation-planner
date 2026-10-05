@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { FieldMap } from "./field-map";
 
 const leaf = vi.hoisted(() => {
-  const map = { setView: vi.fn(), on: vi.fn(), remove: vi.fn() };
+  const map = { setView: vi.fn(), on: vi.fn(), remove: vi.fn(), invalidateSize: vi.fn() };
   map.setView.mockReturnValue(map);
   const tile = { on: vi.fn(), addTo: vi.fn() };
   tile.on.mockReturnValue(tile);
@@ -19,11 +19,6 @@ const weather = vi.hoisted(() => ({
     [place.name, place.admin1, place.country].filter(Boolean).join(", ")),
 }));
 
-vi.mock("leaflet", () => ({
-  default: { map: leaf.mapFactory, tileLayer: leaf.tileFactory },
-  map: leaf.mapFactory, tileLayer: leaf.tileFactory,
-}));
-
 vi.mock("../lib/weather/open-meteo", () => ({
   searchPlaces: weather.searchPlaces,
   reverseGeocode: weather.reverseGeocode,
@@ -34,10 +29,19 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
   vi.unstubAllGlobals();
+  document.querySelectorAll("[data-leaflet-js],[data-leaflet-css]").forEach((node) => node.remove());
 });
+
+function stubLeaflet(): void {
+  vi.stubGlobal("L", {
+    map: leaf.mapFactory,
+    tileLayer: leaf.tileFactory,
+  });
+}
 
 describe("FieldMap", () => {
   it("translates Leaflet latitude/longitude in order and rejects out-of-bounds clicks", async () => {
+    stubLeaflet();
     const onChange = vi.fn();
     render(<FieldMap initialLocation={null} onChange={onChange} disabled={false} />);
     await waitFor(() => expect(leaf.map.on).toHaveBeenCalledWith("click", expect.any(Function)));
@@ -51,6 +55,7 @@ describe("FieldMap", () => {
   });
 
   it("supports keyboard coordinates and validates bounds", async () => {
+    stubLeaflet();
     const onChange = vi.fn();
     render(<FieldMap initialLocation={{ latitude: 31, longitude: 73 }} onChange={onChange} disabled={false} />);
     fireEvent.change(screen.getByLabelText("Latitude"), { target: { value: "0" } });
@@ -62,6 +67,7 @@ describe("FieldMap", () => {
   });
 
   it("honors disabled state and keeps entry available on tile failure", async () => {
+    stubLeaflet();
     const onChange = vi.fn();
     const { rerender } = render(<FieldMap initialLocation={null} onChange={onChange} disabled={true} />);
     await waitFor(() => expect(leaf.map.on).toHaveBeenCalled());
@@ -82,6 +88,7 @@ describe("FieldMap", () => {
   });
 
   it("applies a searched place suggestion to the map coordinates", async () => {
+    stubLeaflet();
     const onChange = vi.fn();
     weather.searchPlaces.mockResolvedValue([
       {
@@ -105,6 +112,7 @@ describe("FieldMap", () => {
   });
 
   it("uses the browser current location and fills coordinates", async () => {
+    stubLeaflet();
     const onChange = vi.fn();
     weather.reverseGeocode.mockResolvedValue({
       id: "coords",
@@ -133,6 +141,8 @@ describe("FieldMap", () => {
         },
       },
     });
+    // Keep Leaflet global after navigator stub.
+    stubLeaflet();
     render(<FieldMap initialLocation={null} onChange={onChange} disabled={false} />);
     fireEvent.click(screen.getByRole("button", { name: /current location/i }));
     await waitFor(() => expect(onChange).toHaveBeenCalledWith({ latitude: 31.52, longitude: 74.35 }));
