@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import {
-  ArrowRight, CheckCircle2, CloudSun, Leaf, MapPinned, PlayCircle, Satellite, ShieldCheck, Sprout,
+  ArrowRight, CheckCircle2, CloudSun, Leaf, PlayCircle, Satellite, ShieldCheck, Sprout,
 } from "lucide-react";
 import type { ReactElement } from "react";
+import { HeroSlider } from "../components/hero-slider";
 import { Reveal } from "../components/reveal";
 import { SiteHeader } from "../components/site-header";
 
-const HERO_IMAGE =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBmViBBcXoqTEL19ku5fNM-FRnnGiPnX16A66PGOz0TvWfGAbFHeaCQYwomE6p8PT0cugkXu4sZy-ehhjcpXiKX59GaJnwR0yt1vuoPhMUJ7Z2AowgwjoKbBJthSGzNao4F9x-6E4JjX5b5vq-jZ32OLqbwXoCCSFiKyWCRgROj6iRC6elNlZMLEPYqpTSgcbidfSmUTSjKnibtwXYfi1K1mJPILu_9CfO9ltiRVQePz-5do9DcDnUY";
 const FIELD_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBNPWMVHr9l3IXxvIGer71Zb6ZeiQoruNMoshq_3us-dR-tMwM1fa2LMlXfZFswJRPz6yP59YdR0BTMq7Hx4IJs1Hh2aQkLha3b9YvR0wTofQK8KlDSCysC1Agu58m0SyhHd2-b95ifKvfSAw_wfJBkaNv5gopGImBd7_Ajd-7rkDS5giVY6mluCdAL-7WTh1QCwNAGR4PBXcIny4ChQxU_waqa-Upnb3ay1VcXQTXdYvc7jh9qssBv";
 const FARMER_IMAGE =
@@ -45,41 +44,7 @@ export default function LandingPage(): ReactElement {
             </Reveal>
 
             <Reveal immediate delayMs={420} variant="scale" className="relative mt-10 w-full max-w-5xl overflow-hidden rounded-2xl bg-[var(--surface-container-lowest)] shadow-[var(--shadow-lift)]">
-              <div className="relative h-[280px] w-full sm:h-[420px] md:h-[520px]">
-                <img
-                  src={HERO_IMAGE}
-                  alt="Sunlit irrigated cropland with a center-pivot system across fertile plains"
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(22,30,19,0.45)] via-transparent to-transparent" />
-                <div className="absolute left-4 top-4 flex items-center gap-3 rounded-xl bg-[rgba(255,255,255,0.95)] p-3 shadow-lg sm:left-8 sm:top-8 sm:p-4">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--secondary-fixed)] text-[var(--secondary)]">
-                    <CloudSun className="h-5 w-5" aria-hidden />
-                  </span>
-                  <div className="text-left">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">Observed climate</p>
-                    <p className="font-display text-sm font-semibold sm:text-base">90-day POWER anomalies</p>
-                  </div>
-                </div>
-                <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-xl bg-[rgba(255,255,255,0.95)] p-3 shadow-lg sm:bottom-8 sm:left-8 sm:p-4">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary-fixed)] text-[var(--primary)]">
-                    <MapPinned className="h-5 w-5" aria-hidden />
-                  </span>
-                  <div className="text-left">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">Pinned demo farm</p>
-                    <p className="font-display text-sm font-semibold sm:text-base">Faisalabad 31.4504° N, 73.135° E</p>
-                  </div>
-                </div>
-                <div className="absolute bottom-4 right-4 hidden items-center gap-3 rounded-xl bg-[rgba(255,255,255,0.95)] p-4 shadow-lg sm:flex">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--tertiary-fixed)] text-[var(--tertiary)]">
-                    <Sprout className="h-5 w-5" aria-hidden />
-                  </span>
-                  <div className="text-left">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">Decision output</p>
-                    <p className="font-display text-sm font-semibold">Ranked rotations + reasons</p>
-                  </div>
-                </div>
-              </div>
+              <HeroSlider />
             </Reveal>
           </div>
         </section>
