@@ -178,13 +178,13 @@ export default function WeatherClient(): ReactElement {
             <form onSubmit={onSearchSubmit} className="space-y-2">
               <label className="text-sm font-semibold">Search a place
                 <div className="relative mt-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--outline)]" aria-hidden />
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-[var(--outline)]" aria-hidden />
                   <input
                     type="text"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="City, region, or farm town"
-                    className="pl-10"
+                    className="weather-search-input"
                     autoComplete="off"
                   />
                 </div>
