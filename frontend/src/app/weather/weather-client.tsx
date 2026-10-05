@@ -196,17 +196,62 @@ export default function WeatherClient(): ReactElement {
     };
   }, [query, bundle]);
 
-  function onSearchSubmit(event: FormEvent): void {
-    event.preventDefault();
-    if (suggestions[0]) {
-      void loadWeather(suggestions[0]);
-      return;
+  async function resolvePlaceFromQuery(): Promise<WeatherPlace | null> {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) return null;
+    if (suggestions[0]) return suggestions[0];
+    try {
+      const places = await searchPlaces(trimmed);
+      return places[0] ?? null;
+    } catch {
+      return null;
     }
-    setError("Pick a place from the suggestions, or enter latitude and longitude below.");
   }
 
-  function onCoordsSubmit(event: FormEvent): void {
+  async function onSearchSubmit(event: FormEvent): Promise<void> {
     event.preventDefault();
+    setPending(true);
+    setError(null);
+    try {
+      const place = await resolvePlaceFromQuery();
+      if (place) {
+        await loadWeather(place);
+        return;
+      }
+      setError("No matching place found. Pick a suggestion, or enter latitude and longitude.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function onCoordsSubmit(event: FormEvent): Promise<void> {
+    event.preventDefault();
+    const trimmed = query.trim();
+    const queryLooksLikeSearch =
+      trimmed.length >= 2
+      && (
+        suggestions.length > 0
+        || searchHint === "default"
+      )
+      && !(bundle && formatPlaceLabel(bundle.place) === trimmed);
+
+    // Typed place name wins over leftover lat/lon so Check coordinates works without picking a suggestion.
+    if (queryLooksLikeSearch) {
+      setPending(true);
+      setError(null);
+      try {
+        const place = await resolvePlaceFromQuery();
+        if (place) {
+          await loadWeather(place);
+          return;
+        }
+        setError(`No places found for “${trimmed}”. Pick a suggestion or enter coordinates.`);
+      } finally {
+        setPending(false);
+      }
+      return;
+    }
+
     if (!parsedCoords) {
       setError("Enter both latitude and longitude before checking coordinates.");
       setBundle(null);
@@ -343,8 +388,14 @@ export default function WeatherClient(): ReactElement {
                 <button
                   type="submit"
                   className="btn-primary text-sm"
-                  disabled={!coordsReady || pending || locating}
-                  title={coordsReady ? "Load forecast for these coordinates" : "Enter latitude and longitude first"}
+                  disabled={pending || locating || (!coordsReady && query.trim().length < 2)}
+                  title={
+                    query.trim().length >= 2
+                      ? "Load forecast for the searched place (first match if none selected)"
+                      : coordsReady
+                        ? "Load forecast for these coordinates"
+                        : "Enter a place name or latitude and longitude first"
+                  }
                 >
                   Check coordinates
                 </button>
