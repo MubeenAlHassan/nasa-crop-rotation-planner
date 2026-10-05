@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, type FormEvent, type ReactElement } from "
 import { Reveal } from "../../components/reveal";
 import { SiteHeader } from "../../components/site-header";
 import { WeatherAtmosphere } from "../../components/weather-atmosphere";
+import { WeatherConditionIcon } from "../../components/weather-condition-icon";
+import { describeWeatherCode } from "../../lib/weather/codes";
 import {
   fetchWeather, formatPlaceLabel, reverseGeocode, searchPlaces,
   type WeatherBundle, type WeatherPlace,
@@ -257,9 +259,17 @@ export default function WeatherClient(): ReactElement {
                     {bundle.place.latitude.toFixed(4)}°, {bundle.place.longitude.toFixed(4)}°
                     {bundle.place.timezone ? ` · ${bundle.place.timezone}` : ""}
                   </p>
-                  <p className="font-display mt-4 text-6xl font-bold tracking-tight sm:text-7xl">
-                    {Math.round(bundle.current.temperatureC)}°
-                  </p>
+                  <div className="mt-4 flex items-center gap-4">
+                    <WeatherConditionIcon
+                      theme={bundle.current.theme}
+                      label={bundle.current.label}
+                      size="lg"
+                      className="rounded-2xl bg-[rgba(237,247,229,0.9)] p-2"
+                    />
+                    <p className="font-display text-6xl font-bold tracking-tight sm:text-7xl">
+                      {Math.round(bundle.current.temperatureC)}°
+                    </p>
+                  </div>
                   <p className="mt-2 text-xl font-semibold">{bundle.current.label}</p>
                   <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
                     Feels like {Math.round(bundle.current.feelsLikeC)}° · Updated {formatClock(bundle.current.time)}
@@ -294,6 +304,13 @@ export default function WeatherClient(): ReactElement {
                   {bundle.hourly.map((hour) => (
                     <div key={hour.time} className="weather-hour">
                       <p className="text-xs font-semibold text-[var(--on-surface-variant)]">{formatClock(hour.time)}</p>
+                      <div className="mt-2 flex justify-center">
+                        <WeatherConditionIcon
+                          theme={describeWeatherCode(hour.weatherCode).theme}
+                          label={hour.label}
+                          size="sm"
+                        />
+                      </div>
                       <p className="mt-2 text-lg font-bold">{Math.round(hour.temperatureC)}°</p>
                       <p className="mt-1 text-[11px] text-[var(--on-surface-variant)]">{hour.label}</p>
                       <p className="mt-2 text-[11px]">{hour.precipitationMm.toFixed(1)} mm</p>
@@ -309,9 +326,12 @@ export default function WeatherClient(): ReactElement {
                 {bundle.daily.map((day) => (
                   <article key={day.date} className={`weather-day weather-day-${day.theme}`}>
                     <p className="text-xs font-bold uppercase tracking-wide">{formatDay(day.date)}</p>
-                    <p className="mt-2 text-sm font-semibold">{day.label}</p>
-                    <p className="mt-3 text-2xl font-bold">{Math.round(day.tempMaxC)}°</p>
-                    <p className="text-sm text-[var(--on-surface-variant)]">Low {Math.round(day.tempMinC)}°</p>
+                    <div className="mt-3 flex items-center justify-center">
+                      <WeatherConditionIcon theme={day.theme} label={day.label} size="lg" />
+                    </div>
+                    <p className="mt-2 text-center text-sm font-semibold">{day.label}</p>
+                    <p className="mt-3 text-center text-2xl font-bold">{Math.round(day.tempMaxC)}°</p>
+                    <p className="text-center text-sm text-[var(--on-surface-variant)]">Low {Math.round(day.tempMinC)}°</p>
                     <dl className="mt-3 space-y-1 text-[11px] text-[var(--on-surface-variant)]">
                       <div className="flex justify-between gap-2"><dt>Rain chance</dt><dd>{Math.round(day.precipitationProbabilityPct)}%</dd></div>
                       <div className="flex justify-between gap-2"><dt>Precip</dt><dd>{day.precipitationMm.toFixed(1)} mm</dd></div>

@@ -538,7 +538,7 @@ input.weather-search-input {
   background: rgba(255, 255, 255, 0.8);
   padding: 0.9rem;
   backdrop-filter: blur(10px);
-  min-height: 12.5rem;
+  min-height: 15rem;
 }
 
 .weather-day-rain {
