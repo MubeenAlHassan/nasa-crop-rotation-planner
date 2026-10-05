@@ -40,6 +40,16 @@ function metric(label: string, value: string, icon: ReactElement): ReactElement 
   );
 }
 
+/** Returns null when either field is blank or out of WGS84 range. */
+function parseCoordinatePair(latRaw: string, lonRaw: string): { lat: number; lon: number } | null {
+  if (latRaw.trim() === "" || lonRaw.trim() === "") return null;
+  const lat = Number(latRaw);
+  const lon = Number(lonRaw);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+  return { lat, lon };
+}
+
 export default function WeatherClient(): ReactElement {
   const [query, setQuery] = useState("");
   const [latitude, setLatitude] = useState("");
@@ -52,6 +62,9 @@ export default function WeatherClient(): ReactElement {
   const searchController = useRef<AbortController | null>(null);
   const weatherController = useRef<AbortController | null>(null);
   const autoStarted = useRef(false);
+
+  const parsedCoords = parseCoordinatePair(latitude, longitude);
+  const coordsReady = parsedCoords !== null;
 
   async function loadWeather(place: WeatherPlace): Promise<void> {
     weatherController.current?.abort();
@@ -71,6 +84,7 @@ export default function WeatherClient(): ReactElement {
     } catch (failure: unknown) {
       if (!controller.signal.aborted) {
         setError(failure instanceof Error ? failure.message : "Unable to load weather.");
+        setBundle(null);
       }
     } finally {
       if (!controller.signal.aborted) setPending(false);
@@ -101,12 +115,17 @@ export default function WeatherClient(): ReactElement {
           await loadWeather(place);
         } catch (failure: unknown) {
           setError(failure instanceof Error ? failure.message : "Unable to use current location.");
+          setBundle(null);
         } finally {
           setLocating(false);
         }
       },
       () => {
         setLocating(false);
+        setBundle(null);
+        setLatitude("");
+        setLongitude("");
+        setQuery("");
         setError("Location permission denied. Allow location access, or enter coordinates / search a place.");
       },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 },
@@ -120,9 +139,22 @@ export default function WeatherClient(): ReactElement {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Empty coordinates → no search / no forecast results.
+  useEffect(() => {
+    if (coordsReady) return;
+    weatherController.current?.abort();
+    setBundle(null);
+    setSuggestions([]);
+    setPending(false);
+  }, [coordsReady]);
+
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 2 || trimmed === "Your current location" || (bundle && formatPlaceLabel(bundle.place) === trimmed)) {
+    if (
+      trimmed.length < 2
+      || trimmed === "Your current location"
+      || (bundle && formatPlaceLabel(bundle.place) === trimmed)
+    ) {
       setSuggestions([]);
       return undefined;
     }
@@ -150,21 +182,17 @@ export default function WeatherClient(): ReactElement {
       void loadWeather(suggestions[0]);
       return;
     }
-    setError("Pick a place from the suggestions, or use custom coordinates below.");
+    setError("Pick a place from the suggestions, or enter latitude and longitude below.");
   }
 
   function onCoordsSubmit(event: FormEvent): void {
     event.preventDefault();
-    if (latitude.trim() === "" || longitude.trim() === "") {
-      setError("Waiting for your location… or type latitude and longitude manually.");
+    if (!parsedCoords) {
+      setError("Enter both latitude and longitude before checking coordinates.");
+      setBundle(null);
       return;
     }
-    const lat = Number(latitude);
-    const lon = Number(longitude);
-    if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) {
-      setError("Enter valid WGS84 latitude (−90 to 90) and longitude (−180 to 180).");
-      return;
-    }
+    const { lat, lon } = parsedCoords;
     void reverseGeocode(lat, lon).then((place) => {
       place.name = "Custom field";
       place.country = "Worldwide coordinates";
@@ -172,8 +200,27 @@ export default function WeatherClient(): ReactElement {
     });
   }
 
+  function updateLatitude(value: string): void {
+    setLatitude(value);
+    if (value.trim() === "") {
+      setBundle(null);
+      setSuggestions([]);
+      setError(null);
+    }
+  }
+
+  function updateLongitude(value: string): void {
+    setLongitude(value);
+    if (value.trim() === "") {
+      setBundle(null);
+      setSuggestions([]);
+      setError(null);
+    }
+  }
+
   const theme = bundle?.current.theme ?? "partly";
   const isDay = bundle?.current.isDay ?? true;
+  const showResults = coordsReady && bundle !== null;
 
   return (
     <div className="weather-page relative min-h-full overflow-hidden text-[var(--on-surface)]">
@@ -234,7 +281,7 @@ export default function WeatherClient(): ReactElement {
                     type="number"
                     step="any"
                     value={latitude}
-                    onChange={(e) => setLatitude(e.target.value)}
+                    onChange={(e) => updateLatitude(e.target.value)}
                     placeholder={locating ? "Detecting…" : "e.g. 31.4504"}
                   />
                 </label>
@@ -243,13 +290,20 @@ export default function WeatherClient(): ReactElement {
                     type="number"
                     step="any"
                     value={longitude}
-                    onChange={(e) => setLongitude(e.target.value)}
+                    onChange={(e) => updateLongitude(e.target.value)}
                     placeholder={locating ? "Detecting…" : "e.g. 73.1350"}
                   />
                 </label>
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
-                <button type="submit" className="btn-primary text-sm" disabled={pending}>Check coordinates</button>
+                <button
+                  type="submit"
+                  className="btn-primary text-sm"
+                  disabled={!coordsReady || pending || locating}
+                  title={coordsReady ? "Load forecast for these coordinates" : "Enter latitude and longitude first"}
+                >
+                  Check coordinates
+                </button>
                 <button type="button" className="btn-secondary text-sm" disabled={locating || pending} onClick={() => void useMyLocation()}>
                   <LocateFixed className="h-4 w-4" aria-hidden />
                   {locating ? "Detecting…" : "Use my location"}
@@ -270,7 +324,7 @@ export default function WeatherClient(): ReactElement {
           )}
         </Reveal>
 
-        {bundle && (
+        {showResults && bundle && (
           <>
             <Reveal immediate delayMs={80} className="weather-glass p-5 sm:p-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
