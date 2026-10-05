@@ -226,10 +226,7 @@ export function RecommendationForm({
             onChange={(e) => setSoilValues((current) => ({ ...current, [field.key]: e.target.value }))} /></label>)}
           {errors.soil && <p role="alert" className="text-sm text-[var(--danger-ink)]">{errors.soil}</p>}
         </fieldset>}
-        <button
-          type="submit"
-          className="w-full rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--brand-strong)]"
-        >
+        <button type="submit" className="btn-primary w-full">
           {submitting ? "Submitting…" : "Get recommendations"}
         </button>
       </fieldset>

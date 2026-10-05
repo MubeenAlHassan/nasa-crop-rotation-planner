@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import HomePage from "./page";
+import PlannerPage from "./page";
 
 const leaf = vi.hoisted(() => {
   const map = { setView: vi.fn(), on: vi.fn(), remove: vi.fn() };
@@ -15,6 +15,14 @@ const leaf = vi.hoisted(() => {
 });
 vi.mock("leaflet", () => ({ default: { map: leaf.mapFactory, tileLayer: leaf.tileFactory },
   map: leaf.mapFactory, tileLayer: leaf.tileFactory }));
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
+}));
+vi.mock("next/link", () => ({
+  default: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+}));
 
 const catalog = JSON.parse(readFileSync(resolve(process.cwd(), "../backend/data/punjab_crops.json"), "utf8"));
 const samples = [...readFileSync(resolve(process.cwd(), "../agent_docs/DATA_SCHEMA.md"), "utf8")
@@ -44,7 +52,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 describe("farmer dashboard integration", () => {
   it("runs the pinned demo on button click, sends exact contract JSON, and renders every returned panel and warning", async () => {
     const fetcher = endpoint();
-    render(<HomePage />);
+    render(<PlannerPage />);
     await screen.findByLabelText("Rotation request");
     fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
     expectPinnedFormFilled();
@@ -73,7 +81,7 @@ describe("farmer dashboard integration", () => {
     response.recommendations = [];
     response.warnings.push({ code: "NO_FEASIBLE_ROTATION", message: "No feasible rotation." });
     endpoint(response);
-    render(<HomePage />);
+    render(<PlannerPage />);
     await screen.findByLabelText("Rotation request");
     fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
     expectPinnedFormFilled();
@@ -89,7 +97,7 @@ describe("farmer dashboard integration", () => {
       return Promise.reject(new Error("Unexpected path"));
     });
     vi.stubGlobal("fetch", fetcher);
-    render(<HomePage />);
+    render(<PlannerPage />);
     await screen.findByLabelText("Rotation request");
     fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
     expectPinnedFormFilled();
