@@ -28,9 +28,9 @@ export function SoilRadar({ soil }: SoilRadarProps): ReactElement {
     }];
   });
   return (
-    <section aria-label="Soil properties" className="space-y-3">
-      <h2>Soil properties, 0–30 cm</h2>
-      <p>Radar axes are display-only: pH 0–14, soil organic carbon 0–50 g/kg, total nitrogen 0–10 g/kg, and texture 0–100%. Values above a display limit are capped on the radar; the table retains raw values.</p>
+    <section aria-label="Soil properties" className="space-y-3 border-t border-[var(--panel-border)] pt-6">
+      <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Soil properties, 0–30 cm</h2>
+      <p className="text-sm text-[var(--muted)]">Radar axes are display-only: pH 0–14, soil organic carbon 0–50 g/kg, total nitrogen 0–10 g/kg, and texture 0–100%. Values above a display limit are capped on the radar; the table retains raw values.</p>
       {axes.length >= 3 ? <figure>
         <figcaption>Available soil properties on fixed display scales</figcaption>
         <div className="h-72"><ResponsiveContainer width="100%" height="100%">
@@ -43,14 +43,16 @@ export function SoilRadar({ soil }: SoilRadarProps): ReactElement {
           </RadarChart>
         </ResponsiveContainer></div>
       </figure> : <p>Too few measured properties for a radar; raw values remain below.</p>}
-      <table>
-        <caption>Exact soil values, units, and field sources</caption>
-        <thead><tr><th scope="col">Property</th><th scope="col">Value</th><th scope="col">Unit</th><th scope="col">Source</th></tr></thead>
-        <tbody>{fields.map((field) => <tr key={field.key}>
-          <th scope="row">{field.label}</th><td>{soil[field.key] === null ? "Unavailable" : String(soil[field.key])}</td>
-          <td>{field.unit}</td><td>{soil.field_sources[field.key].replaceAll("_", " ")}</td>
-        </tr>)}</tbody>
-      </table>
+      <div className="overflow-x-auto rounded-xl border border-[var(--panel-border)]">
+        <table>
+          <caption>Exact soil values, units, and field sources</caption>
+          <thead><tr className="bg-[var(--brand-soft)]/50"><th scope="col">Property</th><th scope="col">Value</th><th scope="col">Unit</th><th scope="col">Source</th></tr></thead>
+          <tbody>{fields.map((field) => <tr key={field.key}>
+            <th scope="row">{field.label}</th><td>{soil[field.key] === null ? "Unavailable" : String(soil[field.key])}</td>
+            <td>{field.unit}</td><td>{soil.field_sources[field.key].replaceAll("_", " ")}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>
     </section>
   );
 }

@@ -1,26 +1,151 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #eef5f0;
+  --background-deep: #e2ede6;
+  --foreground: #163028;
+  --muted: #5c7268;
+  --panel: #ffffff;
+  --panel-border: #c5d6cb;
+  --brand: #0f5c3a;
+  --brand-strong: #0a4030;
+  --brand-soft: #d7ebe0;
+  --accent: #1f7a52;
+  --warning-bg: #fff7e8;
+  --warning-border: #e2b96a;
+  --warning-ink: #5c4010;
+  --danger-bg: #fdecea;
+  --danger-border: #e3a39a;
+  --danger-ink: #7a2e24;
+  --info-bg: #e8f2f8;
+  --info-border: #9dbfd4;
+  --info-ink: #1e4558;
+  --shadow: 0 18px 40px rgba(15, 52, 36, 0.08);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--background);
 }
 
 body {
-  background: var(--background);
+  min-height: 100%;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(1200px 480px at 8% -10%, rgba(47, 140, 90, 0.16), transparent 55%),
+    radial-gradient(900px 420px at 92% 0%, rgba(30, 90, 70, 0.1), transparent 50%),
+    linear-gradient(180deg, var(--background) 0%, var(--background-deep) 100%);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--panel-border);
+  border-radius: 0.65rem;
+  background: #fbfffc;
+  color: var(--foreground);
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid rgba(15, 92, 58, 0.35);
+  outline-offset: 1px;
+  border-color: var(--brand);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled,
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+legend {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: var(--brand-strong);
+  margin-bottom: 0.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+caption {
+  caption-side: bottom;
+  padding-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.soft-panel {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--panel-border);
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
 }

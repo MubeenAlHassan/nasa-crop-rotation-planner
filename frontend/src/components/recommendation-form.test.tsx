@@ -90,4 +90,29 @@ describe("RecommendationForm", () => {
     render(<RecommendationForm catalog={catalog} initialLocation={null} submitting={true} onSubmit={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Submitting…" })).toBeDisabled();
   });
+
+  it("applies pinned demo defaults when demoApplyKey advances", () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(
+      <RecommendationForm catalog={catalog} initialLocation={{ latitude: 31.4504, longitude: 73.135 }}
+        submitting={false} onSubmit={onSubmit} demoApplyKey={0} />,
+    );
+    expect(screen.getByLabelText("Assessment date")).toHaveValue("");
+    rerender(
+      <RecommendationForm catalog={catalog} initialLocation={{ latitude: 31.4504, longitude: 73.135 }}
+        submitting={false} onSubmit={onSubmit} demoApplyKey={1} />,
+    );
+    expect(screen.getByLabelText("Assessment date")).toHaveValue("2025-10-15");
+    expect(screen.getByLabelText("Slot 1 ID")).toHaveValue("rabi_2025");
+    expect(screen.getByLabelText("Data mode")).toHaveValue("fixture");
+    expect(screen.getByLabelText("History 1 crop")).toHaveValue("maize");
+    submit();
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      assessment_end: "2025-10-15",
+      slots: [{ slot_id: "rabi_2025", start_date: "2025-11-01", end_date: "2026-03-31" }],
+      crop_history: [{ crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "retained" }],
+      data_mode: "fixture",
+    });
+  });
 });

@@ -30,24 +30,24 @@ function endpoint(response = structuredClone(samples[1])) {
   return fetcher;
 }
 
-function fillPinnedForm(): void {
-  fireEvent.change(screen.getByLabelText("Assessment date"), { target: { value: "2025-10-15" } });
-  fireEvent.change(screen.getByLabelText("Slot 1 ID"), { target: { value: "rabi_2025" } });
-  fireEvent.change(screen.getByLabelText("Slot 1 start"), { target: { value: "2025-11-01" } });
-  fireEvent.change(screen.getByLabelText("Slot 1 end"), { target: { value: "2026-03-31" } });
+function expectPinnedFormFilled(): void {
+  expect(screen.getByLabelText("Assessment date")).toHaveValue("2025-10-15");
+  expect(screen.getByLabelText("Slot 1 ID")).toHaveValue("rabi_2025");
+  expect(screen.getByLabelText("Slot 1 start")).toHaveValue("2025-11-01");
+  expect(screen.getByLabelText("Slot 1 end")).toHaveValue("2026-03-31");
+  expect(screen.getByLabelText("Data mode")).toHaveValue("fixture");
+  expect(screen.getByLabelText("History 1 crop")).toHaveValue("maize");
 }
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
 describe("farmer dashboard integration", () => {
-  it("selects a field, sends exact contract JSON, and renders every returned panel and warning", async () => {
+  it("runs the pinned demo on button click, sends exact contract JSON, and renders every returned panel and warning", async () => {
     const fetcher = endpoint();
     render(<HomePage />);
     await screen.findByLabelText("Rotation request");
     fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
-    fillPinnedForm();
-    fireEvent.change(screen.getByLabelText("Data mode"), { target: { value: "fixture" } });
-    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
+    expectPinnedFormFilled();
     await screen.findByRole("heading", { name: "Ranked alternatives" });
     const post = fetcher.mock.calls.find(([url]) => url === "/api/recommend-rotation");
     expect(post).toBeDefined();
@@ -55,7 +55,8 @@ describe("farmer dashboard integration", () => {
       region_id: "punjab_pk_demo_v1", location: { latitude: 31.4504, longitude: 73.135 },
       assessment_end: "2025-10-15",
       slots: [{ slot_id: "rabi_2025", start_date: "2025-11-01", end_date: "2026-03-31" }],
-      crop_history: [], irrigation: "rainfed", allowed_crop_ids: [], excluded_crop_ids: [],
+      crop_history: [{ crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "retained" }],
+      irrigation: "rainfed", allowed_crop_ids: [], excluded_crop_ids: [],
       soil_override: null, data_mode: "fixture", top_k: 3,
     });
     expect(screen.getByLabelText("Recommendation results")).toBeInTheDocument();
@@ -75,9 +76,7 @@ describe("farmer dashboard integration", () => {
     render(<HomePage />);
     await screen.findByLabelText("Rotation request");
     fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
-    fillPinnedForm();
-    fireEvent.change(screen.getByLabelText("Data mode"), { target: { value: "fixture" } });
-    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
+    expectPinnedFormFilled();
     expect(await screen.findByText(/No feasible rotation was returned/)).toBeInTheDocument();
     expect(screen.queryByText(/Rotation timeline, rank/)).not.toBeInTheDocument();
   });
@@ -93,9 +92,7 @@ describe("farmer dashboard integration", () => {
     render(<HomePage />);
     await screen.findByLabelText("Rotation request");
     fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
-    fillPinnedForm();
-    fireEvent.change(screen.getByLabelText("Data mode"), { target: { value: "fixture" } });
-    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
+    expectPinnedFormFilled();
     await waitFor(() => expect(resolvePost).toBeDefined());
     const first = fetcher.mock.calls.find(([, init]) => init?.method === "POST");
     fireEvent.change(screen.getAllByLabelText("Latitude")[0], { target: { value: "31.4505" } });
