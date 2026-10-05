@@ -2,6 +2,7 @@
 
 import type { ReactElement } from "react";
 import type { WeatherTheme } from "../lib/weather/codes";
+import { SamsungSun } from "./samsung-sun";
 
 export interface WeatherAtmosphereProps {
   theme: WeatherTheme;
@@ -43,10 +44,7 @@ export function WeatherAtmosphere({
 
       {showSun && (
         <div className="weather-sun-wrap">
-          <span className="samsung-sun-outer-glow" />
-          <span className="samsung-sun-halo" />
-          <span className="samsung-sun-disk" />
-          <span className="samsung-sun-highlight" />
+          <SamsungSun size="xl" />
         </div>
       )}
 
