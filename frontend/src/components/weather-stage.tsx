@@ -3,7 +3,6 @@
 import { Wind } from "lucide-react";
 import type { ReactElement } from "react";
 import type { WeatherTheme } from "../lib/weather/codes";
-import { SamsungSun } from "./samsung-sun";
 import { WeatherConditionIcon } from "./weather-condition-icon";
 
 export interface WeatherStageProps {
@@ -30,8 +29,8 @@ export function WeatherStage({
   const showRain = theme === "rain" || theme === "storm";
   const showSnow = theme === "snow";
   const showWind = windSpeedKmh >= 10 || theme === "storm";
-  const showLayeredSun = (theme === "clear" || theme === "partly") && isDay;
-  const showStageIcon = !showLayeredSun;
+  // Sunny clear skies: no icon on the temperature card — light comes from the sky.
+  const showStageIcon = !(theme === "clear" && isDay);
   const temp = temperatureC ?? 22;
 
   return (
@@ -97,11 +96,7 @@ export function WeatherStage({
           )}
         </div>
 
-        {showLayeredSun ? (
-          <div className="weather-stage-badge weather-stage-badge-sun" aria-hidden>
-            <SamsungSun size="lg" />
-          </div>
-        ) : showStageIcon ? (
+        {showStageIcon && (
           <div className="weather-stage-badge" aria-hidden>
             <span className={`weather-stage-orb weather-stage-orb-${theme}`} />
             <WeatherConditionIcon
@@ -112,7 +107,7 @@ export function WeatherStage({
               className="weather-stage-icon"
             />
           </div>
-        ) : null}
+        )}
       </div>
     </section>
   );

@@ -2,7 +2,6 @@
 
 import type { ReactElement } from "react";
 import type { WeatherTheme } from "../lib/weather/codes";
-import { SamsungSun } from "./samsung-sun";
 
 export interface WeatherAtmosphereProps {
   theme: WeatherTheme;
@@ -43,8 +42,11 @@ export function WeatherAtmosphere({
       <div className="weather-horizon" />
 
       {showSun && (
-        <div className="weather-sun-wrap">
-          <SamsungSun size="xl" />
+        <div className={`weather-sunlight${theme === "partly" ? " is-soft" : ""}`}>
+          <span className="weather-sunlight-glow" />
+          <span className="weather-sunlight-bloom" />
+          <span className="weather-sunlight-core" />
+          <span className="weather-sunlight-shaft" />
         </div>
       )}
 

@@ -328,12 +328,11 @@ caption {
     animation: none;
   }
 
-  .samsung-sun-corona,
-  .samsung-sun-rays,
-  .samsung-sun-chromosphere,
-  .samsung-sun-photosphere,
-  .samsung-sun-flare,
-  .samsung-sun-highlight,
+  .weather-sunlight,
+  .weather-sunlight-glow,
+  .weather-sunlight-bloom,
+  .weather-sunlight-core,
+  .weather-sunlight-shaft,
   .weather-moon,
   .weather-cloud,
   .weather-rain i,
@@ -363,14 +362,16 @@ caption {
 
 .weather-sky-clear {
   background:
-    radial-gradient(circle at 78% 18%, rgba(255, 230, 120, 0.7) 0%, transparent 28%),
-    linear-gradient(180deg, #4eb3ff 0%, #9ad4ff 38%, #e7f6c9 78%, #f3fceb 100%);
+    radial-gradient(circle at 82% 12%, rgba(255, 250, 220, 0.95) 0%, rgba(255, 220, 120, 0.45) 18%, transparent 42%),
+    radial-gradient(ellipse at 70% 0%, rgba(255, 200, 80, 0.28) 0%, transparent 50%),
+    linear-gradient(180deg, #3aa8ff 0%, #8ecfff 36%, #d8efb8 76%, #f3fceb 100%);
 }
 
 .weather-sky-clear.is-hot {
   background:
-    radial-gradient(circle at 80% 14%, rgba(255, 210, 70, 0.95) 0%, transparent 32%),
-    linear-gradient(180deg, #2f9fff 0%, #7ec8ff 34%, #ffe08a 72%, #f7f0c8 100%);
+    radial-gradient(circle at 84% 10%, rgba(255, 245, 200, 1) 0%, rgba(255, 200, 70, 0.55) 20%, transparent 44%),
+    radial-gradient(ellipse at 72% 0%, rgba(255, 170, 40, 0.35) 0%, transparent 52%),
+    linear-gradient(180deg, #2a96ff 0%, #6fc2ff 32%, #ffe08a 70%, #f7f0c8 100%);
 }
 
 .weather-sky-clear.is-night {
@@ -432,188 +433,101 @@ caption {
   pointer-events: none;
 }
 
-.weather-sun-wrap {
+/* Realistic atmospheric sunlight — soft bloom + drifting shafts (no cartoon icon) */
+.weather-sunlight {
   position: absolute;
-  top: 4%;
-  right: 4%;
-  width: min(22rem, 46vw);
-  height: min(22rem, 46vw);
-  display: grid;
-  place-items: center;
+  top: -6%;
+  right: -2%;
+  width: min(34rem, 72vw);
+  height: min(34rem, 72vw);
   pointer-events: none;
   z-index: 1;
+  animation: weather-sunlight-drift 18s ease-in-out infinite;
 }
 
-/* Layered animated sun — corona / rays / chromosphere / photosphere */
-.samsung-sun {
-  position: relative;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-  will-change: transform;
-  animation: samsung-sun-float 9s ease-in-out infinite;
+.weather-sunlight.is-soft {
+  opacity: 0.72;
+  filter: blur(1px);
 }
 
-.samsung-sun-md { width: 5.5rem; height: 5.5rem; }
-.samsung-sun-lg { width: 9.5rem; height: 9.5rem; }
-.samsung-sun-xl { width: 16rem; height: 16rem; }
-
-.samsung-sun-corona,
-.samsung-sun-rays,
-.samsung-sun-chromosphere,
-.samsung-sun-photosphere,
-.samsung-sun-limb,
-.samsung-sun-flare,
-.samsung-sun-highlight {
+.weather-sunlight-glow,
+.weather-sunlight-bloom,
+.weather-sunlight-core,
+.weather-sunlight-shaft {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
 }
 
-.samsung-sun-corona {
-  inset: -58%;
+.weather-sunlight-glow {
+  inset: -10%;
   background: radial-gradient(
-    circle at 48% 52%,
-    rgba(255, 245, 210, 0.9) 0%,
-    rgba(255, 210, 110, 0.5) 24%,
-    rgba(255, 170, 60, 0.22) 46%,
-    rgba(255, 140, 40, 0.08) 62%,
-    transparent 76%
-  );
-  animation: samsung-sun-pulse 6.5s ease-in-out infinite;
-}
-
-.samsung-sun-rays {
-  inset: -18%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 230, 140, 0.0) 8deg,
-    rgba(255, 230, 140, 0.55) 12deg,
-    transparent 22deg,
-    transparent 45deg,
-    rgba(255, 220, 120, 0.45) 50deg,
-    transparent 60deg,
-    transparent 90deg,
-    rgba(255, 235, 150, 0.5) 96deg,
-    transparent 106deg,
-    transparent 135deg,
-    rgba(255, 220, 120, 0.42) 141deg,
-    transparent 151deg,
-    transparent 180deg,
-    rgba(255, 230, 140, 0.52) 186deg,
-    transparent 196deg,
-    transparent 225deg,
-    rgba(255, 215, 110, 0.4) 231deg,
-    transparent 241deg,
-    transparent 270deg,
-    rgba(255, 230, 140, 0.48) 276deg,
-    transparent 286deg,
-    transparent 315deg,
-    rgba(255, 220, 120, 0.44) 321deg,
-    transparent 331deg,
-    transparent 360deg
-  );
-  filter: blur(7px);
-  opacity: 0.72;
-  mix-blend-mode: screen;
-  animation: samsung-sun-spin 42s linear infinite;
-}
-
-.samsung-sun-chromosphere {
-  inset: 10%;
-  background: radial-gradient(
-    circle at 42% 38%,
-    rgba(255, 250, 230, 0.95) 0%,
-    rgba(255, 210, 100, 0.65) 42%,
-    rgba(255, 150, 50, 0.35) 68%,
-    transparent 82%
-  );
-  filter: blur(1.5px);
-  animation: samsung-sun-pulse 5.2s ease-in-out infinite reverse;
-}
-
-.samsung-sun-photosphere {
-  inset: 28%;
-  background:
-    radial-gradient(circle at 34% 30%, #ffffff 0%, transparent 28%),
-    radial-gradient(circle at 62% 68%, rgba(255, 170, 50, 0.35) 0%, transparent 42%),
-    radial-gradient(
-      circle at 40% 36%,
-      #fffef8 0%,
-      #fff3c4 18%,
-      #ffd966 48%,
-      #ffb84d 72%,
-      #f09a2e 100%
-    );
-  box-shadow:
-    0 0 20px rgba(255, 230, 140, 0.95),
-    0 0 48px rgba(255, 180, 60, 0.55),
-    inset 0 -8px 16px rgba(230, 120, 20, 0.28),
-    inset 0 5px 12px rgba(255, 255, 255, 0.7);
-  animation: samsung-sun-pulse 7s ease-in-out infinite;
-}
-
-.samsung-sun-limb {
-  inset: 27%;
-  box-shadow:
-    inset 0 0 0 1.5px rgba(255, 200, 80, 0.35),
-    inset 0 0 14px rgba(255, 140, 40, 0.25);
-  opacity: 0.85;
-  pointer-events: none;
-}
-
-.samsung-sun-flare {
-  inset: 18%;
-  background: conic-gradient(
-    from 200deg,
-    transparent 0deg,
-    rgba(255, 255, 220, 0.35) 18deg,
-    transparent 40deg,
-    transparent 360deg
-  );
-  filter: blur(6px);
-  opacity: 0.55;
-  mix-blend-mode: screen;
-  animation: samsung-sun-spin 28s linear infinite reverse;
-}
-
-.samsung-sun-highlight {
-  inset: 32% 44% 54% 30%;
-  background: radial-gradient(
-    ellipse at 35% 35%,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(255, 255, 255, 0.5) 40%,
+    circle at 55% 45%,
+    rgba(255, 240, 180, 0.55) 0%,
+    rgba(255, 200, 90, 0.22) 35%,
+    rgba(255, 170, 60, 0.08) 55%,
     transparent 70%
   );
-  filter: blur(1.2px);
-  animation: samsung-sun-highlight-drift 8s ease-in-out infinite;
+  animation: weather-sunlight-pulse 10s ease-in-out infinite;
 }
 
-.weather-sun-wrap .samsung-sun {
-  width: 100%;
-  height: 100%;
+.weather-sunlight-bloom {
+  inset: 18%;
+  background: radial-gradient(
+    circle at 48% 48%,
+    rgba(255, 252, 230, 0.95) 0%,
+    rgba(255, 220, 120, 0.55) 28%,
+    rgba(255, 180, 70, 0.18) 52%,
+    transparent 70%
+  );
+  filter: blur(2px);
+  animation: weather-sunlight-pulse 8s ease-in-out infinite reverse;
 }
 
-@keyframes samsung-sun-float {
+.weather-sunlight-core {
+  inset: 36%;
+  background: radial-gradient(
+    circle at 42% 40%,
+    #ffffff 0%,
+    #fff6c8 22%,
+    #ffd56a 55%,
+    #ffb84a 78%,
+    rgba(255, 170, 50, 0.2) 100%
+  );
+  box-shadow:
+    0 0 24px rgba(255, 230, 140, 0.9),
+    0 0 60px rgba(255, 190, 70, 0.45);
+  animation: weather-sunlight-pulse 7s ease-in-out infinite;
+}
+
+.weather-sunlight-shaft {
+  inset: 8% -20% -30% 20%;
+  border-radius: 40%;
+  background: linear-gradient(
+    150deg,
+    rgba(255, 245, 200, 0.35) 0%,
+    rgba(255, 220, 120, 0.12) 38%,
+    transparent 68%
+  );
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  animation: weather-sunlight-shaft 14s ease-in-out infinite;
+}
+
+@keyframes weather-sunlight-drift {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  35% { transform: translate3d(-3%, 2%, 0) scale(1.03); }
-  70% { transform: translate3d(2%, -2%, 0) scale(1.015); }
+  50% { transform: translate3d(-2.5%, 1.5%, 0) scale(1.03); }
 }
 
-@keyframes samsung-sun-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.92; }
-  50% { transform: scale(1.06); opacity: 1; }
+@keyframes weather-sunlight-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
 }
 
-@keyframes samsung-sun-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes samsung-sun-highlight-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.9; }
-  50% { transform: translate3d(12%, 8%, 0) scale(1.08); opacity: 1; }
+@keyframes weather-sunlight-shaft {
+  0%, 100% { transform: rotate(-4deg) translate3d(0, 0, 0); opacity: 0.65; }
+  50% { transform: rotate(3deg) translate3d(-2%, 2%, 0); opacity: 0.85; }
 }
 
 .weather-moon {
@@ -1127,11 +1041,6 @@ input.weather-search-input {
   overflow: visible;
 }
 
-.weather-stage-badge-sun {
-  width: 10.5rem;
-  height: 10.5rem;
-}
-
 .weather-stage-orb {
   position: absolute;
   inset: 0;
@@ -1232,13 +1141,11 @@ input.weather-search-input {
 @media (prefers-reduced-motion: reduce) {
   .weather-stage-orb-clear,
   .weather-stage-orb-partly,
-  .samsung-sun,
-  .samsung-sun-corona,
-  .samsung-sun-rays,
-  .samsung-sun-chromosphere,
-  .samsung-sun-photosphere,
-  .samsung-sun-flare,
-  .samsung-sun-highlight,
+  .weather-sunlight,
+  .weather-sunlight-glow,
+  .weather-sunlight-bloom,
+  .weather-sunlight-core,
+  .weather-sunlight-shaft,
   .fx-rain i,
   .fx-snow i,
   .fx-wind i,
