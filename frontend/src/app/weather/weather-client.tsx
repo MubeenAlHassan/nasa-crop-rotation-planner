@@ -226,7 +226,12 @@ export default function WeatherClient(): ReactElement {
 
   return (
     <div className="weather-page relative min-h-full overflow-hidden text-[var(--on-surface)]">
-      <WeatherAtmosphere theme={theme} isDay={isDay} />
+      <WeatherAtmosphere
+        theme={theme}
+        isDay={isDay}
+        windSpeedKmh={bundle?.current.windSpeedKmh ?? 0}
+        temperatureC={bundle?.current.temperatureC ?? 22}
+      />
       <SiteHeader active="weather" tone="glass" />
 
       <main className="relative z-10 mx-auto max-w-6xl space-y-6 px-4 pb-12 pt-28 sm:px-6 lg:px-8">
