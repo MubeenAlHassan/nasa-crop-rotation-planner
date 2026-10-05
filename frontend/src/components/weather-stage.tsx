@@ -3,6 +3,7 @@
 import { Wind } from "lucide-react";
 import type { ReactElement } from "react";
 import type { WeatherTheme } from "../lib/weather/codes";
+import { WeatherConditionIcon } from "./weather-condition-icon";
 
 export interface WeatherStageProps {
   theme: WeatherTheme;
@@ -17,43 +18,6 @@ function range(count: number): ReadonlyArray<number> {
   return Array.from({ length: count }, (_, index) => index);
 }
 
-function AnimatedSun(): ReactElement {
-  return (
-    <div className="fx-sun" aria-hidden>
-      <span className="fx-sun-glow" />
-      {range(12).map((index) => (
-        <span
-          key={index}
-          className="fx-sun-spoke"
-          style={{ transform: `rotate(${index * 30}deg)` }}
-        />
-      ))}
-      <span className="fx-sun-disk" />
-    </div>
-  );
-}
-
-function AnimatedMoon(): ReactElement {
-  return (
-    <div className="fx-moon" aria-hidden>
-      <span className="fx-moon-glow" />
-      <span className="fx-moon-disk" />
-    </div>
-  );
-}
-
-function AnimatedClouds({ dense = false }: { dense?: boolean }): ReactElement {
-  return (
-    <div className={`fx-clouds${dense ? " is-dense" : ""}`} aria-hidden>
-      <span className="fx-cloud c1" />
-      <span className="fx-cloud c2" />
-      <span className="fx-cloud c3" />
-      <span className="fx-cloud c4" />
-      {dense && <span className="fx-cloud c5" />}
-    </div>
-  );
-}
-
 export function WeatherStage({
   theme,
   isDay,
@@ -62,46 +26,27 @@ export function WeatherStage({
   label,
   placeLabel,
 }: WeatherStageProps): ReactElement {
-  const showSun = (theme === "clear" || theme === "partly") && isDay;
-  const showMoon = (theme === "clear" || theme === "partly") && !isDay;
-  const denseClouds = theme === "cloudy" || theme === "rain" || theme === "storm" || theme === "fog";
-  const showClouds = theme !== "clear";
   const showRain = theme === "rain" || theme === "storm";
   const showSnow = theme === "snow";
   const showWind = windSpeedKmh >= 10 || theme === "storm";
-  const showHeat = theme === "clear" && isDay && (temperatureC ?? 0) >= 30;
+  const temp = temperatureC ?? 22;
 
   return (
     <section
       aria-label="Current sky conditions"
-      className={`weather-stage weather-stage-${theme}${isDay ? "" : " is-night"}${showHeat ? " is-hot" : ""}`}
+      className={`weather-stage weather-stage-${theme}${isDay ? "" : " is-night"}`}
     >
-      <div className="fx-sky-gradient" aria-hidden />
-      <div className="fx-horizon" aria-hidden />
-
-      {showSun && <AnimatedSun />}
-      {showMoon && <AnimatedMoon />}
-      {(showClouds || (theme === "clear" && isDay)) && (
-        <AnimatedClouds dense={denseClouds || theme === "partly"} />
-      )}
-
-      {showWind && (
-        <div className={`fx-wind${windSpeedKmh >= 28 ? " is-strong" : ""}`} aria-hidden>
-          {range(8).map((index) => (
-            <i key={index} style={{ top: `${14 + index * 10}%`, animationDelay: `${index * 0.32}s` }} />
-          ))}
-        </div>
-      )}
+      <div className="weather-stage-bg" aria-hidden />
 
       {showRain && (
         <div className={`fx-rain${theme === "storm" ? " is-heavy" : ""}`} aria-hidden>
-          {range(64).map((index) => (
+          {range(36).map((index) => (
             <i
               key={index}
               style={{
-                left: `${(index * 1.6) % 100}%`,
-                animationDelay: `${(index % 14) * 0.08}s`,
-                animationDuration: theme === "storm" ? "0.55s" : `${0.75 + (index % 5) * 0.08}s`,
+                left: `${(index * 2.8) % 100}%`,
+                animationDelay: `${(index % 10) * 0.1}s`,
+                animationDuration: theme === "storm" ? "0.55s" : `${0.8 + (index % 4) * 0.08}s`,
               }}
             />
           ))}
@@ -110,35 +55,29 @@ export function WeatherStage({
 
       {showSnow && (
         <div className="fx-snow" aria-hidden>
-          {range(48).map((index) => (
+          {range(24).map((index) => (
             <i
               key={index}
               style={{
-                left: `${(index * 2.1) % 100}%`,
-                width: `${5 + (index % 5) * 2}px`,
-                height: `${5 + (index % 5) * 2}px`,
-                animationDelay: `${(index % 16) * 0.12}s`,
-                animationDuration: `${2.6 + (index % 7) * 0.35}s`,
+                left: `${(index * 4) % 100}%`,
+                width: `${5 + (index % 4) * 2}px`,
+                height: `${5 + (index % 4) * 2}px`,
+                animationDelay: `${(index % 12) * 0.14}s`,
               }}
             />
           ))}
         </div>
       )}
 
-      {theme === "storm" && (
-        <>
-          <div className="fx-lightning" aria-hidden />
-          <div className="fx-lightning fx-lightning-b" aria-hidden />
-        </>
-      )}
-
-      {theme === "fog" && (
-        <div className="fx-fog" aria-hidden>
-          <span /><span /><span />
+      {showWind && (
+        <div className="fx-wind" aria-hidden>
+          {range(5).map((index) => (
+            <i key={index} style={{ top: `${22 + index * 14}%`, animationDelay: `${index * 0.4}s` }} />
+          ))}
         </div>
       )}
 
-      {showHeat && <div className="fx-heat" aria-hidden />}
+      {theme === "storm" && <div className="fx-lightning" aria-hidden />}
 
       <div className="weather-stage-content">
         <div className="weather-stage-copy">
@@ -153,6 +92,17 @@ export function WeatherStage({
               Wind {Math.round(windSpeedKmh)} km/h
             </p>
           )}
+        </div>
+
+        <div className="weather-stage-badge" aria-hidden>
+          <span className={`weather-stage-orb weather-stage-orb-${theme}`} />
+          <WeatherConditionIcon
+            theme={theme}
+            label={label}
+            temperatureC={temp}
+            size="lg"
+            className="weather-stage-icon"
+          />
         </div>
       </div>
     </section>
