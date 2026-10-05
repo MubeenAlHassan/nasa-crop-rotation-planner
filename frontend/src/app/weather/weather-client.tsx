@@ -60,6 +60,8 @@ export default function WeatherClient(): ReactElement {
   const [pending, setPending] = useState(false);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Controls muted search-field hint when the value stays empty. */
+  const [searchHint, setSearchHint] = useState<"default" | "mylocation" | "coords">("default");
   const searchController = useRef<AbortController | null>(null);
   const weatherController = useRef<AbortController | null>(null);
   const autoStarted = useRef(false);
@@ -69,7 +71,7 @@ export default function WeatherClient(): ReactElement {
 
   async function loadWeather(
     place: WeatherPlace,
-    options?: { fillSearch?: boolean },
+    options?: { fillSearch?: boolean; hint?: "default" | "mylocation" | "coords" },
   ): Promise<void> {
     weatherController.current?.abort();
     const controller = new AbortController();
@@ -83,7 +85,9 @@ export default function WeatherClient(): ReactElement {
         setBundle(next);
         setLatitude(place.latitude.toFixed(4));
         setLongitude(place.longitude.toFixed(4));
-        // Browser location stays as a placeholder; searched places fill the field.
+        const hint = options?.hint ?? "default";
+        setSearchHint(hint);
+        // Coord / browser location stay as placeholders; searched places fill City, Province, Country.
         if (options?.fillSearch !== false) {
           setQuery(formatPlaceLabel(place));
         } else {
@@ -108,6 +112,7 @@ export default function WeatherClient(): ReactElement {
     setLocating(true);
     setError(null);
     setQuery("");
+    setSearchHint("mylocation");
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
@@ -117,11 +122,9 @@ export default function WeatherClient(): ReactElement {
         setLongitude(lon.toFixed(4));
         try {
           const place = await reverseGeocode(lat, lon);
-          place.name = "Your current location";
-          place.country = "Detected by browser";
           place.latitude = lat;
           place.longitude = lon;
-          await loadWeather(place, { fillSearch: false });
+          await loadWeather(place, { fillSearch: false, hint: "mylocation" });
         } catch (failure: unknown) {
           setError(failure instanceof Error ? failure.message : "Unable to use current location.");
           setBundle(null);
@@ -135,6 +138,7 @@ export default function WeatherClient(): ReactElement {
         setLatitude("");
         setLongitude("");
         setQuery("");
+        setSearchHint("default");
         setError("Location permission denied. Allow location access, or enter coordinates / search a place.");
       },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 },
@@ -159,9 +163,11 @@ export default function WeatherClient(): ReactElement {
 
   const locationPlaceholder = locating
     ? "Detecting your location…"
-    : bundle?.place.name === "Your current location"
+    : searchHint === "mylocation"
       ? "Your current location, detected by browser"
-      : "City, region, or farm town";
+      : searchHint === "coords"
+        ? "Custom field coordinates"
+        : "City, region, or farm town";
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -207,10 +213,13 @@ export default function WeatherClient(): ReactElement {
       return;
     }
     const { lat, lon } = parsedCoords;
-    void reverseGeocode(lat, lon).then((place) => {
-      place.name = "Custom field";
-      place.country = "Worldwide coordinates";
-      return loadWeather(place);
+    setSearchHint("coords");
+    setQuery("");
+    void reverseGeocode(lat, lon).then((place) => (
+      loadWeather(place, { fillSearch: false, hint: "coords" })
+    )).catch((failure: unknown) => {
+      setError(failure instanceof Error ? failure.message : "Unable to check coordinates.");
+      setBundle(null);
     });
   }
 
@@ -275,7 +284,10 @@ export default function WeatherClient(): ReactElement {
                   <input
                     type="text"
                     value={query}
-                    onChange={(event) => setQuery(event.target.value)}
+                    onChange={(event) => {
+                      setSearchHint("default");
+                      setQuery(event.target.value);
+                    }}
                     placeholder={locationPlaceholder}
                     className="weather-search-input"
                     autoComplete="off"

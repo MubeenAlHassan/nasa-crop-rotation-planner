@@ -143,24 +143,56 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
   }));
 }
 
+interface ReverseGeocodeClientPayload {
+  city?: string;
+  locality?: string;
+  principalSubdivision?: string;
+  countryName?: string;
+}
+
+/**
+ * Resolve city / province / country for a WGS84 point.
+ * Uses BigDataCloud's browser reverse-geocode client (Open-Meteo has no reverse endpoint).
+ */
 export async function reverseGeocode(
   latitude: number,
   longitude: number,
   signal?: AbortSignal,
 ): Promise<WeatherPlace> {
-  const url = new URL(GEOCODE_URL);
-  // Open-Meteo geocoding has no reverse endpoint; approximate with nearby place search via forecast timezone + coords label.
-  // Use a tiny search around common cities is unreliable — build a coordinate place and enrich timezone from forecast.
-  void signal;
-  return {
+  const fallback: WeatherPlace = {
     id: `coords:${latitude.toFixed(4)},${longitude.toFixed(4)}`,
     name: `${Math.abs(latitude).toFixed(3)}° ${latitude >= 0 ? "N" : "S"}, ${Math.abs(longitude).toFixed(3)}° ${longitude >= 0 ? "E" : "W"}`,
     latitude,
     longitude,
-    country: "Custom field",
+    country: "",
     admin1: null,
     timezone: null,
   };
+
+  try {
+    const url = new URL("https://api.bigdatacloud.net/data/reverse-geocode-client");
+    url.searchParams.set("latitude", String(latitude));
+    url.searchParams.set("longitude", String(longitude));
+    url.searchParams.set("localityLanguage", "en");
+    const response = await fetch(url, { signal });
+    if (!response.ok) return fallback;
+    const payload = await response.json() as ReverseGeocodeClientPayload;
+    const name = (payload.city || payload.locality || "").trim();
+    const admin1 = (payload.principalSubdivision || "").trim() || null;
+    const country = (payload.countryName || "").trim();
+    if (!name && !admin1 && !country) return fallback;
+    return {
+      id: `coords:${latitude.toFixed(4)},${longitude.toFixed(4)}`,
+      name: name || admin1 || country || fallback.name,
+      latitude,
+      longitude,
+      country,
+      admin1: name ? admin1 : null,
+      timezone: null,
+    };
+  } catch {
+    return fallback;
+  }
 }
 
 export async function fetchWeather(
