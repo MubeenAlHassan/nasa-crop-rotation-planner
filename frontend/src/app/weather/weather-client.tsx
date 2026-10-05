@@ -299,7 +299,7 @@ export default function WeatherClient(): ReactElement {
         windSpeedKmh={bundle?.current.windSpeedKmh ?? 0}
         temperatureC={bundle?.current.temperatureC ?? 22}
       />
-      <SiteHeader active="weather" tone="glass" />
+      <SiteHeader active="weather" />
 
       <main className="relative z-10 mx-auto max-w-6xl space-y-6 px-4 pb-12 pt-28 sm:px-6 lg:px-8">
         <Reveal immediate delayMs={80} className="weather-glass p-5 sm:p-7">
