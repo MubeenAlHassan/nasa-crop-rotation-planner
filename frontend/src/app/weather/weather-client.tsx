@@ -67,7 +67,10 @@ export default function WeatherClient(): ReactElement {
   const parsedCoords = parseCoordinatePair(latitude, longitude);
   const coordsReady = parsedCoords !== null;
 
-  async function loadWeather(place: WeatherPlace): Promise<void> {
+  async function loadWeather(
+    place: WeatherPlace,
+    options?: { fillSearch?: boolean },
+  ): Promise<void> {
     weatherController.current?.abort();
     const controller = new AbortController();
     weatherController.current = controller;
@@ -80,7 +83,12 @@ export default function WeatherClient(): ReactElement {
         setBundle(next);
         setLatitude(place.latitude.toFixed(4));
         setLongitude(place.longitude.toFixed(4));
-        setQuery(formatPlaceLabel(place));
+        // Browser location stays as a placeholder; searched places fill the field.
+        if (options?.fillSearch !== false) {
+          setQuery(formatPlaceLabel(place));
+        } else {
+          setQuery("");
+        }
       }
     } catch (failure: unknown) {
       if (!controller.signal.aborted) {
@@ -99,6 +107,7 @@ export default function WeatherClient(): ReactElement {
     }
     setLocating(true);
     setError(null);
+    setQuery("");
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
@@ -106,14 +115,13 @@ export default function WeatherClient(): ReactElement {
         // Fill the custom-field coords as soon as the browser reports a fix.
         setLatitude(lat.toFixed(4));
         setLongitude(lon.toFixed(4));
-        setQuery("Your current location");
         try {
           const place = await reverseGeocode(lat, lon);
           place.name = "Your current location";
           place.country = "Detected by browser";
           place.latitude = lat;
           place.longitude = lon;
-          await loadWeather(place);
+          await loadWeather(place, { fillSearch: false });
         } catch (failure: unknown) {
           setError(failure instanceof Error ? failure.message : "Unable to use current location.");
           setBundle(null);
@@ -149,11 +157,16 @@ export default function WeatherClient(): ReactElement {
     setPending(false);
   }, [coordsReady]);
 
+  const locationPlaceholder = locating
+    ? "Detecting your location…"
+    : bundle?.place.name === "Your current location"
+      ? "Your current location, detected by browser"
+      : "City, region, or farm town";
+
   useEffect(() => {
     const trimmed = query.trim();
     if (
       trimmed.length < 2
-      || trimmed === "Your current location"
       || (bundle && formatPlaceLabel(bundle.place) === trimmed)
     ) {
       setSuggestions([]);
@@ -263,7 +276,7 @@ export default function WeatherClient(): ReactElement {
                     type="text"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="City, region, or farm town"
+                    placeholder={locationPlaceholder}
                     className="weather-search-input"
                     autoComplete="off"
                   />

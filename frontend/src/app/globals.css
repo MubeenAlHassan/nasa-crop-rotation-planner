@@ -733,6 +733,12 @@ input.weather-search-input {
   padding-right: 0.9rem;
 }
 
+.weather-page input::placeholder {
+  color: var(--outline);
+  opacity: 0.85;
+  font-weight: 500;
+}
+
 .weather-metric {
   display: flex;
   align-items: flex-start;
