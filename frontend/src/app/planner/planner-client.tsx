@@ -9,6 +9,7 @@ import { RecommendationResults } from "../../components/recommendation-results";
 import { RotationTimeline } from "../../components/rotation-timeline";
 import { SoilRadar } from "../../components/soil-radar";
 import { SiteHeader } from "../../components/site-header";
+import { Reveal } from "../../components/reveal";
 import { fetchCropCatalog, recommendRotation } from "../../lib/api/client";
 import {
   DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset, samePoint, type FieldPresetId,
@@ -168,26 +169,29 @@ export default function PlannerClient(): ReactElement {
     <div className="min-h-full bg-[var(--background)] text-[var(--on-surface)]">
       <SiteHeader active="planner" />
       <main className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-28 sm:px-6 lg:px-8">
-        <header className="soft-panel px-5 py-6 sm:px-8">
+        <Reveal immediate as="header" className="soft-panel px-5 py-6 sm:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">NASA data · transparent rules</p>
           <h1 className="font-display mt-2 text-4xl font-bold text-[var(--primary)] sm:text-5xl">Rotation planner</h1>
           <p className="mt-3 max-w-2xl text-base text-[var(--on-surface-variant)] sm:text-lg">
             Explore crop rotation choices using observed climate, local soil context, and transparent agronomic rules.
             Pick an agricultural field preset below, or click the map for any WGS84 point.
           </p>
-        </header>
+        </Reveal>
 
-        <section aria-label="Field presets" className="panel p-5 sm:p-6">
+        <Reveal immediate delayMs={120} as="section" aria-label="Field presets" className="panel p-5 sm:p-6">
           <h2 className="font-display text-xl font-semibold text-[var(--primary)]">Quick agricultural locations</h2>
           <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
             Presets fill map coordinates for known farm / research fields. Only Faisalabad has authorized offline fixture data.
           </p>
           <div className="mt-4 grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {FIELD_PRESETS.map((preset) => {
+            {FIELD_PRESETS.map((preset, index) => {
               const selected = activePreset?.id === preset.id;
               return (
-                <div
+                <Reveal
                   key={preset.id}
+                  immediate
+                  delayMs={180 + index * 80}
+                  variant="up"
                   className={`flex h-full min-h-[17.5rem] flex-col rounded-xl border p-4 ${selected
                     ? "border-[var(--primary)] bg-[var(--surface-container-low)]"
                     : "border-[var(--outline-variant)] bg-white"}`}
@@ -221,16 +225,13 @@ export default function PlannerClient(): ReactElement {
                       </button>
                     )}
                   </div>
-                </div>
+                </Reveal>
               );
             })}
           </div>
-        </section>
+        </Reveal>
 
-        <section
-          aria-label="Pinned demonstration"
-          className="overflow-hidden rounded-2xl border border-[var(--warning-border)] bg-[var(--warning-bg)] p-5 shadow-sm sm:p-6"
-        >
+        <Reveal delayMs={80} as="section" aria-label="Pinned demonstration" className="overflow-hidden rounded-2xl border border-[var(--warning-border)] bg-[var(--warning-bg)] p-5 shadow-sm sm:p-6">
           <div className="max-w-3xl space-y-2 text-[var(--warning-ink)]">
             <h2 className="font-display text-xl font-semibold">Pinned Faisalabad demonstration</h2>
             <p className="text-sm leading-relaxed sm:text-base">
@@ -269,10 +270,10 @@ export default function PlannerClient(): ReactElement {
               </button>
             </section>
           )}
-        </section>
+        </Reveal>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start">
-          <div className="space-y-6">
+          <Reveal delayMs={100} variant="left" className="space-y-6">
             <div className="panel p-4 sm:p-5">
               <FieldMap initialLocation={location} onChange={selectLocation} disabled={false} />
             </div>
@@ -293,9 +294,10 @@ export default function PlannerClient(): ReactElement {
                 />
               </div>
             )}
-          </div>
+          </Reveal>
 
-          <div ref={resultsRef} className="panel space-y-8 p-4 sm:p-6" aria-live="polite">
+          <Reveal delayMs={180} variant="right">
+            <div ref={resultsRef} className="panel space-y-8 p-4 sm:p-6" aria-live="polite">
             {pending && (
               <p role="status" className="rounded-xl bg-[var(--info-bg)] px-4 py-3 text-[var(--info-ink)]">
                 Building recommendations…
@@ -332,7 +334,8 @@ export default function PlannerClient(): ReactElement {
               <ClimateCharts climate={response.features.climate} scenarios={response.features.slot_scenarios} />
               <SoilRadar soil={response.features.soil} />
             </>}
-          </div>
+            </div>
+          </Reveal>
         </div>
       </main>
     </div>

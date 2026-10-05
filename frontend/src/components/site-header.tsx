@@ -10,7 +10,7 @@ export interface SiteHeaderProps {
 
 export function SiteHeader({ active = "home" }: SiteHeaderProps): ReactElement {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[rgba(20,31,18,0.06)] bg-[rgba(243,252,235,0.88)] backdrop-blur-xl">
+    <header className="animate-header-in fixed inset-x-0 top-0 z-50 border-b border-[rgba(20,31,18,0.06)] bg-[rgba(243,252,235,0.88)] backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-4 sm:px-8">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3">
