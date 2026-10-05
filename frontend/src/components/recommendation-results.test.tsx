@@ -12,7 +12,6 @@ vi.mock("recharts", () => ({
   XAxis: () => null,
   YAxis: () => null,
   Tooltip: () => null,
-  Legend: () => null,
   Bar: () => null,
 }));
 
@@ -50,6 +49,9 @@ describe("RecommendationResults", () => {
     expect(screen.getByText("Rank 1: score 83.20")).toBeInTheDocument();
     expect(screen.getByText(/Feasible rotations: 4/)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /component score chart for rank 1/i })).toBeInTheDocument();
+    expect(screen.getByText("Component scores (0–100)")).toBeInTheDocument();
+    expect(screen.getByText("Effective weights (%)")).toBeInTheDocument();
+    expect(screen.getByText(/Unavailable components \(temperature\)/)).toBeInTheDocument();
     expect(screen.queryByRole("table", { name: /rank 1/ })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /^table$/i }));

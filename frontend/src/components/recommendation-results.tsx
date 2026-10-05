@@ -3,7 +3,7 @@
 import { BarChart3, Table2 } from "lucide-react";
 import { useState, type ReactElement } from "react";
 import {
-  Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import type { Exclusion, Message, Recommendation, Source } from "@/lib/generated/contracts";
 
@@ -39,17 +39,23 @@ function modeTone(mode: Source["mode"]): string {
 
 type DetailView = "chart" | "table";
 
+const SCORE_FILL = "#00652c";
+const WEIGHT_FILL = "#006398";
+
 function ComponentBreakdown({ recommendation }: { recommendation: Recommendation }): ReactElement {
   const [view, setView] = useState<DetailView>("chart");
-  const chartData = components.map((name) => {
+  const scoreData = components.map((name) => {
     const score = recommendation.components[name];
     return {
       component: label(name),
-      score: score === null ? 0 : Number(score.toFixed(2)),
-      weight: Number((recommendation.effective_weights[name] * 100).toFixed(2)),
-      unavailable: score === null,
+      score: score === null ? null : Number(score.toFixed(2)),
     };
   });
+  const weightData = components.map((name) => ({
+    component: label(name),
+    weight: Number((recommendation.effective_weights[name] * 100).toFixed(2)),
+  }));
+  const unavailable = components.filter((name) => recommendation.components[name] === null);
 
   return (
     <div className="mt-3 space-y-3">
@@ -91,27 +97,61 @@ function ComponentBreakdown({ recommendation }: { recommendation: Recommendation
 
       {view === "chart" ? (
         <div
-          className="h-64 rounded-lg border border-[var(--panel-border)] bg-[#fbfffc] p-2"
+          className="space-y-3"
           role="img"
           aria-label={`Component score chart for rank ${recommendation.rank}`}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(20,31,18,0.08)" />
-              <XAxis dataKey="component" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip
-                formatter={(value, name) => {
-                  const numeric = typeof value === "number" ? value : Number(value);
-                  if (name === "weight") return [`${formatPlannerNumber(numeric)}%`, "Effective weight"];
-                  return [formatPlannerNumber(numeric), "Score"];
-                }}
-              />
-              <Legend formatter={(value) => (value === "weight" ? "Effective weight %" : "Score")} />
-              <Bar dataKey="score" name="score" fill="var(--brand-strong, #166534)" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="weight" name="weight" fill="var(--primary, #22c55e)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="grid gap-4 md:grid-cols-2">
+            <figure className="rounded-lg border border-[var(--panel-border)] bg-[#fbfffc] p-3">
+              <figcaption className="mb-2 text-sm font-medium text-[var(--foreground)]">
+                Component scores (0–100)
+              </figcaption>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={scoreData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(20,31,18,0.08)" />
+                    <XAxis dataKey="component" tick={{ fontSize: 11 }} interval={0} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                    <Tooltip
+                      formatter={(value) => {
+                        if (value === null || value === undefined) return ["Unavailable", "Score"];
+                        const numeric = typeof value === "number" ? value : Number(value);
+                        return [formatPlannerNumber(numeric), "Score"];
+                      }}
+                    />
+                    <Bar dataKey="score" name="Score" fill={SCORE_FILL} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </figure>
+            <figure className="rounded-lg border border-[var(--panel-border)] bg-[#fbfffc] p-3">
+              <figcaption className="mb-2 text-sm font-medium text-[var(--foreground)]">
+                Effective weights (%)
+              </figcaption>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={weightData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(20,31,18,0.08)" />
+                    <XAxis dataKey="component" tick={{ fontSize: 11 }} interval={0} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} unit="%" />
+                    <Tooltip
+                      formatter={(value) => {
+                        const numeric = typeof value === "number" ? value : Number(value);
+                        return [`${formatPlannerNumber(numeric)}%`, "Effective weight"];
+                      }}
+                    />
+                    <Bar dataKey="weight" name="Effective weight" fill={WEIGHT_FILL} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </figure>
+          </div>
+          {unavailable.length > 0 && (
+            <p className="text-xs text-[var(--muted)]">
+              Unavailable components ({unavailable.map(label).join(", ")}) show no score bar and carry
+              zero effective weight after renormalization.
+            </p>
+          )}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-[var(--panel-border)]">
