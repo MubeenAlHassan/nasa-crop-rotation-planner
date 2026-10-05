@@ -29,7 +29,7 @@ export function WeatherStage({
   const showRain = theme === "rain" || theme === "storm";
   const showSnow = theme === "snow";
   const showWind = windSpeedKmh >= 10 || theme === "storm";
-  // Sunny clear skies: no icon on the temperature card — light comes from the sky.
+  // Clear daytime: sky light only. Clear/partly night: moon icon (never a sun).
   const showStageIcon = !(theme === "clear" && isDay);
   const temp = temperatureC ?? 22;
 
@@ -103,6 +103,7 @@ export function WeatherStage({
               theme={theme}
               label={label}
               temperatureC={temp}
+              isDay={isDay}
               size="lg"
               className="weather-stage-icon"
             />

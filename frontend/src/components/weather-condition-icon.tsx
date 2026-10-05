@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun, Snowflake, Sun, ThermometerSun,
+  Cloud, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Moon, Snowflake, Sun, ThermometerSun,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactElement } from "react";
@@ -32,7 +32,11 @@ export function resolveVisualTheme(theme: WeatherTheme, temperatureC: number): W
   return theme;
 }
 
-function iconFor(theme: WeatherTheme, temperatureC: number): { Icon: LucideIcon; color: string } {
+function iconFor(
+  theme: WeatherTheme,
+  temperatureC: number,
+  isDay: boolean,
+): { Icon: LucideIcon; color: string } {
   const visual = resolveVisualTheme(theme, temperatureC);
   const band = temperatureBand(temperatureC);
 
@@ -43,6 +47,13 @@ function iconFor(theme: WeatherTheme, temperatureC: number): { Icon: LucideIcon;
   }
   if (visual === "fog") return { Icon: CloudFog, color: "text-[#94a3b8]" };
   if (visual === "cloudy") return { Icon: Cloud, color: "text-[#64748b]" };
+
+  // Night: never show a sun — use moon / cloud-moon.
+  if (!isDay) {
+    if (visual === "partly") return { Icon: CloudMoon, color: "text-[#c4b5fd]" };
+    return { Icon: Moon, color: "text-[#e2e8f0]" };
+  }
+
   if (visual === "partly") return { Icon: CloudSun, color: "text-[#0ea5e9]" };
   if (band === "hot") return { Icon: ThermometerSun, color: "text-[#ea580c]" };
   return { Icon: Sun, color: "text-[#d97706]" };
@@ -53,6 +64,8 @@ export interface WeatherConditionIconProps {
   label: string;
   /** Air temperature in °C — used to choose a temperature-aware icon. */
   temperatureC: number;
+  /** When false, clear/partly skies use a moon instead of a sun. */
+  isDay?: boolean;
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -67,10 +80,11 @@ export function WeatherConditionIcon({
   theme,
   label,
   temperatureC,
+  isDay = true,
   size = "md",
   className = "",
 }: WeatherConditionIconProps): ReactElement {
-  const { Icon, color } = iconFor(theme, temperatureC);
+  const { Icon, color } = iconFor(theme, temperatureC, isDay);
   const detail = `${label} · ${Math.round(temperatureC)}°C`;
   return (
     <span
