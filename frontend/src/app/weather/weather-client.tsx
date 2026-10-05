@@ -356,14 +356,7 @@ export default function WeatherClient(): ReactElement {
                     {bundle.place.latitude.toFixed(4)}°, {bundle.place.longitude.toFixed(4)}°
                     {bundle.place.timezone ? ` · ${bundle.place.timezone}` : ""}
                   </p>
-                  <div className="mt-4 flex items-center gap-4">
-                    <WeatherConditionIcon
-                      theme={bundle.current.theme}
-                      label={bundle.current.label}
-                      temperatureC={bundle.current.temperatureC}
-                      size="lg"
-                      className="rounded-2xl bg-[rgba(237,247,229,0.9)] p-2"
-                    />
+                  <div className="mt-4">
                     <p className="font-display text-6xl font-bold tracking-tight sm:text-7xl">
                       {Math.round(bundle.current.temperatureC)}°
                     </p>
