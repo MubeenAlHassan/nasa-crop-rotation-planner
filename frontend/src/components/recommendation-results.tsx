@@ -1,4 +1,10 @@
-import type { ReactElement } from "react";
+"use client";
+
+import { BarChart3, Table2 } from "lucide-react";
+import { useState, type ReactElement } from "react";
+import {
+  Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis,
+} from "recharts";
 import type { Exclusion, Message, Recommendation, Source } from "@/lib/generated/contracts";
 
 export interface RecommendationResultsProps {
@@ -15,11 +21,123 @@ export interface RecommendationResultsProps {
 const components = ["nitrogen", "roots", "water", "temperature", "soil"] as const;
 const label = (value: string): string => value.replaceAll("_", " ");
 
+/** Display numeric planner values with at least two decimal places. */
+export function formatPlannerNumber(value: number): string {
+  return value.toFixed(2);
+}
+
+function formatComponentScore(value: number | null): string {
+  return value === null ? "Unavailable" : formatPlannerNumber(value);
+}
+
 function modeTone(mode: Source["mode"]): string {
   if (mode === "fixture" || mode === "live" || mode === "cache" || mode === "farmer_input") {
     return "bg-[var(--brand-soft)] text-[var(--brand-strong)] ring-[var(--panel-border)]";
   }
   return "bg-slate-100 text-slate-700 ring-slate-200";
+}
+
+type DetailView = "chart" | "table";
+
+function ComponentBreakdown({ recommendation }: { recommendation: Recommendation }): ReactElement {
+  const [view, setView] = useState<DetailView>("chart");
+  const chartData = components.map((name) => {
+    const score = recommendation.components[name];
+    return {
+      component: label(name),
+      score: score === null ? 0 : Number(score.toFixed(2)),
+      weight: Number((recommendation.effective_weights[name] * 100).toFixed(2)),
+      unavailable: score === null,
+    };
+  });
+
+  return (
+    <div className="mt-3 space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium text-[var(--muted)]">Component breakdown</p>
+        <div
+          role="group"
+          aria-label={`Detail view for rank ${recommendation.rank}`}
+          className="inline-flex rounded-lg border border-[var(--panel-border)] bg-[var(--brand-soft)]/40 p-0.5"
+        >
+          <button
+            type="button"
+            aria-pressed={view === "chart"}
+            className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition ${
+              view === "chart"
+                ? "bg-white text-[var(--brand-strong)] shadow-sm"
+                : "text-[var(--muted)] hover:text-[var(--foreground)]"
+            }`}
+            onClick={() => setView("chart")}
+          >
+            <BarChart3 className="h-3.5 w-3.5" aria-hidden />
+            Chart
+          </button>
+          <button
+            type="button"
+            aria-pressed={view === "table"}
+            className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition ${
+              view === "table"
+                ? "bg-white text-[var(--brand-strong)] shadow-sm"
+                : "text-[var(--muted)] hover:text-[var(--foreground)]"
+            }`}
+            onClick={() => setView("table")}
+          >
+            <Table2 className="h-3.5 w-3.5" aria-hidden />
+            Table
+          </button>
+        </div>
+      </div>
+
+      {view === "chart" ? (
+        <div
+          className="h-64 rounded-lg border border-[var(--panel-border)] bg-[#fbfffc] p-2"
+          role="img"
+          aria-label={`Component score chart for rank ${recommendation.rank}`}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(20,31,18,0.08)" />
+              <XAxis dataKey="component" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip
+                formatter={(value, name) => {
+                  const numeric = typeof value === "number" ? value : Number(value);
+                  if (name === "weight") return [`${formatPlannerNumber(numeric)}%`, "Effective weight"];
+                  return [formatPlannerNumber(numeric), "Score"];
+                }}
+              />
+              <Legend formatter={(value) => (value === "weight" ? "Effective weight %" : "Score")} />
+              <Bar dataKey="score" name="score" fill="var(--brand-strong, #166534)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="weight" name="weight" fill="var(--primary, #22c55e)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-[var(--panel-border)]">
+          <table>
+            <caption>Returned component scores and effective weights for rank {recommendation.rank}</caption>
+            <thead>
+              <tr className="bg-[var(--brand-soft)]/50">
+                <th scope="col">Component</th>
+                <th scope="col">Score</th>
+                <th scope="col">Effective weight</th>
+              </tr>
+            </thead>
+            <tbody>
+              {components.map((name) => (
+                <tr key={name}>
+                  <th scope="row">{label(name)}</th>
+                  <td>{formatComponentScore(recommendation.components[name])}</td>
+                  <td>{formatPlannerNumber(recommendation.effective_weights[name])}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function RecommendationResults({
@@ -66,30 +184,10 @@ export function RecommendationResults({
           {recommendations.map((recommendation) => (
             <li key={recommendation.rotation_id} className="rounded-xl border border-[var(--panel-border)] bg-white p-4 shadow-sm">
               <h3 className="text-lg font-semibold text-[var(--brand-strong)]">
-                Rank {recommendation.rank}: score {recommendation.score}
+                Rank {recommendation.rank}: score {formatPlannerNumber(recommendation.score)}
               </h3>
               <p className="mt-1 text-base font-medium">{recommendation.slots.map((slot) => slot.crop_name).join(" → ")}</p>
-              <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--panel-border)]">
-                <table>
-                  <caption>Returned component scores and effective weights for rank {recommendation.rank}</caption>
-                  <thead>
-                    <tr className="bg-[var(--brand-soft)]/50">
-                      <th scope="col">Component</th>
-                      <th scope="col">Score</th>
-                      <th scope="col">Effective weight</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {components.map((name) => (
-                      <tr key={name}>
-                        <th scope="row">{label(name)}</th>
-                        <td>{recommendation.components[name] === null ? "Unavailable" : recommendation.components[name]}</td>
-                        <td>{recommendation.effective_weights[name]}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ComponentBreakdown recommendation={recommendation} />
               <h4 className="mt-4 font-semibold text-[var(--brand-strong)]">Reasons</h4>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[var(--foreground)]">
                 {recommendation.reasons.map((reason, index) => (
