@@ -86,10 +86,18 @@ export default function WeatherClient(): ReactElement {
     setError(null);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        // Fill the custom-field coords as soon as the browser reports a fix.
+        setLatitude(lat.toFixed(4));
+        setLongitude(lon.toFixed(4));
+        setQuery("Your current location");
         try {
-          const place = await reverseGeocode(position.coords.latitude, position.coords.longitude);
+          const place = await reverseGeocode(lat, lon);
           place.name = "Your current location";
           place.country = "Detected by browser";
+          place.latitude = lat;
+          place.longitude = lon;
           await loadWeather(place);
         } catch (failure: unknown) {
           setError(failure instanceof Error ? failure.message : "Unable to use current location.");
@@ -99,9 +107,9 @@ export default function WeatherClient(): ReactElement {
       },
       () => {
         setLocating(false);
-        setError("Location permission denied. Search a city or enter coordinates instead.");
+        setError("Location permission denied. Allow location access, or enter coordinates / search a place.");
       },
-      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 60_000 },
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 },
     );
   }
 
@@ -114,7 +122,7 @@ export default function WeatherClient(): ReactElement {
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 2 || (bundle && formatPlaceLabel(bundle.place) === trimmed)) {
+    if (trimmed.length < 2 || trimmed === "Your current location" || (bundle && formatPlaceLabel(bundle.place) === trimmed)) {
       setSuggestions([]);
       return undefined;
     }
@@ -147,6 +155,10 @@ export default function WeatherClient(): ReactElement {
 
   function onCoordsSubmit(event: FormEvent): void {
     event.preventDefault();
+    if (latitude.trim() === "" || longitude.trim() === "") {
+      setError("Waiting for your location… or type latitude and longitude manually.");
+      return;
+    }
     const lat = Number(latitude);
     const lon = Number(longitude);
     if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) {
@@ -218,10 +230,22 @@ export default function WeatherClient(): ReactElement {
               <p className="text-sm font-semibold">Custom field (WGS84)</p>
               <div className="grid grid-cols-2 gap-2">
                 <label className="text-xs">Latitude
-                  <input type="number" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="31.4504" />
+                  <input
+                    type="number"
+                    step="any"
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
+                    placeholder={locating ? "Detecting…" : "e.g. 31.4504"}
+                  />
                 </label>
                 <label className="text-xs">Longitude
-                  <input type="number" step="any" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="73.1350" />
+                  <input
+                    type="number"
+                    step="any"
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                    placeholder={locating ? "Detecting…" : "e.g. 73.1350"}
+                  />
                 </label>
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
