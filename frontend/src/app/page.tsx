@@ -18,17 +18,17 @@ export default function LandingPage(): ReactElement {
   return (
     <div className="min-h-full bg-[var(--background)] text-[var(--on-surface)]">
       <SiteHeader active="home" />
-      <main className="pt-20">
-        <section className="px-4 py-10 sm:px-8 sm:py-14">
-          <div className="mx-auto flex max-w-[1440px] flex-col items-center text-center">
-            <Reveal immediate delayMs={40} variant="down" className="badge mb-6 bg-[var(--surface-container)] text-[var(--primary)] shadow-sm">
+      <main>
+        <section aria-label="Field Shift hero" className="w-full pt-20">
+          <HeroSlider>
+            <Reveal immediate delayMs={40} variant="down" className="badge mb-6 border border-white/25 bg-white/15 text-white shadow-sm backdrop-blur-md">
               <ShieldCheck className="h-4 w-4" aria-hidden />
               NASA Space Apps · Explainable crop-rotation decision aid
             </Reveal>
-            <Reveal immediate delayMs={120} as="h1" className="font-display max-w-4xl text-3xl font-bold tracking-tight text-[var(--on-surface)] sm:text-5xl">
+            <Reveal immediate delayMs={120} as="h1" className="font-display max-w-4xl text-3xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
               Smarter rotation choices, grounded in observed climate and transparent rules
             </Reveal>
-            <Reveal immediate delayMs={220} as="p" className="mt-4 max-w-2xl text-base text-[var(--on-surface-variant)] sm:text-lg">
+            <Reveal immediate delayMs={220} as="p" className="mt-4 max-w-2xl text-base text-white/90 sm:text-lg">
               Field Shift ranks feasible next crops from NASA POWER climate context, local soil signals, and
               deterministic agronomic constraints — not yield forecasts or fertilizer prescriptions.
             </Reveal>
@@ -37,18 +37,15 @@ export default function LandingPage(): ReactElement {
                 Open the planner
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
-              <Link href="/planner?demo=1" className="btn-secondary w-full sm:w-auto">
-                <PlayCircle className="h-5 w-5 text-[var(--primary)]" aria-hidden />
+              <Link
+                href="/planner?demo=1"
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-white/40 bg-white/15 px-6 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/25 sm:w-auto"
+              >
+                <PlayCircle className="h-5 w-5" aria-hidden />
                 Watch pinned field demo
               </Link>
             </Reveal>
-          </div>
-        </section>
-
-        <section aria-label="Field photography" className="w-full">
-          <Reveal immediate delayMs={420} variant="fade" className="w-full">
-            <HeroSlider />
-          </Reveal>
+          </HeroSlider>
         </section>
 
         <section className="px-4 py-6 sm:px-8">

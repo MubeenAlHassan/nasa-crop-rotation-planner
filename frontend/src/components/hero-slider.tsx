@@ -1,7 +1,6 @@
 "use client";
 
-import { CloudSun, MapPinned, Sprout } from "lucide-react";
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 
 export interface HeroSlide {
   src: string;
@@ -36,9 +35,10 @@ const FADE_MS = 900;
 
 export interface HeroSliderProps {
   slides?: readonly HeroSlide[];
+  children?: ReactNode;
 }
 
-export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps): ReactElement {
+export function HeroSlider({ slides = DEFAULT_SLIDES, children }: HeroSliderProps): ReactElement {
   const [index, setIndex] = useState(0);
   const [baseIndex, setBaseIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -70,7 +70,7 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps): ReactE
 
   return (
     <div
-      className="hero-slider relative h-[340px] w-full overflow-hidden rounded-none bg-[#16301a] shadow-[var(--shadow-lift)] sm:h-[500px] md:h-[580px] lg:h-[640px]"
+      className="hero-slider relative flex min-h-[calc(100svh-5rem)] w-full flex-col overflow-hidden bg-[#16301a]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -101,37 +101,15 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps): ReactE
         );
       })}
 
-      <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-[rgba(22,30,19,0.5)] via-transparent to-transparent" />
+      <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-b from-[rgba(12,20,10,0.55)] via-[rgba(12,20,10,0.4)] to-[rgba(12,20,10,0.65)]" />
 
-      <div className="absolute left-4 top-4 z-[4] flex items-center gap-3 rounded-xl bg-[rgba(255,255,255,0.95)] p-3 shadow-lg sm:left-8 sm:top-8 sm:p-4">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--secondary-fixed)] text-[var(--secondary)]">
-          <CloudSun className="h-5 w-5" aria-hidden />
-        </span>
-        <div className="text-left">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">Observed climate</p>
-          <p className="font-display text-sm font-semibold sm:text-base">90-day POWER anomalies</p>
-        </div>
-      </div>
-      <div className="absolute bottom-5 left-4 z-[4] flex items-center gap-3 rounded-xl bg-[rgba(255,255,255,0.95)] p-3 shadow-lg sm:bottom-8 sm:left-8 sm:p-4">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary-fixed)] text-[var(--primary)]">
-          <MapPinned className="h-5 w-5" aria-hidden />
-        </span>
-        <div className="text-left">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">Pinned demo farm</p>
-          <p className="font-display text-sm font-semibold sm:text-base">Faisalabad 31.4504° N, 73.135° E</p>
-        </div>
-      </div>
-      <div className="absolute bottom-5 right-4 z-[4] hidden items-center gap-3 rounded-xl bg-[rgba(255,255,255,0.95)] p-4 shadow-lg sm:flex sm:bottom-8 sm:right-8">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--tertiary-fixed)] text-[var(--tertiary)]">
-          <Sprout className="h-5 w-5" aria-hidden />
-        </span>
-        <div className="text-left">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">Decision output</p>
-          <p className="font-display text-sm font-semibold">Ranked rotations + reasons</p>
+      <div className="relative z-[4] flex flex-1 flex-col items-center justify-center px-4 pb-24 pt-16 text-center sm:px-8 sm:pb-28 sm:pt-20">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-4xl flex-col items-center">
+          {children}
         </div>
       </div>
 
-      <div className="absolute bottom-5 left-1/2 z-[5] flex -translate-x-1/2 items-center gap-2 rounded-full bg-[rgba(15,23,12,0.45)] px-3 py-2 backdrop-blur-sm sm:bottom-8">
+      <div className="absolute bottom-6 left-1/2 z-[5] flex -translate-x-1/2 items-center gap-2 rounded-full bg-[rgba(15,23,12,0.45)] px-3 py-2 backdrop-blur-sm sm:bottom-8">
         {slides.map((slide, slideIndex) => (
           <button
             key={slide.src}
