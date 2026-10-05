@@ -3,7 +3,7 @@
 import { Wind } from "lucide-react";
 import type { ReactElement } from "react";
 import type { WeatherTheme } from "../lib/weather/codes";
-import { WeatherConditionIcon } from "./weather-condition-icon";
+import { WeatherStageEmblem } from "./weather-stage-emblem";
 
 export interface WeatherStageProps {
   theme: WeatherTheme;
@@ -29,9 +29,8 @@ export function WeatherStage({
   const showRain = theme === "rain" || theme === "storm";
   const showSnow = theme === "snow";
   const showWind = windSpeedKmh >= 10 || theme === "storm";
-  // Clear daytime: sky light only. Clear/partly night: moon icon (never a sun).
+  // Clear daytime: sky light only — no badge. Everything else gets the frosted emblem.
   const showStageIcon = !(theme === "clear" && isDay);
-  const temp = temperatureC ?? 22;
 
   return (
     <section
@@ -99,14 +98,7 @@ export function WeatherStage({
         {showStageIcon && (
           <div className="weather-stage-badge" aria-hidden>
             <span className={`weather-stage-orb weather-stage-orb-${theme}`} />
-            <WeatherConditionIcon
-              theme={theme}
-              label={label}
-              temperatureC={temp}
-              isDay={isDay}
-              size="lg"
-              className="weather-stage-icon"
-            />
+            <WeatherStageEmblem theme={theme} isDay={isDay} label={label} />
           </div>
         )}
       </div>
