@@ -752,53 +752,49 @@ input.weather-search-input {
   min-height: 11.5rem;
   border-radius: 1.35rem;
   border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow: 0 14px 34px rgba(30, 50, 25, 0.12);
+  background: transparent;
+  box-shadow: 0 14px 34px rgba(30, 50, 25, 0.1);
   color: #16301a;
+  backdrop-filter: blur(2px);
 }
 
 .weather-stage-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
 }
 
-.weather-stage-clear .weather-stage-bg {
-  background:
-    radial-gradient(circle at 88% 30%, rgba(255, 220, 120, 0.55) 0%, transparent 34%),
-    linear-gradient(120deg, #dff3ff 0%, #b8e0ff 42%, #ffe9a8 100%);
-}
-
+.weather-stage-clear .weather-stage-bg,
 .weather-stage-partly .weather-stage-bg {
-  background:
-    radial-gradient(circle at 86% 28%, rgba(255, 220, 120, 0.4) 0%, transparent 32%),
-    linear-gradient(120deg, #d7ecff 0%, #c5d9e8 50%, #efe6c2 100%);
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 55%,
+    rgba(255, 240, 180, 0.12) 100%
+  );
 }
 
-.weather-stage-cloudy .weather-stage-bg {
-  background: linear-gradient(120deg, #d5dde4 0%, #c2ccd6 55%, #dfe6df 100%);
-}
-
+.weather-stage-cloudy .weather-stage-bg,
 .weather-stage-fog .weather-stage-bg {
-  background: linear-gradient(120deg, #d8dee3 0%, #e7ebef 55%, #eef1ee 100%);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .weather-stage-rain .weather-stage-bg {
-  background: linear-gradient(135deg, #4b6073 0%, #6f8496 50%, #8fa398 100%);
-  color: #f4f8ff;
+  background: rgba(20, 35, 50, 0.22);
 }
 
 .weather-stage-snow .weather-stage-bg {
-  background: linear-gradient(135deg, #9eb6cf 0%, #d5e4f2 55%, #f5f9fc 100%);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .weather-stage-storm .weather-stage-bg {
-  background: linear-gradient(135deg, #1b2430 0%, #3a4a5b 52%, #5a6a5e 100%);
-  color: #f4f8ff;
+  background: rgba(10, 16, 24, 0.28);
 }
 
 .weather-stage.is-night .weather-stage-bg {
-  background: linear-gradient(135deg, #0d1b2a 0%, #1b3350 55%, #243b2e 100%);
-  color: #f4f8ff;
+  background: rgba(8, 16, 28, 0.28);
 }
 
 .weather-stage-rain,
@@ -827,7 +823,8 @@ input.weather-search-input {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.72;
+  opacity: 0.8;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.55);
 }
 
 .weather-stage-title {
@@ -836,6 +833,7 @@ input.weather-search-input {
   font-size: clamp(1.35rem, 2.4vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.02em;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.45);
 }
 
 .weather-stage-temp {
@@ -845,6 +843,7 @@ input.weather-search-input {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.04em;
+  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.4);
 }
 
 .weather-stage-meta {
