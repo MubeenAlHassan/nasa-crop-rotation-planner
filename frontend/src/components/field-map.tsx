@@ -217,24 +217,31 @@ export function FieldMap({ initialLocation, onChange, disabled }: FieldMapProps)
   const busy = disabled || searching || locating;
 
   return (
-    <section aria-label="Field location" className="space-y-3">
-      <div className="flex items-end justify-between gap-3">
+    <section aria-label="Field location" className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-2">
         <h2 className="text-lg font-semibold text-[var(--brand-strong)]">Field location</h2>
         <p className="text-xs text-[var(--muted)]">Search, locate, click map, or type WGS84</p>
       </div>
 
-      <form onSubmit={onSearchSubmit} className="space-y-2">
-        <label className="text-sm font-medium">
+      <form
+        onSubmit={onSearchSubmit}
+        className="field-location-search space-y-3 rounded-xl border border-[var(--panel-border)] bg-[var(--brand-soft)]/35 p-3 sm:p-4"
+      >
+        <label className="text-sm font-semibold text-[var(--on-surface)]">
           Search a place
-          <div className="relative mt-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" aria-hidden />
+          <div className="relative mt-1.5">
+            <Search
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--brand-strong)]"
+              aria-hidden
+            />
             <input
               type="search"
               value={query}
               disabled={busy}
               autoComplete="off"
+              spellCheck={false}
               placeholder={locating ? "Detecting your location…" : "City, region, or farm town"}
-              className="w-full pl-10"
+              className="field-location-search-input"
               onChange={(event) => {
                 setQuery(event.target.value);
                 setPlaceLabel(null);
@@ -242,24 +249,25 @@ export function FieldMap({ initialLocation, onChange, disabled }: FieldMapProps)
             />
           </div>
         </label>
+
         {suggestions.length > 0 && (
           <ul
             role="listbox"
             aria-label="Place suggestions"
-            className="max-h-52 overflow-auto rounded-xl border border-[var(--panel-border)] bg-white shadow-sm"
+            className="max-h-52 overflow-auto rounded-xl border border-[var(--panel-border)] bg-white shadow-[var(--shadow-card)]"
           >
             {suggestions.map((place) => (
-              <li key={place.id} role="option">
+              <li key={place.id} role="option" className="border-b border-[var(--panel-border)] last:border-b-0">
                 <button
                   type="button"
                   disabled={busy}
-                  className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-[var(--brand-soft)]/40"
+                  className="flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left text-sm transition hover:bg-[var(--brand-soft)]/55"
                   onClick={() => applyLocation(place.latitude, place.longitude, formatPlaceLabel(place))}
                 >
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--brand-strong)]" aria-hidden />
                   <span>
-                    <span className="font-semibold">{place.name}</span>
-                    <span className="block text-[var(--muted)]">
+                    <span className="font-semibold text-[var(--on-surface)]">{place.name}</span>
+                    <span className="mt-0.5 block text-xs text-[var(--muted)]">
                       {[place.admin1, place.country].filter(Boolean).join(", ")} · {place.latitude.toFixed(2)}, {place.longitude.toFixed(2)}
                     </span>
                   </span>
@@ -268,13 +276,18 @@ export function FieldMap({ initialLocation, onChange, disabled }: FieldMapProps)
             ))}
           </ul>
         )}
-        <div className="flex flex-wrap gap-2">
-          <button type="submit" className="btn-primary text-sm" disabled={busy || query.trim().length < 2}>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          <button
+            type="submit"
+            className="btn-primary h-11 w-full text-sm"
+            disabled={busy || query.trim().length < 2}
+          >
             {searching ? "Searching…" : "Use searched place"}
           </button>
           <button
             type="button"
-            className="btn-secondary text-sm"
+            className="btn-secondary h-11 w-full text-sm"
             disabled={busy}
             onClick={useCurrentLocation}
           >
@@ -282,14 +295,14 @@ export function FieldMap({ initialLocation, onChange, disabled }: FieldMapProps)
             {locating ? "Detecting…" : "Current location"}
           </button>
         </div>
-      </form>
 
-      {placeLabel && (
-        <p className="inline-flex items-center gap-1.5 text-sm text-[var(--muted)]">
-          <MapPin className="h-3.5 w-3.5 text-[var(--brand-strong)]" aria-hidden />
-          {placeLabel}
-        </p>
-      )}
+        {placeLabel && (
+          <p className="inline-flex items-center gap-1.5 rounded-lg bg-white/80 px-2.5 py-1.5 text-sm text-[var(--on-surface-variant)] ring-1 ring-[var(--panel-border)]">
+            <MapPin className="h-3.5 w-3.5 text-[var(--brand-strong)]" aria-hidden />
+            <span>{placeLabel}</span>
+          </p>
+        )}
+      </form>
 
       <div ref={containerRef} aria-label="Map coordinate picker" className="h-64 w-full overflow-hidden rounded-xl border border-[var(--panel-border)]" />
       <p className="text-sm text-[var(--muted)]">Map tiles © OpenStreetMap contributors. Select a point or enter coordinates below.</p>
