@@ -42,11 +42,13 @@ export default function LandingPage(): ReactElement {
                 Watch pinned field demo
               </Link>
             </Reveal>
-
-            <Reveal immediate delayMs={420} variant="scale" className="relative mt-10 w-full max-w-5xl overflow-hidden rounded-2xl bg-[var(--surface-container-lowest)] shadow-[var(--shadow-lift)]">
-              <HeroSlider />
-            </Reveal>
           </div>
+        </section>
+
+        <section aria-label="Field photography" className="w-full">
+          <Reveal immediate delayMs={420} variant="fade" className="w-full">
+            <HeroSlider />
+          </Reveal>
         </section>
 
         <section className="px-4 py-6 sm:px-8">

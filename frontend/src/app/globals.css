@@ -284,20 +284,24 @@ caption {
   font-weight: 600;
 }
 
-/* Landing hero field photography slider */
+/* Landing hero field photography slider — crossfade without background flash */
 .hero-slider-slide {
   opacity: 0;
-  transform: scale(1.04);
-  transition:
-    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 4.5s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
+  z-index: 0;
+  transition: opacity 900ms ease-in-out;
+  will-change: opacity;
+  backface-visibility: hidden;
+}
+
+.hero-slider-slide.is-base {
+  opacity: 1;
+  z-index: 1;
+  transition: none;
 }
 
 .hero-slider-slide.is-active {
   opacity: 1;
-  transform: scale(1);
-  z-index: 1;
+  z-index: 2;
 }
 
 .hero-slider-dot {
