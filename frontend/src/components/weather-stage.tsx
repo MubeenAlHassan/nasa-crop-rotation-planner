@@ -20,10 +20,15 @@ function range(count: number): ReadonlyArray<number> {
 function AnimatedSun(): ReactElement {
   return (
     <div className="fx-sun" aria-hidden>
-      <span className="fx-sun-rays" />
-      <span className="fx-sun-corona" />
-      <span className="fx-sun-core" />
-      <span className="fx-sun-shine" />
+      <span className="fx-sun-glow" />
+      {range(12).map((index) => (
+        <span
+          key={index}
+          className="fx-sun-spoke"
+          style={{ transform: `rotate(${index * 30}deg)` }}
+        />
+      ))}
+      <span className="fx-sun-disk" />
     </div>
   );
 }

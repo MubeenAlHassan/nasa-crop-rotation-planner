@@ -750,11 +750,11 @@ input.weather-search-input {
   overflow: hidden;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  min-height: 50vh;
-  min-height: 50dvh;
+  min-height: 13.5rem;
+  height: clamp(13.5rem, 24vh, 17rem);
   border: 0;
   border-radius: 0;
-  box-shadow: 0 18px 40px rgba(20, 35, 18, 0.18);
+  box-shadow: 0 12px 28px rgba(20, 35, 18, 0.12);
   color: #f7faf5;
 }
 
@@ -828,81 +828,48 @@ input.weather-search-input {
 
 .fx-sun {
   position: absolute;
-  top: 8%;
-  right: 8%;
-  width: min(18rem, 42vw);
-  height: min(18rem, 42vw);
+  top: 50%;
+  right: clamp(1.5rem, 8vw, 5rem);
+  width: 7.5rem;
+  height: 7.5rem;
   z-index: 2;
   display: grid;
   place-items: center;
   pointer-events: none;
+  transform: translateY(-55%);
 }
 
-.fx-sun-rays {
+.fx-sun-glow {
   position: absolute;
-  inset: 0;
+  inset: -35%;
   border-radius: 9999px;
-  background: conic-gradient(
-    from 0deg,
-    rgba(255, 220, 80, 0.7) 0deg,
-    transparent 16deg,
-    rgba(255, 220, 80, 0.55) 32deg,
-    transparent 48deg,
-    rgba(255, 220, 80, 0.7) 64deg,
-    transparent 80deg,
-    rgba(255, 220, 80, 0.55) 96deg,
-    transparent 112deg,
-    rgba(255, 220, 80, 0.7) 128deg,
-    transparent 144deg,
-    rgba(255, 220, 80, 0.55) 160deg,
-    transparent 176deg,
-    rgba(255, 220, 80, 0.7) 192deg,
-    transparent 208deg,
-    rgba(255, 220, 80, 0.55) 224deg,
-    transparent 240deg,
-    rgba(255, 220, 80, 0.7) 256deg,
-    transparent 272deg,
-    rgba(255, 220, 80, 0.55) 288deg,
-    transparent 304deg,
-    rgba(255, 220, 80, 0.7) 320deg,
-    transparent 336deg,
-    rgba(255, 220, 80, 0.55) 360deg
-  );
-  animation: weather-sun-spin 22s linear infinite;
-  filter: blur(0.5px);
-  opacity: 0.85;
+  background: radial-gradient(circle, rgba(255, 236, 150, 0.7) 0%, rgba(255, 200, 80, 0.25) 42%, transparent 70%);
+  animation: weather-sun-pulse 5s ease-in-out infinite;
 }
 
-.fx-sun-corona {
+.fx-sun-spoke {
   position: absolute;
-  inset: 12%;
+  left: 50%;
+  top: 50%;
+  width: 0.18rem;
+  height: 1.15rem;
+  margin-left: -0.09rem;
+  margin-top: -3.15rem;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(255, 240, 170, 0.95) 0%, rgba(255, 180, 50, 0.35) 48%, transparent 70%);
-  animation: weather-sun-pulse 4.5s ease-in-out infinite;
+  background: linear-gradient(180deg, #ffe566 0%, rgba(255, 210, 80, 0.15) 100%);
+  transform-origin: center 3.15rem;
+  opacity: 0.9;
+  animation: weather-sun-pulse 4s ease-in-out infinite;
 }
 
-.fx-sun-core {
+.fx-sun-disk {
   position: relative;
   z-index: 2;
-  width: 42%;
-  height: 42%;
+  width: 3.4rem;
+  height: 3.4rem;
   border-radius: 9999px;
-  background:
-    radial-gradient(circle at 32% 30%, #fffef6 0%, #ffe566 40%, #ff9f1a 78%, #f07800 100%);
-  box-shadow:
-    0 0 28px rgba(255, 210, 70, 1),
-    0 0 70px rgba(255, 160, 30, 0.75),
-    0 0 120px rgba(255, 120, 0, 0.4);
-  animation: weather-sun-pulse 5.5s ease-in-out infinite;
-}
-
-.fx-sun-shine {
-  position: absolute;
-  inset: -18%;
-  border-radius: 9999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 55%);
-  mix-blend-mode: screen;
-  animation: weather-sun-pulse 3.8s ease-in-out infinite reverse;
+  background: radial-gradient(circle at 40% 35%, #fff9d6 0%, #ffe566 45%, #ffb84d 100%);
+  box-shadow: 0 0 18px rgba(255, 200, 60, 0.65);
 }
 
 .fx-moon {
@@ -952,11 +919,11 @@ input.weather-search-input {
   animation: weather-cloud-drift 30s linear infinite;
 }
 
-.fx-cloud.c1 { top: 12%; left: -12%; width: 8rem; opacity: 0.9; }
-.fx-cloud.c2 { top: 24%; left: 10%; width: 11rem; opacity: 0.82; animation-duration: 38s; }
-.fx-cloud.c3 { top: 16%; left: 48%; width: 9rem; opacity: 0.78; animation-duration: 46s; animation-direction: reverse; }
-.fx-cloud.c4 { top: 34%; left: 70%; width: 10rem; opacity: 0.72; animation-duration: 34s; }
-.fx-cloud.c5 { top: 42%; left: 25%; width: 12rem; opacity: 0.7; animation-duration: 42s; }
+.fx-cloud.c1 { top: 18%; left: -12%; width: 7rem; opacity: 0.88; }
+.fx-cloud.c2 { top: 36%; left: 8%; width: 9rem; opacity: 0.78; animation-duration: 38s; }
+.fx-cloud.c3 { top: 22%; left: 42%; width: 8rem; opacity: 0.75; animation-duration: 46s; animation-direction: reverse; }
+.fx-cloud.c4 { top: 48%; left: 68%; width: 8.5rem; opacity: 0.7; animation-duration: 34s; }
+.fx-cloud.c5 { top: 58%; left: 22%; width: 10rem; opacity: 0.65; animation-duration: 42s; }
 
 .fx-clouds.is-dense .fx-cloud {
   background: rgba(220, 228, 236, 0.92);
@@ -1060,11 +1027,11 @@ input.weather-search-input {
   position: relative;
   z-index: 6;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
-  padding: clamp(1.5rem, 4vw, 3rem);
-  min-height: 50vh;
-  min-height: 50dvh;
+  padding: 1.25rem clamp(1.25rem, 4vw, 3rem);
+  height: 100%;
+  min-height: 0;
 }
 
 .weather-stage-copy {
@@ -1093,17 +1060,17 @@ input.weather-search-input {
 }
 
 .weather-stage-title {
-  margin-top: 0.45rem;
+  margin-top: 0.25rem;
   font-family: var(--font-display), "Plus Jakarta Sans", sans-serif;
-  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .weather-stage-temp {
-  margin-top: 0.45rem;
+  margin-top: 0.15rem;
   font-family: var(--font-display), "Plus Jakarta Sans", sans-serif;
-  font-size: clamp(4.5rem, 11vw, 7rem);
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: -0.04em;
@@ -1124,10 +1091,8 @@ input.weather-search-input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fx-sun-rays,
-  .fx-sun-corona,
-  .fx-sun-core,
-  .fx-sun-shine,
+  .fx-sun-glow,
+  .fx-sun-spoke,
   .fx-cloud,
   .fx-wind i,
   .fx-rain i,
