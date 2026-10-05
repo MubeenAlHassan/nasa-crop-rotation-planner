@@ -182,39 +182,45 @@ export default function PlannerClient(): ReactElement {
           <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
             Presets fill map coordinates for known farm / research fields. Only Faisalabad has authorized offline fixture data.
           </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-4 grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {FIELD_PRESETS.map((preset) => {
               const selected = activePreset?.id === preset.id;
               return (
                 <div
                   key={preset.id}
-                  className={`rounded-xl border p-4 ${selected
+                  className={`flex h-full min-h-[17.5rem] flex-col rounded-xl border p-4 ${selected
                     ? "border-[var(--primary)] bg-[var(--surface-container-low)]"
                     : "border-[var(--outline-variant)] bg-white"}`}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--on-surface-variant)]">{preset.region}</p>
-                  <p className="font-display mt-1 font-semibold">{preset.name}</p>
-                  <p className="mt-1 text-sm text-[var(--on-surface-variant)]">{formatCoords(preset.location)}</p>
-                  <p className="mt-2 text-xs text-[var(--muted)]">{preset.summary}</p>
-                  {preset.kind === "fixture" ? (
-                    <div className="mt-3 flex flex-col gap-2">
-                      <button type="button" onClick={() => armDemo("rainfed")} disabled={pending} className="btn-secondary">
-                        Rainfed demo
-                      </button>
-                      <button type="button" onClick={() => armDemo("available")} disabled={pending} className="btn-primary">
-                        Irrigated demo (wheat)
-                      </button>
-                    </div>
-                  ) : (
-                    <button type="button" onClick={() => usePreset(preset.id)} disabled={pending} className="btn-primary mt-3 w-full">
-                      Use {preset.name.split(" ")[0]} location
-                    </button>
-                  )}
-                  {selected && preset.kind === "custom" && (
-                    <p role="status" className="mt-2 text-sm text-[var(--info-ink)]">
-                      {preset.name} selected. Review form dates, then submit with Current data.
+                  <div className="flex min-h-0 flex-1 flex-col gap-1">
+                    <p className="line-clamp-2 min-h-[2.5rem] text-xs font-semibold uppercase tracking-wide text-[var(--on-surface-variant)]">
+                      {preset.region}
                     </p>
-                  )}
+                    <p className="font-display line-clamp-2 min-h-[3rem] font-semibold leading-snug">{preset.name}</p>
+                    <p className="text-sm text-[var(--on-surface-variant)]">{formatCoords(preset.location)}</p>
+                    <p className="mt-1 line-clamp-3 text-xs text-[var(--muted)]">{preset.summary}</p>
+                    {selected && preset.kind === "custom" && (
+                      <p role="status" className="mt-2 text-sm text-[var(--info-ink)]">
+                        {preset.name} selected. Review form dates, then submit with Current data.
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-auto flex min-h-[5.75rem] flex-col justify-end gap-2 pt-3">
+                    {preset.kind === "fixture" ? (
+                      <>
+                        <button type="button" onClick={() => armDemo("rainfed")} disabled={pending} className="btn-secondary w-full">
+                          Rainfed demo
+                        </button>
+                        <button type="button" onClick={() => armDemo("available")} disabled={pending} className="btn-primary w-full">
+                          Irrigated demo (wheat)
+                        </button>
+                      </>
+                    ) : (
+                      <button type="button" onClick={() => usePreset(preset.id)} disabled={pending} className="btn-primary w-full">
+                        Use {preset.name.split(" ")[0]} location
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
             })}
