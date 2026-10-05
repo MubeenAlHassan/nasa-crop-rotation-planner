@@ -743,7 +743,8 @@ input.weather-search-input {
   to { transform: translateY(-10px); opacity: 0.65; }
 }
 
-/* Dedicated on-page weather stage (always visible above cards) */
+
+/* Dedicated animated weather stage (no photo backgrounds) */
 .weather-stage {
   position: relative;
   overflow: hidden;
@@ -754,77 +755,333 @@ input.weather-search-input {
   border: 0;
   border-radius: 0;
   box-shadow: 0 18px 40px rgba(20, 35, 18, 0.18);
+  color: #f7faf5;
 }
 
-.weather-stage-photo {
+.fx-sky-gradient {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
   z-index: 0;
-  transform: scale(1.02);
+  transition: background 600ms ease;
 }
 
-.weather-stage-shade {
+.weather-stage-clear .fx-sky-gradient {
+  background:
+    radial-gradient(circle at 78% 28%, rgba(255, 240, 160, 0.95) 0%, rgba(255, 190, 70, 0.35) 22%, transparent 42%),
+    linear-gradient(180deg, #2f9bff 0%, #7ec8ff 38%, #c9e8a8 78%, #8fbf5a 100%);
+}
+
+.weather-stage-clear.is-hot .fx-sky-gradient {
+  background:
+    radial-gradient(circle at 80% 24%, rgba(255, 255, 210, 1) 0%, rgba(255, 170, 40, 0.55) 24%, transparent 46%),
+    linear-gradient(180deg, #1f8fff 0%, #6abfff 34%, #ffe08a 72%, #f0c85a 100%);
+}
+
+.weather-stage-partly .fx-sky-gradient {
+  background:
+    radial-gradient(circle at 82% 26%, rgba(255, 230, 140, 0.7) 0%, transparent 36%),
+    linear-gradient(180deg, #4aa8ff 0%, #9ad0ff 40%, #d7ebc0 100%);
+}
+
+.weather-stage-cloudy .fx-sky-gradient {
+  background: linear-gradient(180deg, #6d7f90 0%, #9aabba 45%, #c5d0c2 100%);
+}
+
+.weather-stage-fog .fx-sky-gradient {
+  background: linear-gradient(180deg, #8f9aa4 0%, #c2cbd1 50%, #dfe5df 100%);
+}
+
+.weather-stage-rain .fx-sky-gradient {
+  background: linear-gradient(185deg, #2a3b4d 0%, #4d6478 42%, #6f8674 100%);
+}
+
+.weather-stage-snow .fx-sky-gradient {
+  background: linear-gradient(180deg, #6f90b4 0%, #b7cfe4 48%, #eef4f9 100%);
+}
+
+.weather-stage-storm .fx-sky-gradient {
+  background: linear-gradient(180deg, #101820 0%, #2a3848 44%, #46564c 100%);
+}
+
+.weather-stage.is-night .fx-sky-gradient {
+  background:
+    radial-gradient(circle at 76% 24%, rgba(255, 255, 230, 0.35) 0%, transparent 18%),
+    linear-gradient(180deg, #071525 0%, #16324f 48%, #1d3a2e 100%);
+}
+
+.fx-horizon {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -12%;
+  height: 42%;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, rgba(70, 120, 50, 0.35), transparent 68%);
+  pointer-events: none;
+}
+
+.weather-stage-rain .fx-horizon,
+.weather-stage-storm .fx-horizon,
+.weather-stage-snow .fx-horizon {
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.12), transparent 68%);
+}
+
+.fx-sun {
+  position: absolute;
+  top: 8%;
+  right: 8%;
+  width: min(18rem, 42vw);
+  height: min(18rem, 42vw);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.fx-sun-rays {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  background:
-    linear-gradient(90deg, rgba(10, 22, 16, 0.55) 0%, rgba(10, 22, 16, 0.2) 42%, rgba(10, 22, 16, 0.08) 100%),
-    linear-gradient(180deg, rgba(10, 22, 16, 0.12) 0%, rgba(10, 22, 16, 0.35) 100%);
-  pointer-events: none;
-}
-
-.weather-stage.is-night .weather-stage-shade {
-  background:
-    linear-gradient(90deg, rgba(4, 10, 20, 0.72) 0%, rgba(4, 10, 20, 0.4) 50%, rgba(4, 10, 20, 0.3) 100%);
-}
-
-.weather-stage-rain .weather-stage-shade,
-.weather-stage-storm .weather-stage-shade {
-  background:
-    linear-gradient(90deg, rgba(8, 14, 22, 0.62) 0%, rgba(8, 14, 22, 0.28) 55%, rgba(8, 14, 22, 0.2) 100%);
-}
-
-.weather-stage-sunbeam {
-  position: absolute;
-  right: -5%;
-  top: -20%;
-  width: min(55vw, 34rem);
-  height: min(55vw, 34rem);
   border-radius: 9999px;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(255, 230, 140, 0.55) 18%, rgba(255, 190, 60, 0.22) 40%, transparent 68%);
-  mix-blend-mode: screen;
-  animation: weather-sun-pulse 7s ease-in-out infinite;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 220, 80, 0.7) 0deg,
+    transparent 16deg,
+    rgba(255, 220, 80, 0.55) 32deg,
+    transparent 48deg,
+    rgba(255, 220, 80, 0.7) 64deg,
+    transparent 80deg,
+    rgba(255, 220, 80, 0.55) 96deg,
+    transparent 112deg,
+    rgba(255, 220, 80, 0.7) 128deg,
+    transparent 144deg,
+    rgba(255, 220, 80, 0.55) 160deg,
+    transparent 176deg,
+    rgba(255, 220, 80, 0.7) 192deg,
+    transparent 208deg,
+    rgba(255, 220, 80, 0.55) 224deg,
+    transparent 240deg,
+    rgba(255, 220, 80, 0.7) 256deg,
+    transparent 272deg,
+    rgba(255, 220, 80, 0.55) 288deg,
+    transparent 304deg,
+    rgba(255, 220, 80, 0.7) 320deg,
+    transparent 336deg,
+    rgba(255, 220, 80, 0.55) 360deg
+  );
+  animation: weather-sun-spin 22s linear infinite;
+  filter: blur(0.5px);
+  opacity: 0.85;
 }
 
-.weather-stage-partly .weather-stage-sunbeam {
-  opacity: 0.7;
-  right: 5%;
-  width: min(42vw, 26rem);
-  height: min(42vw, 26rem);
+.fx-sun-corona {
+  position: absolute;
+  inset: 12%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 240, 170, 0.95) 0%, rgba(255, 180, 50, 0.35) 48%, transparent 70%);
+  animation: weather-sun-pulse 4.5s ease-in-out infinite;
+}
+
+.fx-sun-core {
+  position: relative;
+  z-index: 2;
+  width: 42%;
+  height: 42%;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 32% 30%, #fffef6 0%, #ffe566 40%, #ff9f1a 78%, #f07800 100%);
+  box-shadow:
+    0 0 28px rgba(255, 210, 70, 1),
+    0 0 70px rgba(255, 160, 30, 0.75),
+    0 0 120px rgba(255, 120, 0, 0.4);
+  animation: weather-sun-pulse 5.5s ease-in-out infinite;
+}
+
+.fx-sun-shine {
+  position: absolute;
+  inset: -18%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 55%);
+  mix-blend-mode: screen;
+  animation: weather-sun-pulse 3.8s ease-in-out infinite reverse;
+}
+
+.fx-moon {
+  position: absolute;
+  top: 10%;
+  right: 12%;
+  width: 7.5rem;
+  height: 7.5rem;
+  z-index: 2;
+}
+
+.fx-moon-glow {
+  position: absolute;
+  inset: -30%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 230, 0.45), transparent 65%);
+}
+
+.fx-moon-disk {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 35% 35%, #f8f4df, #d6cba0 70%);
+  box-shadow: 0 0 36px rgba(255, 255, 220, 0.4);
+}
+
+.fx-clouds {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fx-cloud {
+  position: absolute;
+  display: block;
+  height: 2.8rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    2.4rem -0.85rem 0 0.45rem rgba(255, 255, 255, 0.88),
+    4.8rem 0.15rem 0 0.1rem rgba(255, 255, 255, 0.8),
+    -1.7rem 0.25rem 0 0.05rem rgba(255, 255, 255, 0.78);
+  filter: drop-shadow(0 10px 16px rgba(30, 50, 30, 0.12));
+  animation: weather-cloud-drift 30s linear infinite;
+}
+
+.fx-cloud.c1 { top: 12%; left: -12%; width: 8rem; opacity: 0.9; }
+.fx-cloud.c2 { top: 24%; left: 10%; width: 11rem; opacity: 0.82; animation-duration: 38s; }
+.fx-cloud.c3 { top: 16%; left: 48%; width: 9rem; opacity: 0.78; animation-duration: 46s; animation-direction: reverse; }
+.fx-cloud.c4 { top: 34%; left: 70%; width: 10rem; opacity: 0.72; animation-duration: 34s; }
+.fx-cloud.c5 { top: 42%; left: 25%; width: 12rem; opacity: 0.7; animation-duration: 42s; }
+
+.fx-clouds.is-dense .fx-cloud {
+  background: rgba(220, 228, 236, 0.92);
+  box-shadow:
+    2.4rem -0.85rem 0 0.45rem rgba(220, 228, 236, 0.92),
+    4.8rem 0.15rem 0 0.1rem rgba(200, 210, 220, 0.88),
+    -1.7rem 0.25rem 0 0.05rem rgba(210, 218, 226, 0.85);
+}
+
+.fx-wind i {
+  position: absolute;
+  left: -20%;
+  width: 36%;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  z-index: 4;
+  animation: weather-wind-sweep 3.4s linear infinite;
+}
+
+.fx-wind.is-strong i {
+  height: 3px;
+  width: 44%;
+  animation-duration: 2s;
+}
+
+.fx-rain i,
+.fx-snow i {
+  position: absolute;
+  top: -12%;
+  display: block;
+  border-radius: 9999px;
+  z-index: 4;
+}
+
+.fx-rain i {
+  width: 2px;
+  height: 18px;
+  background: linear-gradient(180deg, transparent, rgba(230, 242, 255, 0.95));
+  transform: rotate(14deg);
+  animation: weather-fall 0.8s linear infinite;
+}
+
+.fx-rain.is-heavy i {
+  width: 2.5px;
+  height: 24px;
+}
+
+.fx-snow i {
+  background: radial-gradient(circle, #fff 0%, rgba(220, 240, 255, 0.9) 60%, transparent 72%);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
+  animation: weather-snow-fall 3.2s linear infinite;
+}
+
+.fx-lightning {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.14);
+  animation: weather-flash 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.fx-lightning-b {
+  animation-delay: 1.6s;
+  background: rgba(180, 210, 255, 0.16);
+}
+
+.fx-fog span {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  height: 28%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.42);
+  filter: blur(18px);
+  z-index: 4;
+  animation: weather-fog-drift 11s ease-in-out infinite alternate;
+}
+
+.fx-fog span:nth-child(1) { top: 30%; }
+.fx-fog span:nth-child(2) { top: 48%; opacity: 0.7; animation-duration: 14s; }
+.fx-fog span:nth-child(3) { top: 64%; opacity: 0.55; animation-duration: 12s; }
+
+.fx-heat {
+  position: absolute;
+  inset: 18% 0 0;
+  z-index: 4;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0px,
+    rgba(255, 210, 120, 0.1) 10px,
+    rgba(255, 255, 255, 0.02) 20px
+  );
+  mix-blend-mode: soft-light;
+  animation: weather-heat-shimmer 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
 .weather-stage-content {
   position: relative;
-  z-index: 3;
+  z-index: 6;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  gap: 1.25rem;
   padding: clamp(1.5rem, 4vw, 3rem);
   min-height: 50vh;
   min-height: 50dvh;
-  color: #f7faf5;
 }
 
 .weather-stage-copy {
   max-width: 34rem;
+}
+
+.weather-stage-clear .weather-stage-copy,
+.weather-stage-partly .weather-stage-copy,
+.weather-stage-snow .weather-stage-copy {
+  color: #16301a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.weather-stage-clear .weather-stage-kicker,
+.weather-stage-partly .weather-stage-kicker,
+.weather-stage-snow .weather-stage-kicker {
+  color: rgba(22, 48, 26, 0.75);
 }
 
 .weather-stage-kicker {
@@ -841,7 +1098,6 @@ input.weather-search-input {
   font-size: clamp(1.9rem, 4vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
 }
 
 .weather-stage-temp {
@@ -851,7 +1107,6 @@ input.weather-search-input {
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: -0.04em;
-  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
 .weather-stage-meta {
@@ -860,65 +1115,26 @@ input.weather-search-input {
   align-items: center;
   gap: 0.4rem;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 0.4rem 0.85rem;
   font-size: 0.9rem;
   font-weight: 600;
   backdrop-filter: blur(8px);
 }
 
-.stage-rain i,
-.stage-snow i {
-  position: absolute;
-  top: -10%;
-  display: block;
-  border-radius: 9999px;
-  z-index: 2;
-}
-
-.stage-rain i {
-  width: 3px;
-  height: 18px;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.95));
-  animation: weather-fall 0.8s linear infinite;
-}
-
-.stage-snow i {
-  background: #fff;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
-  animation: weather-snow-fall 3s linear infinite;
-}
-
-.stage-wind i {
-  position: absolute;
-  left: -15%;
-  width: 40%;
-  height: 3px;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
-  z-index: 2;
-  animation: weather-wind-sweep 3.2s linear infinite;
-}
-
-@media (max-width: 640px) {
-  .weather-stage-sunbeam {
-    width: 12rem;
-    height: 12rem;
-    right: -1rem;
-    top: -1rem;
-  }
-
-  .weather-stage-content {
-    align-items: flex-end;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .weather-stage-sunbeam,
-  .stage-rain i,
-  .stage-snow i,
-  .stage-wind i {
+  .fx-sun-rays,
+  .fx-sun-corona,
+  .fx-sun-core,
+  .fx-sun-shine,
+  .fx-cloud,
+  .fx-wind i,
+  .fx-rain i,
+  .fx-snow i,
+  .fx-lightning,
+  .fx-fog span,
+  .fx-heat {
     animation: none !important;
   }
 }
