@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactElement } from "
 import { Reveal } from "../../components/reveal";
 import { SiteHeader } from "../../components/site-header";
 import { WeatherAtmosphere } from "../../components/weather-atmosphere";
-import { WeatherConditionIcon } from "../../components/weather-condition-icon";
+import { WeatherConditionIcon, resolveVisualTheme } from "../../components/weather-condition-icon";
 import { describeWeatherCode } from "../../lib/weather/codes";
 import {
   fetchWeather, formatPlaceLabel, reverseGeocode, searchPlaces,
@@ -218,7 +218,9 @@ export default function WeatherClient(): ReactElement {
     }
   }
 
-  const theme = bundle?.current.theme ?? "partly";
+  const theme = bundle
+    ? resolveVisualTheme(bundle.current.theme, bundle.current.temperatureC)
+    : "partly";
   const isDay = bundle?.current.isDay ?? true;
   const showResults = coordsReady && bundle !== null;
 
@@ -341,6 +343,7 @@ export default function WeatherClient(): ReactElement {
                     <WeatherConditionIcon
                       theme={bundle.current.theme}
                       label={bundle.current.label}
+                      temperatureC={bundle.current.temperatureC}
                       size="lg"
                       className="rounded-2xl bg-[rgba(237,247,229,0.9)] p-2"
                     />
@@ -386,6 +389,7 @@ export default function WeatherClient(): ReactElement {
                         <WeatherConditionIcon
                           theme={describeWeatherCode(hour.weatherCode).theme}
                           label={hour.label}
+                          temperatureC={hour.temperatureC}
                           size="sm"
                         />
                       </div>
@@ -401,11 +405,19 @@ export default function WeatherClient(): ReactElement {
             <Reveal delayMs={160} className="weather-glass p-4 sm:p-5">
               <h2 className="font-display mb-3 text-xl font-semibold">7-day outlook</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
-                {bundle.daily.map((day) => (
-                  <article key={day.date} className={`weather-day weather-day-${day.theme}`}>
+                {bundle.daily.map((day) => {
+                  const dayTemp = (day.tempMaxC + day.tempMinC) / 2;
+                  const dayVisual = resolveVisualTheme(day.theme, dayTemp);
+                  return (
+                  <article key={day.date} className={`weather-day weather-day-${dayVisual}`}>
                     <p className="text-xs font-bold uppercase tracking-wide">{formatDay(day.date)}</p>
                     <div className="mt-3 flex items-center justify-center">
-                      <WeatherConditionIcon theme={day.theme} label={day.label} size="lg" />
+                      <WeatherConditionIcon
+                        theme={day.theme}
+                        label={day.label}
+                        temperatureC={dayTemp}
+                        size="lg"
+                      />
                     </div>
                     <p className="mt-2 text-center text-sm font-semibold">{day.label}</p>
                     <p className="mt-3 text-center text-2xl font-bold">{Math.round(day.tempMaxC)}°</p>
@@ -417,7 +429,8 @@ export default function WeatherClient(): ReactElement {
                       <div className="flex justify-between gap-2"><dt>UV max</dt><dd>{day.uvIndexMax.toFixed(1)}</dd></div>
                     </dl>
                   </article>
-                ))}
+                  );
+                })}
               </div>
             </Reveal>
 
