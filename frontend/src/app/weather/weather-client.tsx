@@ -270,12 +270,12 @@ export default function WeatherClient(): ReactElement {
                 </div>
               </label>
               {suggestions.length > 0 && (
-                <ul className="overflow-hidden rounded-xl border border-[var(--outline-variant)] bg-white shadow-lg">
+                <ul className="weather-suggest">
                   {suggestions.map((place) => (
                     <li key={place.id}>
                       <button
                         type="button"
-                        className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-[var(--surface-container-low)]"
+                        className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm"
                         onClick={() => void loadWeather(place)}
                       >
                         <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--primary)]" aria-hidden />
