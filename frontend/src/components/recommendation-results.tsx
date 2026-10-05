@@ -8,6 +8,8 @@ export interface RecommendationResultsProps {
   sources: ReadonlyArray<Source>;
   warnings: ReadonlyArray<Message>;
   exclusions: ReadonlyArray<Exclusion>;
+  onRetryWithIrrigation?: () => void;
+  retrying?: boolean;
 }
 
 const components = ["nitrogen", "roots", "water", "temperature", "soil"] as const;
@@ -22,6 +24,7 @@ function modeTone(mode: Source["mode"]): string {
 
 export function RecommendationResults({
   recommendations, feasibleRotationCount, dataQuality, sources, warnings, exclusions,
+  onRetryWithIrrigation, retrying = false,
 }: RecommendationResultsProps): ReactElement {
   return (
     <section aria-label="Recommendation results" className="space-y-5">
@@ -44,8 +47,19 @@ export function RecommendationResults({
         >
           <p className="font-semibold">No feasible rotation was returned.</p>
           <p className="mt-1 text-sm">
-            Review the exclusions and input constraints below. For this rainfed demo, try Irrigation → Available and submit again.
+            Under rainfed constraints, wheat is excluded because it requires irrigation, and other catalog crops miss this Rabi planting window.
+            Try irrigation available to unlock the documented wheat alternative.
           </p>
+          {onRetryWithIrrigation && (
+            <button
+              type="button"
+              className="btn-primary mt-4"
+              disabled={retrying}
+              onClick={onRetryWithIrrigation}
+            >
+              {retrying ? "Running irrigated demo…" : "Retry with irrigation available"}
+            </button>
+          )}
         </div>
       ) : (
         <ol className="space-y-4">

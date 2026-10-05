@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent, type ReactElement } from "react";
 import type { CropCatalogResponse, History, Location, RecommendationRequest, Slot, SoilOverride } from "@/lib/generated/contracts";
+import { FIELD_PRESETS, findPreset, formatCoords } from "../lib/field-presets";
 
 export interface RecommendationFormProps {
   catalog: CropCatalogResponse;
@@ -10,6 +11,12 @@ export interface RecommendationFormProps {
   onSubmit: (request: RecommendationRequest) => void;
   /** Increment to apply the pinned Faisalabad demo defaults into the form. */
   demoApplyKey?: number;
+  /** Irrigation value applied with the next demoApplyKey. */
+  demoIrrigation?: RecommendationRequest["irrigation"];
+  /** Increment when a custom map point is chosen to switch into Current data mode. */
+  customApplyKey?: number;
+  /** Keep parent/map location in sync when the farmer edits coordinates in the form. */
+  onLocationCommit?: (location: Location) => void;
 }
 
 const DEMO_ASSESSMENT = "2025-10-15";
@@ -17,6 +24,30 @@ const DEMO_SLOTS: Slot[] = [{ slot_id: "rabi_2025", start_date: "2025-11-01", en
 const DEMO_HISTORY: History[] = [{
   crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "retained",
 }];
+
+function isoTodayUtc(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function addUtcDays(iso: string, days: number): string {
+  const time = Date.parse(`${iso}T00:00:00.000Z`);
+  return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
+}
+
+function customPlanDefaults(assessment: string): { slots: Slot[]; history: History[] } {
+  const year = Number(assessment.slice(0, 4));
+  const month = Number(assessment.slice(5, 7));
+  // Prefer an upcoming Rabi-like window after assessment.
+  const startYear = month >= 11 ? year + 1 : year;
+  const start = `${startYear}-11-01`;
+  const end = `${startYear + 1}-03-31`;
+  const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
+  const slotEnd = end <= slotStart ? addUtcDays(slotStart, 120) : end;
+  return {
+    slots: [{ slot_id: "rabi_slot", start_date: slotStart, end_date: slotEnd }],
+    history: [],
+  };
+}
 
 type Errors = Record<string, string>;
 type SoilKey = "ph" | "soc_g_kg" | "total_n_g_kg" | "sand_pct" | "silt_pct" | "clay_pct";
@@ -44,6 +75,7 @@ function numeric(value: string, min: number, max: number): number | null {
 
 export function RecommendationForm({
   catalog, initialLocation, submitting, onSubmit, demoApplyKey = 0,
+  demoIrrigation = "rainfed", customApplyKey = 0, onLocationCommit,
 }: RecommendationFormProps): ReactElement {
   const [latitude, setLatitude] = useState(initialLocation?.latitude.toString() ?? "");
   const [longitude, setLongitude] = useState(initialLocation?.longitude.toString() ?? "");
@@ -62,6 +94,7 @@ export function RecommendationForm({
   });
   const [errors, setErrors] = useState<Errors>({});
   const [appliedDemoKey, setAppliedDemoKey] = useState(0);
+  const [appliedCustomKey, setAppliedCustomKey] = useState(0);
   const cropIds = new Set(catalog.crops.map((crop) => crop.crop_id));
 
   const [external, setExternal] = useState({ latitude: initialLocation?.latitude, longitude: initialLocation?.longitude });
@@ -75,7 +108,7 @@ export function RecommendationForm({
     setAssessment(DEMO_ASSESSMENT);
     setSlots(DEMO_SLOTS.map((slot) => ({ ...slot })));
     setHistory(DEMO_HISTORY.map((row) => ({ ...row })));
-    setIrrigation("rainfed");
+    setIrrigation(demoIrrigation);
     setAllowed([]);
     setExcluded([]);
     setDataMode("fixture");
@@ -84,6 +117,33 @@ export function RecommendationForm({
     setSampledOn("");
     setSoilValues({ ph: "", soc_g_kg: "", total_n_g_kg: "", sand_pct: "", silt_pct: "", clay_pct: "" });
     setErrors({});
+  }
+  if (customApplyKey > 0 && customApplyKey !== appliedCustomKey) {
+    setAppliedCustomKey(customApplyKey);
+    const assessmentDate = isoTodayUtc();
+    const plan = customPlanDefaults(assessmentDate);
+    setAssessment(assessmentDate);
+    setSlots(plan.slots);
+    setHistory(plan.history);
+    setIrrigation("available");
+    setAllowed([]);
+    setExcluded([]);
+    setDataMode("auto");
+    setTopK(3);
+    setUseSoil(false);
+    setSampledOn("");
+    setSoilValues({ ph: "", soc_g_kg: "", total_n_g_kg: "", sand_pct: "", silt_pct: "", clay_pct: "" });
+    setErrors({});
+  }
+
+  function commitCoordinates(nextLatitude: string, nextLongitude: string): void {
+    setLatitude(nextLatitude);
+    setLongitude(nextLongitude);
+    const lat = numeric(nextLatitude, -90, 90);
+    const lon = numeric(nextLongitude, -180, 180);
+    if (lat !== null && lon !== null && onLocationCommit) {
+      onLocationCommit({ latitude: lat, longitude: lon });
+    }
   }
 
   function updateSlot(index: number, key: keyof Slot, value: string): void {
@@ -174,9 +234,43 @@ export function RecommendationForm({
         <legend>Plan a crop rotation</legend>
         <p className="text-sm text-[var(--muted)]">Region: {catalog.region_id}</p>
         <div className="grid grid-cols-2 gap-3">
-          <label>Latitude<input type="number" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} /></label>
-          <label>Longitude<input type="number" step="any" value={longitude} onChange={(e) => setLongitude(e.target.value)} /></label>
+          <label>Latitude
+            <input type="number" step="any" value={latitude}
+              onChange={(e) => commitCoordinates(e.target.value, longitude)} />
+          </label>
+          <label>Longitude
+            <input type="number" step="any" value={longitude}
+              onChange={(e) => commitCoordinates(latitude, e.target.value)} />
+          </label>
         </div>
+        {(() => {
+          const lat = numeric(latitude, -90, 90);
+          const lon = numeric(longitude, -180, 180);
+          if (lat === null || lon === null) return null;
+          const preset = findPreset({ latitude: lat, longitude: lon });
+          if (preset?.kind === "fixture") {
+            return (
+              <p className="rounded-lg bg-[var(--surface-container-low)] px-3 py-2 text-sm text-[var(--on-surface-variant)]">
+                Pinned Faisalabad point selected. Use <strong>Authorized demo fixture</strong> for offline results, or run the demo buttons above.
+              </p>
+            );
+          }
+          if (preset) {
+            return (
+              <p className="rounded-lg bg-[var(--info-bg)] px-3 py-2 text-sm text-[var(--info-ink)]">
+                {preset.name} selected ({formatCoords(preset.location)}). Data mode is <strong>Current data</strong> —
+                this agricultural field has no offline fixture archive.
+              </p>
+            );
+          }
+          return (
+            <p className="rounded-lg bg-[var(--info-bg)] px-3 py-2 text-sm text-[var(--info-ink)]">
+              Custom location selected. Data mode is set to <strong>Current data</strong>.
+              Offline fixtures only exist for Faisalabad — live climate needs prepared POWER baselines for this point.
+              Known presets: {FIELD_PRESETS.filter((item) => item.kind === "custom").map((item) => item.name).join(", ")}.
+            </p>
+          );
+        })()}
         {errors.location && <p role="alert" className="text-sm text-[var(--danger-ink)]">{errors.location}</p>}
         <label>Assessment date<input type="date" value={assessment} onChange={(e) => setAssessment(e.target.value)} /></label>
         {errors.assessment && <p role="alert" className="text-sm text-[var(--danger-ink)]">{errors.assessment}</p>}

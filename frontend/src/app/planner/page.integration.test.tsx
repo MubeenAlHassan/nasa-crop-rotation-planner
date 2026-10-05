@@ -54,7 +54,7 @@ describe("farmer dashboard integration", () => {
     const fetcher = endpoint();
     render(<PlannerPage />);
     await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
     expectPinnedFormFilled();
     await screen.findByRole("heading", { name: "Ranked alternatives" });
     const post = fetcher.mock.calls.find(([url]) => url === "/api/recommend-rotation");
@@ -74,22 +74,35 @@ describe("farmer dashboard integration", () => {
     expect(screen.getByText(/Surface soil moisture is unavailable/)).toBeInTheDocument();
   });
 
-  it("renders zero-result state without a timeline", async () => {
+  it("renders zero-result state without a timeline and can retry with irrigation", async () => {
     const response = structuredClone(samples[1]);
     response.status = "no_feasible_rotation";
     response.feasible_rotation_count = 0;
     response.recommendations = [];
     response.warnings.push({ code: "NO_FEASIBLE_ROTATION", message: "No feasible rotation." });
-    endpoint(response);
+    const irrigated = structuredClone(samples[1]);
+    const fetcher = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.includes("?region_id=")) return Response.json(catalog);
+      if (url === "/api/recommend-rotation" && init?.method === "POST") {
+        const body = JSON.parse(init.body as string) as { irrigation: string };
+        return Response.json(body.irrigation === "available" ? irrigated : response);
+      }
+      throw new Error(`Unexpected same-origin path: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
     render(<PlannerPage />);
     await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
     expectPinnedFormFilled();
     expect(await screen.findByText(/No feasible rotation was returned/)).toBeInTheDocument();
     expect(screen.queryByText(/Rotation timeline, rank/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Retry with irrigation available" }));
+    await screen.findByRole("heading", { name: "Ranked alternatives" });
+    expect(screen.getByText(/Rotation timeline, rank 1/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Irrigation")).toHaveValue("available");
   });
 
-  it("cancels a pending request on coordinate change and denies fixture data to nearby points", async () => {
+  it("cancels a pending request on coordinate change and switches custom points to current data", async () => {
     let resolvePost: ((response: Response) => void) | undefined;
     const fetcher = vi.fn((url: string, init?: RequestInit) => {
       if (url.includes("?region_id=")) return Promise.resolve(Response.json(catalog));
@@ -99,7 +112,7 @@ describe("farmer dashboard integration", () => {
     vi.stubGlobal("fetch", fetcher);
     render(<PlannerPage />);
     await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: "Use pinned Faisalabad demo" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
     expectPinnedFormFilled();
     await waitFor(() => expect(resolvePost).toBeDefined());
     const first = fetcher.mock.calls.find(([, init]) => init?.method === "POST");
@@ -107,6 +120,9 @@ describe("farmer dashboard integration", () => {
     expect(first?.[1]?.signal?.aborted).toBe(true);
     resolvePost!(Response.json(samples[1]));
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Ranked alternatives" })).not.toBeInTheDocument());
+    expect(screen.getByLabelText("Data mode")).toHaveValue("auto");
+    expect(screen.getByText(/Custom location selected/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Data mode"), { target: { value: "fixture" } });
     fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
     expect(await screen.findByText(/Use the pinned Faisalabad demo action/)).toBeInTheDocument();
     expect(fetcher.mock.calls.filter(([, init]) => init?.method === "POST")).toHaveLength(1);
