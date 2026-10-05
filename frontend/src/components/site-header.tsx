@@ -11,7 +11,7 @@ export interface SiteHeaderProps {
 
 export function SiteHeader({ active = "home", tone = "default" }: SiteHeaderProps): ReactElement {
   const headerClass = tone === "glass"
-    ? "animate-header-in fixed inset-x-0 top-0 z-50 border-b border-white/35 bg-[rgba(243,252,235,0.48)] backdrop-blur-2xl"
+    ? "animate-header-in fixed inset-x-0 top-0 z-50 border-b border-white/40 bg-[rgba(255,255,255,0.28)] backdrop-blur-2xl"
     : "animate-header-in fixed inset-x-0 top-0 z-50 border-b border-[rgba(20,31,18,0.06)] bg-[rgba(243,252,235,0.88)] backdrop-blur-xl";
 
   const link = (href: string, label: string, isActive: boolean): ReactElement => (

@@ -248,7 +248,7 @@ export default function WeatherClient(): ReactElement {
   const showResults = coordsReady && bundle !== null;
 
   return (
-    <div className="weather-page relative min-h-full overflow-hidden text-[var(--on-surface)]">
+    <div className={`weather-page weather-tone-${theme}${isDay ? "" : " is-night"} relative min-h-full overflow-hidden text-[var(--on-surface)]`}>
       <WeatherAtmosphere
         theme={theme}
         isDay={isDay}
