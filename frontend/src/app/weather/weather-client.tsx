@@ -8,6 +8,7 @@ import { Reveal } from "../../components/reveal";
 import { SiteHeader } from "../../components/site-header";
 import { WeatherAtmosphere } from "../../components/weather-atmosphere";
 import { WeatherConditionIcon, resolveVisualTheme } from "../../components/weather-condition-icon";
+import { WeatherStage } from "../../components/weather-stage";
 import { describeWeatherCode } from "../../lib/weather/codes";
 import {
   fetchWeather, formatPlaceLabel, reverseGeocode, searchPlaces,
@@ -235,7 +236,18 @@ export default function WeatherClient(): ReactElement {
       <SiteHeader active="weather" tone="glass" />
 
       <main className="relative z-10 mx-auto max-w-6xl space-y-6 px-4 pb-12 pt-28 sm:px-6 lg:px-8">
-        <Reveal immediate className="weather-glass p-5 sm:p-7">
+        <Reveal immediate>
+          <WeatherStage
+            theme={theme}
+            isDay={isDay}
+            temperatureC={bundle?.current.temperatureC ?? null}
+            windSpeedKmh={bundle?.current.windSpeedKmh ?? 0}
+            label={bundle?.current.label ?? (locating ? "Detecting sky conditions…" : "Set a location to preview the sky")}
+            placeLabel={bundle ? formatPlaceLabel(bundle.place) : "Sky preview"}
+          />
+        </Reveal>
+
+        <Reveal immediate delayMs={80} className="weather-glass p-5 sm:p-7">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--primary)]">Weather prediction</p>
           <h1 className="font-display mt-2 text-3xl font-bold sm:text-4xl">Global field conditions</h1>
           <p className="mt-2 max-w-2xl text-sm text-[var(--on-surface-variant)] sm:text-base">
