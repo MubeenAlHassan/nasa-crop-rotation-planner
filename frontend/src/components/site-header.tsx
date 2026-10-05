@@ -43,7 +43,6 @@ export function SiteHeader({ active = "home", tone = "default" }: SiteHeaderProp
             <a href="/#capabilities" className="text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--on-surface)]">Capabilities</a>
             <a href="/#demo-farm" className="text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--on-surface)]">Demo farm</a>
             {link("/planner", "Planner", active === "planner")}
-            {link("/weather", "Weather prediction", active === "weather")}
           </nav>
         </div>
         <div className="flex items-center gap-3">
