@@ -327,4 +327,262 @@ caption {
   .animate-hero-in {
     animation: none;
   }
+
+  .weather-sun,
+  .weather-clouds span,
+  .weather-rain i,
+  .weather-snow i,
+  .weather-lightning,
+  .weather-fog {
+    animation: none !important;
+  }
+}
+
+/* Weather prediction atmosphere */
+.weather-page {
+  min-height: 100%;
+}
+
+.weather-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  transition: background 700ms ease;
+}
+
+.weather-sky-clear {
+  background: linear-gradient(180deg, #7ec8ff 0%, #c9e8ff 42%, #f3fceb 100%);
+}
+
+.weather-sky-clear.is-night {
+  background: linear-gradient(180deg, #0b1c33 0%, #1d3557 45%, #2a4230 100%);
+}
+
+.weather-sky-partly {
+  background: linear-gradient(180deg, #8ec5ff 0%, #d7ebff 40%, #eef8e4 100%);
+}
+
+.weather-sky-cloudy {
+  background: linear-gradient(180deg, #9aa7b5 0%, #c5ced6 45%, #e4ebe0 100%);
+}
+
+.weather-sky-fog {
+  background: linear-gradient(180deg, #b8c2c8 0%, #d7dde1 50%, #e8efe3 100%);
+}
+
+.weather-sky-rain {
+  background: linear-gradient(180deg, #4a5d73 0%, #6f8498 40%, #a8b7a4 100%);
+}
+
+.weather-sky-snow {
+  background: linear-gradient(180deg, #9eb6d1 0%, #d5e4f2 48%, #f4f7fb 100%);
+}
+
+.weather-sky-storm {
+  background: linear-gradient(180deg, #1f2a37 0%, #3b4a5c 42%, #5f6f62 100%);
+}
+
+.weather-sky-glow {
+  position: absolute;
+  inset: auto -10% -20% -10%;
+  height: 55%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.35), transparent 70%);
+  pointer-events: none;
+}
+
+.weather-sun {
+  position: absolute;
+  top: 12%;
+  right: 14%;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #fff7cc 0%, #ffd56a 40%, rgba(255, 180, 60, 0.15) 70%, transparent 72%);
+  box-shadow: 0 0 60px rgba(255, 200, 80, 0.55);
+  animation: weather-sun-pulse 6s ease-in-out infinite;
+}
+
+.weather-clouds span {
+  position: absolute;
+  display: block;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.55);
+  filter: blur(1px);
+  animation: weather-cloud-drift 28s linear infinite;
+}
+
+.weather-clouds span:nth-child(1) {
+  top: 16%;
+  left: -10%;
+  width: 14rem;
+  height: 3.5rem;
+}
+
+.weather-clouds span:nth-child(2) {
+  top: 28%;
+  left: 20%;
+  width: 18rem;
+  height: 4rem;
+  opacity: 0.75;
+  animation-duration: 36s;
+}
+
+.weather-clouds span:nth-child(3) {
+  top: 20%;
+  left: 55%;
+  width: 12rem;
+  height: 3rem;
+  opacity: 0.65;
+  animation-duration: 42s;
+  animation-direction: reverse;
+}
+
+.weather-rain i,
+.weather-snow i {
+  position: absolute;
+  top: -10%;
+  display: block;
+  border-radius: 9999px;
+}
+
+.weather-rain i {
+  width: 2px;
+  height: 14px;
+  background: linear-gradient(180deg, transparent, rgba(220, 235, 255, 0.85));
+  animation: weather-fall 0.9s linear infinite;
+}
+
+.weather-snow i {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  animation: weather-snow-fall 3.6s linear infinite;
+}
+
+.weather-lightning {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.08);
+  animation: weather-flash 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.weather-fog {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 70%, rgba(255, 255, 255, 0.45), transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(255, 255, 255, 0.35), transparent 55%);
+  animation: weather-fog-drift 12s ease-in-out infinite alternate;
+}
+
+.weather-glass {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 10px 30px rgba(35, 55, 30, 0.1);
+  backdrop-filter: blur(14px);
+}
+
+.weather-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border-radius: 0.9rem;
+  background: rgba(237, 247, 229, 0.75);
+  padding: 0.75rem 0.85rem;
+}
+
+.weather-metric-icon {
+  display: inline-flex;
+  height: 1.75rem;
+  width: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: white;
+  color: var(--primary);
+}
+
+.weather-metric-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+}
+
+.weather-metric-value {
+  margin-top: 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.weather-hour {
+  width: 5.5rem;
+  border-radius: 0.9rem;
+  background: rgba(237, 247, 229, 0.7);
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+}
+
+.weather-day {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.9rem;
+  backdrop-filter: blur(10px);
+  min-height: 12.5rem;
+}
+
+.weather-day-rain {
+  background: linear-gradient(180deg, rgba(190, 210, 230, 0.85), rgba(255, 255, 255, 0.85));
+}
+
+.weather-day-snow {
+  background: linear-gradient(180deg, rgba(230, 240, 250, 0.95), rgba(255, 255, 255, 0.9));
+}
+
+.weather-day-clear,
+.weather-day-partly {
+  background: linear-gradient(180deg, rgba(255, 244, 210, 0.75), rgba(255, 255, 255, 0.9));
+}
+
+.weather-day-storm {
+  background: linear-gradient(180deg, rgba(180, 190, 210, 0.9), rgba(255, 255, 255, 0.88));
+}
+
+@keyframes weather-sun-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes weather-cloud-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(35vw); }
+}
+
+@keyframes weather-fall {
+  from { transform: translateY(-10vh); opacity: 0; }
+  20% { opacity: 1; }
+  to { transform: translateY(110vh); opacity: 0.2; }
+}
+
+@keyframes weather-snow-fall {
+  from { transform: translate3d(0, -10vh, 0); opacity: 0; }
+  15% { opacity: 1; }
+  to { transform: translate3d(12px, 110vh, 0); opacity: 0.3; }
+}
+
+@keyframes weather-flash {
+  0%, 86%, 100% { opacity: 0; }
+  88% { opacity: 0.55; }
+  90% { opacity: 0.05; }
+  92% { opacity: 0.4; }
+}
+
+@keyframes weather-fog-drift {
+  from { transform: translateX(-2%) scale(1); }
+  to { transform: translateX(3%) scale(1.05); }
 }

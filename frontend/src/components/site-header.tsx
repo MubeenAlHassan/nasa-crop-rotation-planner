@@ -1,16 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { Leaf } from "lucide-react";
+import { CloudSun, Leaf } from "lucide-react";
 import type { ReactElement } from "react";
 
 export interface SiteHeaderProps {
-  active?: "home" | "planner";
+  active?: "home" | "planner" | "weather";
+  tone?: "default" | "glass";
 }
 
-export function SiteHeader({ active = "home" }: SiteHeaderProps): ReactElement {
+export function SiteHeader({ active = "home", tone = "default" }: SiteHeaderProps): ReactElement {
+  const headerClass = tone === "glass"
+    ? "animate-header-in fixed inset-x-0 top-0 z-50 border-b border-white/30 bg-[rgba(243,252,235,0.72)] backdrop-blur-xl"
+    : "animate-header-in fixed inset-x-0 top-0 z-50 border-b border-[rgba(20,31,18,0.06)] bg-[rgba(243,252,235,0.88)] backdrop-blur-xl";
+
+  const link = (href: string, label: string, isActive: boolean): ReactElement => (
+    <Link
+      href={href}
+      className={`text-sm font-semibold ${isActive ? "text-[var(--primary)]" : "text-[var(--on-surface-variant)] hover:text-[var(--on-surface)]"}`}
+    >
+      {label}
+    </Link>
+  );
+
   return (
-    <header className="animate-header-in fixed inset-x-0 top-0 z-50 border-b border-[rgba(20,31,18,0.06)] bg-[rgba(243,252,235,0.88)] backdrop-blur-xl">
+    <header className={headerClass}>
       <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-4 sm:px-8">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3">
@@ -28,16 +42,21 @@ export function SiteHeader({ active = "home" }: SiteHeaderProps): ReactElement {
             <a href="/#how-it-works" className="text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--on-surface)]">How it works</a>
             <a href="/#capabilities" className="text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--on-surface)]">Capabilities</a>
             <a href="/#demo-farm" className="text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--on-surface)]">Demo farm</a>
-            <Link
-              href="/planner"
-              className={`text-sm font-semibold ${active === "planner" ? "text-[var(--primary)]" : "text-[var(--on-surface-variant)] hover:text-[var(--on-surface)]"}`}
-            >
-              Planner
-            </Link>
+            {link("/planner", "Planner", active === "planner")}
+            {link("/weather", "Weather prediction", active === "weather")}
           </nav>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/planner" className="hidden text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--primary)] sm:inline-flex">
+          <Link
+            href="/weather"
+            className={`hidden items-center gap-1.5 text-sm font-semibold sm:inline-flex ${
+              active === "weather" ? "text-[var(--primary)]" : "text-[var(--on-surface-variant)] hover:text-[var(--primary)]"
+            }`}
+          >
+            <CloudSun className="h-4 w-4" aria-hidden />
+            Weather
+          </Link>
+          <Link href="/planner" className="hidden text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--primary)] md:inline-flex">
             Open planner
           </Link>
           <Link href="/planner?demo=1" className="btn-primary text-sm">
