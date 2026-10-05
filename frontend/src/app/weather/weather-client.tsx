@@ -292,7 +292,7 @@ export default function WeatherClient(): ReactElement {
   const showResults = coordsReady && bundle !== null;
 
   return (
-    <div className={`weather-page weather-tone-${theme}${isDay ? "" : " is-night"} relative min-h-full overflow-hidden text-[var(--on-surface)]`}>
+    <div className={`weather-page weather-tone-${theme}${isDay ? "" : " is-night"} relative min-h-full overflow-hidden`}>
       <WeatherAtmosphere
         theme={theme}
         isDay={isDay}
@@ -301,7 +301,7 @@ export default function WeatherClient(): ReactElement {
       />
       <SiteHeader active="weather" />
 
-      <main className="relative z-10 mx-auto max-w-6xl space-y-6 px-4 pb-12 pt-28 sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto max-w-6xl space-y-6 px-4 pb-12 pt-28 text-[var(--on-surface)] sm:px-6 lg:px-8">
         <Reveal immediate delayMs={80} className="weather-glass p-5 sm:p-7">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--primary)]">Weather prediction</p>
           <h1 className="font-display mt-2 text-3xl font-bold sm:text-4xl">Global field conditions</h1>
