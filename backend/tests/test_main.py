@@ -54,12 +54,13 @@ def test_live_lifespan_mounts_routes_closes_client_and_disables_fixtures(monkeyp
     asyncio.run(check())
 
 
-def test_fixture_mode_uses_no_http_client_and_returns_pinned_sources(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_fixture_mode_keeps_live_providers_and_returns_pinned_sources(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("ENABLE_DEMO_FIXTURES", "true")
     monkeypatch.setenv("BACKEND_DATA_DIR", str(ROOT))
     async def check() -> None:
         async with app.router.lifespan_context(app):
-            assert app.state.http_client is None
+            assert isinstance(app.state.http_client, httpx.AsyncClient)
+            assert isinstance(app.state.live_providers, ProviderBundle)
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),
                                          base_url="http://test") as client:
                 response = await client.post("/api/v1/recommend-rotation", json=REQUEST)
@@ -68,8 +69,9 @@ def test_fixture_mode_uses_no_http_client_and_returns_pinned_sources(monkeypatch
                 assert payload["location"] == REQUEST["location"]
                 assert response.headers["x-request-id"] == payload["request_id"]
                 assert payload["sources"][0]["mode"] == "fixture"
+                # Auto mode uses live POWER (may be 503 offline without network / cold baseline).
                 auto = await client.post("/api/v1/recommend-rotation", json={**REQUEST, "data_mode": "auto"})
-                assert auto.status_code == 503
+                assert auto.status_code in (200, 503)
                 nearby = await client.post("/api/v1/recommend-rotation", json={
                     **REQUEST, "location": {"latitude": 31.4505, "longitude": 73.135}})
                 assert nearby.status_code == 422

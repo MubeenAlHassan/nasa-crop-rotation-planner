@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import math
 from datetime import date, timedelta
 
@@ -9,6 +10,8 @@ from app.schemas.contracts import Location, Source
 from app.schemas.domain import JsonFetcher, PowerDaily, PowerProvider, PowerSeries, ProviderError
 
 _URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
+_MAX_SPAN_DAYS = 366
+_MAX_CONCURRENT_CHUNKS = 5
 
 
 class NasaPowerProvider(PowerProvider):
@@ -18,8 +21,55 @@ class NasaPowerProvider(PowerProvider):
     async def get_daily(
         self, location: Location, start: date, end: date, *, deadline: float,
     ) -> PowerSeries:
-        if end < start or start < date(1991, 1, 1) or (end - start).days > 366:
+        if end < start or start < date(1991, 1, 1):
             raise ProviderError("power", "Unsupported POWER date interval", False)
+        span = (end - start).days + 1
+        if span <= _MAX_SPAN_DAYS:
+            return await self._fetch_range(location, start, end, deadline=deadline)
+
+        # Climatology baselines are captured as complete-year chunks (Phase 0 pattern).
+        chunks: list[tuple[date, date]] = []
+        year = start.year
+        while year <= end.year:
+            chunk_start = max(start, date(year, 1, 1))
+            chunk_end = min(end, date(year, 12, 31))
+            if (chunk_end - chunk_start).days + 1 > _MAX_SPAN_DAYS:
+                raise ProviderError("power", "Unsupported POWER date interval", False)
+            chunks.append((chunk_start, chunk_end))
+            year += 1
+
+        semaphore = asyncio.Semaphore(_MAX_CONCURRENT_CHUNKS)
+
+        async def fetch_chunk(chunk_start: date, chunk_end: date) -> PowerSeries:
+            async with semaphore:
+                return await self._fetch_range(location, chunk_start, chunk_end, deadline=deadline)
+
+        parts = await asyncio.gather(*[fetch_chunk(a, b) for a, b in chunks])
+        rows: list[PowerDaily] = []
+        modes: set[str] = set()
+        for part in parts:
+            rows.extend(part.rows)
+            modes.add(part.source.mode)
+        rows.sort(key=lambda row: row.day)
+        if modes == {"cache"}:
+            mode = "cache"
+        elif "stale_cache" in modes:
+            mode = "stale_cache"
+        elif "live" in modes:
+            mode = "live"
+        else:
+            mode = parts[0].source.mode
+        source = parts[0].source.model_copy(update={
+            "mode": mode,
+            "observed_start": start,
+            "observed_end": end,
+            "used_for": ("/features/climate", "/features/slot_scenarios"),
+        })
+        return PowerSeries(location=location, rows=tuple(rows), source=source)
+
+    async def _fetch_range(
+        self, location: Location, start: date, end: date, *, deadline: float,
+    ) -> PowerSeries:
         params = (
             ("parameters", "PRECTOTCORR,T2M"), ("community", "AG"),
             ("format", "JSON"), ("time-standard", "UTC"),

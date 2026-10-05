@@ -41,7 +41,7 @@ function addUtcDays(iso: string, days: number): string {
   return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
 }
 
-/** Live-data irrigated request for a custom map / search point (not the pinned fixture). */
+/** Live irrigated request for a custom map / search point. */
 function customIrrigatedRequest(location: Location): RecommendationRequest {
   const assessment = isoTodayUtc();
   const year = Number(assessment.slice(0, 4));
@@ -84,7 +84,8 @@ export default function PlannerClient(): ReactElement {
   const demoArmedRef = useRef(false);
   const resultsRef = useRef<HTMLDivElement | null>(null);
   const autoDemoStarted = useRef(false);
-  const pendingIrrigatedLocation = useRef<Location | null>(null);
+  const pendingCustomIrrigated = useRef<Location | null>(null);
+  const [usingFixtureFallback, setUsingFixtureFallback] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -106,7 +107,7 @@ export default function PlannerClient(): ReactElement {
     }
   }, [pending, response, requestError]);
 
-  function selectLocation(next: Location): void {
+  function selectLocation(next: Location, options?: { skipCustomFormApply?: boolean }): void {
     if (location && samePoint(location, next)) return;
     active.current?.abort();
     active.current = null;
@@ -117,7 +118,9 @@ export default function PlannerClient(): ReactElement {
     if (!samePoint(next, DEMO_POINT)) {
       demoArmedRef.current = false;
       setDemoArmed(false);
-      setCustomApplyKey((value) => value + 1);
+      if (!options?.skipCustomFormApply) {
+        setCustomApplyKey((value) => value + 1);
+      }
     }
     setLocation(next);
   }
@@ -156,8 +159,19 @@ export default function PlannerClient(): ReactElement {
     });
   }
 
+  function submitPinnedIrrigatedFixture(asFallback = false): void {
+    demoArmedRef.current = true;
+    setDemoArmed(true);
+    setDemoIrrigation("available");
+    setDemoApplyKey((value) => value + 1);
+    setUsingFixtureFallback(asFallback);
+    setRequestError(null);
+    submit({ ...DEMO_REQUEST, irrigation: "available" });
+  }
+
   function armDemo(irrigation: RecommendationRequest["irrigation"] = "rainfed"): void {
-    pendingIrrigatedLocation.current = null;
+    pendingCustomIrrigated.current = null;
+    setUsingFixtureFallback(false);
     selectLocation(DEMO_POINT);
     demoArmedRef.current = true;
     setDemoArmed(true);
@@ -171,7 +185,7 @@ export default function PlannerClient(): ReactElement {
     submit({ ...DEMO_REQUEST, irrigation });
   }
 
-  /** Map/search/preset location → irrigated run (fixture for Faisalabad, live for custom points). */
+  /** Map/search/preset → try live irrigated climate; fall back to pinned irrigated fixture for offline demo. */
   function runIrrigatedForLocation(next: Location): void {
     if (samePoint(next, DEMO_POINT)) {
       armDemo("available");
@@ -179,14 +193,42 @@ export default function PlannerClient(): ReactElement {
     }
     if (!(location && samePoint(location, next))) {
       selectLocation(next);
+    } else {
+      active.current?.abort();
+      active.current = null;
+      generation.current += 1;
+      setPending(false);
+      setResponse(null);
+      setRequestError(null);
     }
+    setUsingFixtureFallback(false);
     setRequestError(null);
     if (!catalog) {
-      pendingIrrigatedLocation.current = next;
+      pendingCustomIrrigated.current = next;
       return;
     }
-    pendingIrrigatedLocation.current = null;
-    submit(customIrrigatedRequest(next));
+    pendingCustomIrrigated.current = null;
+    active.current?.abort();
+    const controller = new AbortController();
+    active.current = controller;
+    const current = ++generation.current;
+    setPending(true);
+    setResponse(null);
+    void recommendRotation(customIrrigatedRequest(next), controller.signal).then((result) => {
+      if (current === generation.current && !controller.signal.aborted) {
+        setUsingFixtureFallback(false);
+        setResponse(result);
+      }
+    }).catch(() => {
+      if (current !== generation.current || controller.signal.aborted) return;
+      // Live POWER/baseline unavailable — show irrigated demo results instead of a hard error.
+      submitPinnedIrrigatedFixture(true);
+    }).finally(() => {
+      if (current === generation.current && active.current === controller) {
+        active.current = null;
+        setPending(false);
+      }
+    });
   }
 
   function usePreset(id: FieldPresetId): void {
@@ -199,10 +241,10 @@ export default function PlannerClient(): ReactElement {
   }
 
   useEffect(() => {
-    if (!catalog || !pendingIrrigatedLocation.current) return;
-    const next = pendingIrrigatedLocation.current;
-    pendingIrrigatedLocation.current = null;
-    submit(customIrrigatedRequest(next));
+    if (!catalog || !pendingCustomIrrigated.current) return;
+    const next = pendingCustomIrrigated.current;
+    pendingCustomIrrigated.current = null;
+    runIrrigatedForLocation(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog]);
 
@@ -225,6 +267,9 @@ export default function PlannerClient(): ReactElement {
     response && response.feasible_rotation_count === 0 && demoArmed && location && samePoint(location, DEMO_POINT),
   );
   const activePreset = findPreset(location);
+  const customPinFixturePlayback = Boolean(
+    usingFixtureFallback && location && !samePoint(location, DEMO_POINT) && response,
+  );
 
   return (
     <div className="min-h-full bg-[var(--background)] text-[var(--on-surface)]">
@@ -266,7 +311,7 @@ export default function PlannerClient(): ReactElement {
                     <p className="mt-1 line-clamp-3 text-xs text-[var(--muted)]">{preset.summary}</p>
                     {selected && preset.kind === "custom" && (
                       <p role="status" className="mt-2 text-sm text-[var(--info-ink)]">
-                        {preset.name} selected. Irrigated recommendations run automatically with Current data.
+                        {preset.name} selected. Irrigated pinned demo runs automatically (map pin ≠ fixture farm).
                       </p>
                     )}
                   </div>
@@ -362,6 +407,12 @@ export default function PlannerClient(): ReactElement {
             {pending && (
               <p role="status" className="rounded-xl bg-[var(--info-bg)] px-4 py-3 text-[var(--info-ink)]">
                 Building irrigated recommendations…
+              </p>
+            )}
+            {customPinFixturePlayback && (
+              <p role="status" className="rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] px-4 py-3 text-sm text-[var(--warning-ink)]">
+                Live climate for {formatCoords(location!)} was unavailable, so rankings use the authorized Faisalabad
+                demonstration fixture at {formatCoords(DEMO_POINT)}. Retry later once POWER baselines are cached.
               </p>
             )}
             {requestError && (

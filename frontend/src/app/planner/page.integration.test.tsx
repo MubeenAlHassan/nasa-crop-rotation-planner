@@ -118,7 +118,7 @@ describe("farmer dashboard integration", () => {
     expectPinnedFormFilled();
     await waitFor(() => expect(resolvers.length).toBe(1));
     const first = fetcher.mock.calls.find(([, init]) => init?.method === "POST");
-    // Field map latitude change auto-starts an irrigated live request for the custom point.
+    // Field map latitude change tries live irrigated climate first.
     fireEvent.change(screen.getAllByLabelText("Latitude")[0], { target: { value: "31.4505" } });
     expect(first?.[1]?.signal?.aborted).toBe(true);
     await waitFor(() => expect(resolvers.length).toBe(2));
@@ -127,13 +127,27 @@ describe("farmer dashboard integration", () => {
     );
     expect(secondBody.irrigation).toBe("available");
     expect(secondBody.data_mode).toBe("auto");
+    expect(secondBody.location).toEqual({ latitude: 31.4505, longitude: 73.135 });
     resolvers[0]!(Response.json(samples[1]));
-    resolvers[1]!(Response.json(samples[1]));
-    await waitFor(() => expect(screen.getByLabelText("Data mode")).toHaveValue("auto"));
-    expect(screen.getByText(/Custom location selected/)).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Data mode"), { target: { value: "fixture" } });
-    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
-    expect(await screen.findByText(/Use the pinned Faisalabad demo action/)).toBeInTheDocument();
+    resolvers[1]!(Response.json({
+      schema_version: "1.0.0",
+      request_id: "00000000-0000-4000-8000-000000000099",
+      error: {
+        code: "REQUIRED_DATA_UNAVAILABLE",
+        message: "Live providers are not configured.",
+        retryable: true,
+        details: [],
+      },
+    }, { status: 503 }));
+    await waitFor(() => expect(resolvers.length).toBe(3));
+    const fallbackBody = JSON.parse(
+      fetcher.mock.calls.filter(([, init]) => init?.method === "POST").at(-1)![1]!.body as string,
+    );
+    expect(fallbackBody.data_mode).toBe("fixture");
+    expect(fallbackBody.location).toEqual({ latitude: 31.4504, longitude: 73.135 });
+    resolvers[2]!(Response.json(samples[1]));
+    await waitFor(() => expect(screen.getByText(/Live climate for/)).toBeInTheDocument());
+    expect(screen.getByLabelText("Data mode")).toHaveValue("fixture");
   });
 
   it("auto-runs irrigated recommendations when a custom place is chosen on the map form path", async () => {
