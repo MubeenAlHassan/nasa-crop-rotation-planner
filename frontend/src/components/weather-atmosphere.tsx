@@ -44,7 +44,6 @@ export function WeatherAtmosphere({
       {showSun && (
         <div className="weather-sun-wrap">
           <span className="samsung-sun-outer-glow" />
-          <span className="samsung-sun-beams" />
           <span className="samsung-sun-halo" />
           <span className="samsung-sun-disk" />
           <span className="samsung-sun-highlight" />

@@ -7,12 +7,11 @@ export interface SamsungSunProps {
   className?: string;
 }
 
-/** Soft glowing sun inspired by Samsung Weather (disk + bloom + slow beams). */
+/** Soft pearl sun for the weather stage card (glow + orb, no spokes). */
 export function SamsungSun({ size = "lg", className = "" }: SamsungSunProps): ReactElement {
   return (
     <div className={`samsung-sun samsung-sun-${size} ${className}`.trim()} aria-hidden>
       <span className="samsung-sun-outer-glow" />
-      <span className="samsung-sun-beams" />
       <span className="samsung-sun-halo" />
       <span className="samsung-sun-disk" />
       <span className="samsung-sun-highlight" />
