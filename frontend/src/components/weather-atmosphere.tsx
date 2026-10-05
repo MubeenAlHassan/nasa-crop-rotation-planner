@@ -42,11 +42,14 @@ export function WeatherAtmosphere({
       <div className="weather-horizon" />
 
       {showSun && (
-        <div className={`weather-sunlight${theme === "partly" ? " is-soft" : ""}`}>
-          <span className="weather-sunlight-glow" />
-          <span className="weather-sunlight-bloom" />
-          <span className="weather-sunlight-core" />
-          <span className="weather-sunlight-shaft" />
+        <div className={`weather-sunlight${theme === "partly" ? " is-soft" : ""}${showHeat ? " is-hot" : ""}`}>
+          <span className="weather-sunlight-haze" />
+          <span className="weather-sunlight-scatter" />
+          <span className="weather-sunlight-rays" />
+          <span className="weather-sunlight-corona" />
+          <span className="weather-sunlight-disk" />
+          <span className="weather-sunlight-flare a" />
+          <span className="weather-sunlight-flare b" />
         </div>
       )}
 
