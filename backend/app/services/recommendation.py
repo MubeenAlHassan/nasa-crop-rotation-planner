@@ -5,10 +5,9 @@ from __future__ import annotations
 import asyncio
 import time
 from datetime import date, datetime, timedelta
-from pathlib import Path
 from uuid import UUID
 
-from app.catalog.registry import load_crop_catalog
+from app.catalog.registry import CATALOG_FILES, load_crop_catalog
 from app.engine.ranking import rank_rotations
 from app.features.climate import calculate_climate_features
 from app.features.moisture import build_moisture_result
@@ -27,9 +26,6 @@ from app.schemas.domain import (
     RequiredDataUnavailable,
 )
 
-_CATALOG = Path(__file__).parents[2] / "data" / "punjab_crops.json"
-
-
 def _unavailable(provider: str) -> Source:
     return Source(provider=provider, mode="unavailable", product=None, observed_start=None,
                   observed_end=None, retrieved_at=None, grid_resolution_km=None,
@@ -47,7 +43,10 @@ async def build_recommendation_response(
     request: RecommendationRequest, providers: ProviderBundle, *,
     request_id: UUID, generated_at: datetime,
 ) -> RecommendationResponse:
-    catalog = load_crop_catalog(_CATALOG, request.region_id)
+    catalog_path = CATALOG_FILES.get(request.region_id)
+    if catalog_path is None:
+        raise ValueError("Unknown region_id")
+    catalog = load_crop_catalog(catalog_path, request.region_id)
     deadline = time.monotonic() + 8.0
     observed_start = request.assessment_end - timedelta(days=89)
     tasks = (

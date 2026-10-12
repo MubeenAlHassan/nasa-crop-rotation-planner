@@ -364,7 +364,11 @@
           "type": "array"
         },
         "region_id": {
-          "const": "punjab_pk_demo_v1",
+          "enum": [
+            "punjab_pk_demo_v1",
+            "maryland_usa_demo_v1",
+            "uk_england_demo_v1"
+          ],
           "type": "string"
         },
         "schema_version": {
@@ -598,7 +602,10 @@
                 "SOIL_PH_FIT",
                 "LIMITED_RESIDUE_BENEFIT",
                 "ROTATION_DIVERSITY",
-                "FARMER_OBJECTIVE"
+                "FARMER_OBJECTIVE",
+                "SOIL_ORGANIC_CONTEXT",
+                "EXTREME_CLIMATE_ANOMALY",
+                "SOIL_HEALTH_TRANSITION"
               ],
               "type": "string"
             },
@@ -845,7 +852,11 @@
           "$ref": "#/$defs/Location"
         },
         "region_id": {
-          "const": "punjab_pk_demo_v1",
+          "enum": [
+            "punjab_pk_demo_v1",
+            "maryland_usa_demo_v1",
+            "uk_england_demo_v1"
+          ],
           "type": "string"
         },
         "slots": {

@@ -71,8 +71,10 @@ class HttpxJsonFetcher(JsonFetcher):
             remaining = deadline - self._clock()
             if remaining <= 0:
                 raise ProviderError(provider, "Provider deadline exceeded", True)
+            # SoilGrids multi-property queries often need >4s; stay within the shared deadline.
+            read_cap = 18.0 if provider == "soilgrids" else 4.0
             timeout = httpx.Timeout(
-                connect=min(2.0, remaining), read=min(4.0, remaining),
+                connect=min(2.0, remaining), read=min(read_cap, remaining),
                 write=min(2.0, remaining), pool=min(1.0, remaining),
             )
             try:

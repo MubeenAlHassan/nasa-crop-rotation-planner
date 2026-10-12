@@ -9,7 +9,7 @@ Implement Pydantic v2 models and export OpenAPI/JSON Schema as the source of gen
 | Field | Type | Required/default | Validation |
 | --- | --- | --- | --- |
 | `location` | `Location` | Required | Latitude/longitude below |
-| `region_id` | string | Required | Must match an enabled catalog; initially `punjab_pk_demo_v1` |
+| `region_id` | string | Required | Enabled catalogs: `punjab_pk_demo_v1`, `maryland_usa_demo_v1`, `uk_england_demo_v1` |
 | `assessment_end` | date | Required | Latest requested observation date; 90-day window must fit provider coverage; ≤UTC today |
 | `slots` | `Slot[]` | Required | 1–4 dated, ordered, nonoverlapping slots |
 | `crop_history` | `History[]` | `[]` | 0–8 ordered completed crops; empty history explicitly degrades quality |

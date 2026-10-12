@@ -103,6 +103,11 @@ def score_rotation(
             scores["roots"].append((40, 75, 100)[difference])
             if difference:
                 reasons["ROOT_DEPTH_ALTERNATION"] = Message(code="ROOT_DEPTH_ALTERNATION", message="The catalog rooting classes differ between adjacent crops.")
+            if previous.legume or crop.legume or difference:
+                reasons["SOIL_HEALTH_TRANSITION"] = Message(
+                    code="SOIL_HEALTH_TRANSITION",
+                    message="Legume and/or root-class transitions are treated as soil-resilience preferences under agronomy-v1.",
+                )
         previous, previous_residue = crop, "unknown"
         if scenario.rainfall_mm is not None:
             water = 100 - 100 * _distance(scenario.rainfall_mm, crop.rainfall_min_mm, crop.rainfall_max_mm) / max(crop.rainfall_max_mm, 10)
@@ -123,8 +128,33 @@ def score_rotation(
         if features.soil.ph is not None:
             if not crop.ph_min <= features.soil.ph <= crop.ph_max:
                 raise ValueError("Infeasible pH reached scoring")
-            scores["soil"].append(100)
+            # pH remains the hard suitability screen; SOC adds a soft soil-health context score.
+            soil_score = 100.0
+            if features.soil.soc_g_kg is not None:
+                # Prefer moderate SOC (about 5–20 g/kg) as a resilience signal — not a yield model.
+                soc = features.soil.soc_g_kg
+                if soc < 5:
+                    soil_score = 70.0
+                elif soc > 40:
+                    soil_score = 85.0
+                else:
+                    soil_score = 100.0
+                reasons["SOIL_ORGANIC_CONTEXT"] = Message(
+                    code="SOIL_ORGANIC_CONTEXT",
+                    message="Mapped or observed soil organic carbon informs the soil-health context score (not a yield prediction).",
+                )
+            scores["soil"].append(soil_score)
             reasons["SOIL_PH_FIT"] = Message(code="SOIL_PH_FIT", message="Known topsoil pH is within the catalog crop interval.")
+    rain_band = features.climate.rainfall_band
+    heat_band = features.climate.heat_band
+    if rain_band in ("severe_dry", "severe_wet") or heat_band == "high":
+        reasons["EXTREME_CLIMATE_ANOMALY"] = Message(
+            code="EXTREME_CLIMATE_ANOMALY",
+            message=(
+                f"Observed climate shows an extreme band (rainfall={rain_band}, heat={heat_band}) "
+                "versus the 1991–2020 baseline — a historical stress signal, not a future climate forecast."
+            ),
+        )
     if features.soil.ph is None:
         warnings["SOIL_SCREEN_INCOMPLETE"] = Message(code="SOIL_SCREEN_INCOMPLETE", message="Soil pH is unavailable; suitability screening is incomplete.")
     values = {}

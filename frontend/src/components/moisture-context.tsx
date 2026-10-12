@@ -19,8 +19,9 @@ export function MoistureContext({ moisture, scenarios }: MoistureContextProps): 
     <section aria-label="Surface moisture context" className="space-y-3 border-t border-[var(--panel-border)] pt-6">
       <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Surface moisture (SMAP context)</h2>
       <p className="text-sm text-[var(--muted)]">
-        Values are coarse surface volumetric water content when an authorized SMAP archive is present.
-        They are not root-zone measurements and do not replace on-farm sensing.
+        Values are coarse ~9 km SMAP surface volumetric water when an authorized Earthdata point archive is present.
+        They are not root-zone measurements and cannot be invented for arbitrary farms without prepared granules.
+        When unavailable, Field Shift still ranks using NASA POWER rainfall/temperature anomalies and farmer irrigation settings.
       </p>
       <div className="overflow-x-auto rounded-xl border border-[var(--panel-border)]">
         <table>

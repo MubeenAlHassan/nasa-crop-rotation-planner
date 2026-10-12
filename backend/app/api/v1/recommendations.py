@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from pathlib import Path
 from uuid import UUID, uuid4
 
-from app.catalog.registry import load_crop_catalog
+from app.catalog.registry import CATALOG_FILES, load_crop_catalog
 from app.schemas.contracts import (
     CropCatalogResponse,
     Error,
@@ -24,7 +23,6 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
 _LOG = logging.getLogger(__name__)
-_CATALOG = Path(__file__).parents[3] / "data" / "punjab_crops.json"
 
 
 def _error(request_id: UUID, status: int, code: str, message: str, retryable: bool,
@@ -101,9 +99,10 @@ def get_provider_bundle(request: Request) -> ProviderBundle:
 
 @router.get("/api/v1/crops", response_model=CropCatalogResponse)
 def get_crops(region_id: str) -> CropCatalogResponse:
-    if region_id != "punjab_pk_demo_v1":
+    catalog_path = CATALOG_FILES.get(region_id)
+    if catalog_path is None:
         raise HTTPException(status_code=422, detail="Unknown region ID.")
-    return load_crop_catalog(_CATALOG, region_id)
+    return load_crop_catalog(catalog_path, region_id)
 
 
 @router.post("/api/v1/recommend-rotation", response_model=RecommendationResponse)

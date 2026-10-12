@@ -34,8 +34,21 @@ function addUtcDays(iso: string, days: number): string {
   return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
 }
 
-function customPlanDefaults(assessment: string): { slots: Slot[]; history: History[] } {
+function customPlanDefaults(
+  assessment: string,
+  regionId: RecommendationRequest["region_id"],
+): { slots: Slot[]; history: History[] } {
   const year = Number(assessment.slice(0, 4));
+  if (regionId === "maryland_usa_demo_v1" || regionId === "uk_england_demo_v1") {
+    const start = `${year}-09-20`;
+    const end = `${year + 1}-07-15`;
+    const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
+    const slotEnd = end <= slotStart ? addUtcDays(slotStart, 240) : end;
+    return {
+      slots: [{ slot_id: "winter_slot", start_date: slotStart, end_date: slotEnd }],
+      history: [],
+    };
+  }
   const month = Number(assessment.slice(5, 7));
   // Prefer an upcoming Rabi-like window after assessment.
   const startYear = month >= 11 ? year + 1 : year;
@@ -123,7 +136,7 @@ export function RecommendationForm({
   if (customApplyKey > 0 && customApplyKey !== appliedCustomKey) {
     setAppliedCustomKey(customApplyKey);
     const assessmentDate = isoTodayUtc();
-    const plan = customPlanDefaults(assessmentDate);
+    const plan = customPlanDefaults(assessmentDate, catalog.region_id);
     setAssessment(assessmentDate);
     setSlots(plan.slots);
     setHistory(plan.history);

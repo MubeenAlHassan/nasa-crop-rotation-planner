@@ -3,20 +3,23 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useSearchParams } from "next/navigation";
 import { ClimateCharts } from "../../components/climate-charts";
+import { ClimateStressAlert } from "../../components/climate-stress-alert";
 import { CropTraits } from "../../components/crop-traits";
 import { FieldMap } from "../../components/field-map";
 import { MoistureContext } from "../../components/moisture-context";
 import { RecommendationForm } from "../../components/recommendation-form";
 import { RecommendationResults } from "../../components/recommendation-results";
 import { RotationTimeline } from "../../components/rotation-timeline";
+import { SoilHealthOutcomes } from "../../components/soil-health-outcomes";
 import { SoilRadar } from "../../components/soil-radar";
 import { SiteHeader } from "../../components/site-header";
 import { Reveal } from "../../components/reveal";
 import { fetchCropCatalog, recommendRotation } from "../../lib/api/client";
 import {
-  DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset, samePoint, type FieldPresetId,
+  DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset, regionForLocation, samePoint,
+  type FieldPresetId,
 } from "../../lib/field-presets";
-import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse } from "../../lib/generated/contracts";
+import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse, Slot } from "../../lib/generated/contracts";
 
 const DEMO_REQUEST: RecommendationRequest = {
   region_id: "punjab_pk_demo_v1",
@@ -44,21 +47,34 @@ function addUtcDays(iso: string, days: number): string {
   return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
 }
 
-/** Live irrigated request for a custom map / search point. */
-function customIrrigatedRequest(location: Location): RecommendationRequest {
-  const assessment = isoTodayUtc();
+function defaultSlotsForLocation(location: Location, assessment: string): Slot[] {
+  const preset = findPreset(location);
   const year = Number(assessment.slice(0, 4));
   const month = Number(assessment.slice(5, 7));
+  if (preset?.slotKind === "winter_cereal") {
+    const startYear = month >= 9 ? year : year;
+    const start = `${startYear}-09-20`;
+    const end = `${startYear + 1}-07-15`;
+    const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
+    const slotEnd = end <= slotStart ? addUtcDays(slotStart, 240) : end;
+    return [{ slot_id: "winter_slot", start_date: slotStart, end_date: slotEnd }];
+  }
   const startYear = month >= 11 ? year + 1 : year;
   const start = `${startYear}-11-01`;
   const end = `${startYear + 1}-03-31`;
   const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
   const slotEnd = end <= slotStart ? addUtcDays(slotStart, 120) : end;
+  return [{ slot_id: "rabi_slot", start_date: slotStart, end_date: slotEnd }];
+}
+
+/** Live irrigated request for a custom map / search point. */
+function customIrrigatedRequest(location: Location): RecommendationRequest {
+  const assessment = isoTodayUtc();
   return {
-    region_id: "punjab_pk_demo_v1",
+    region_id: regionForLocation(location),
     location,
     assessment_end: assessment,
-    slots: [{ slot_id: "rabi_slot", start_date: slotStart, end_date: slotEnd }],
+    slots: defaultSlotsForLocation(location, assessment),
     crop_history: [],
     irrigation: "available",
     allowed_crop_ids: [],
@@ -91,17 +107,19 @@ export default function PlannerClient(): ReactElement {
   const pendingCustomIrrigated = useRef<Location | null>(null);
   const [usingFixtureFallback, setUsingFixtureFallback] = useState(false);
 
+  const activeRegionId = regionForLocation(location);
+
   useEffect(() => {
     const controller = new AbortController();
     setCatalog(null);
     setCatalogError(null);
-    void fetchCropCatalog("punjab_pk_demo_v1", controller.signal).then(setCatalog).catch((failure: unknown) => {
+    void fetchCropCatalog(activeRegionId, controller.signal).then(setCatalog).catch((failure: unknown) => {
       if (!controller.signal.aborted) {
         setCatalogError(failure instanceof Error ? failure.message : "Crop catalog is unavailable.");
       }
     });
     return () => controller.abort();
-  }, [catalogAttempt]);
+  }, [catalogAttempt, activeRegionId]);
 
   useEffect(() => () => active.current?.abort(), []);
 
@@ -454,8 +472,10 @@ export default function PlannerClient(): ReactElement {
                 onRetryWithIrrigation={showIrrigationRetry ? () => armDemo("available") : undefined}
                 retrying={pending} />
               {response.recommendations[0] && <RotationTimeline recommendation={response.recommendations[0]} />}
+              <ClimateStressAlert climate={response.features.climate} />
               <ClimateCharts climate={response.features.climate} scenarios={response.features.slot_scenarios} />
               <MoistureContext moisture={response.features.moisture} scenarios={response.features.slot_scenarios} />
+              <SoilHealthOutcomes recommendation={response.recommendations[0] ?? null} soil={response.features.soil} />
               <SoilRadar soil={response.features.soil} />
             </>}
             </div>

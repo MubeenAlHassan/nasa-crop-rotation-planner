@@ -33,6 +33,7 @@ const reasonCodes = new Set([
   "LEGUME_AFTER_HIGH_DEMAND", "LEGUME_BEFORE_HIGH_DEMAND", "ROOT_DEPTH_ALTERNATION",
   "WATER_STRESS_TOLERANCE", "SEASONAL_CLIMATE_FIT", "SOIL_PH_FIT",
   "LIMITED_RESIDUE_BENEFIT", "ROTATION_DIVERSITY", "FARMER_OBJECTIVE",
+  "SOIL_ORGANIC_CONTEXT", "EXTREME_CLIMATE_ANOMALY", "SOIL_HEALTH_TRANSITION",
 ]);
 const warningCodes = new Set([
   "DEMO_FIXTURE", "SOURCE_STALE", "SOILGRIDS_UNAVAILABLE", "SMAP_UNAVAILABLE",
@@ -241,7 +242,7 @@ export async function recommendRotation(
 }
 
 export async function fetchCropCatalog(
-  regionId: "punjab_pk_demo_v1",
+  regionId: "punjab_pk_demo_v1" | "maryland_usa_demo_v1" | "uk_england_demo_v1",
   signal?: AbortSignal,
 ): Promise<CropCatalogResponse> {
   const { response, payload } = await send(

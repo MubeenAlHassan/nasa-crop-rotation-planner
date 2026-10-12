@@ -78,9 +78,11 @@ async def lifespan(application: FastAPI):
     async with httpx.AsyncClient(timeout=timeout) as client:
         application.state.http_client = client
         fetcher = HttpxJsonFetcher(client, provider_cache)
+        # SoilGrids REST is attempted unless explicitly disabled. Failures stay degraded/unavailable.
+        soilgrids_rest = os.getenv("ENABLE_SOILGRIDS_REST", "true").lower() not in {"0", "false", "no"}
         application.state.live_providers = ProviderBundle(
             power=NasaPowerProvider(fetcher),
-            soil=IsricSoilProvider(fetcher, rest_enabled=os.getenv("ENABLE_SOILGRIDS_REST") == "true"),
+            soil=IsricSoilProvider(fetcher, rest_enabled=soilgrids_rest),
             smap=_smap_provider(application.state.data_root),
         )
         try:

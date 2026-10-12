@@ -30,7 +30,7 @@ export interface CropCatalogResponse {
     | [Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop]
     | [Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop]
     | [Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop];
-  region_id: "punjab_pk_demo_v1";
+  region_id: "punjab_pk_demo_v1" | "maryland_usa_demo_v1" | "uk_england_demo_v1";
   schema_version: "1.0.0";
 }
 export interface Crop {
@@ -142,7 +142,7 @@ export interface RecommendationRequest {
     | [string, string, string, string, string, string, string, string, string, string, string, string];
   irrigation: "rainfed" | "available";
   location: Location;
-  region_id: "punjab_pk_demo_v1";
+  region_id: "punjab_pk_demo_v1" | "maryland_usa_demo_v1" | "uk_england_demo_v1";
   /**
    * @minItems 1
    * @maxItems 4
@@ -332,6 +332,9 @@ export interface Message {
         | "LIMITED_RESIDUE_BENEFIT"
         | "ROTATION_DIVERSITY"
         | "FARMER_OBJECTIVE"
+        | "SOIL_ORGANIC_CONTEXT"
+        | "EXTREME_CLIMATE_ANOMALY"
+        | "SOIL_HEALTH_TRANSITION"
       )
     | (
         | "DEMO_FIXTURE"
