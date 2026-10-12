@@ -11,6 +11,9 @@ export interface RecommendationResultsProps {
   recommendations: ReadonlyArray<Recommendation>;
   feasibleRotationCount: number;
   dataQuality: "complete" | "limited";
+  status: "ok" | "degraded" | "no_feasible_rotation";
+  rulesVersion?: string;
+  catalogVersion?: string;
   sources: ReadonlyArray<Source>;
   warnings: ReadonlyArray<Message>;
   exclusions: ReadonlyArray<Exclusion>;
@@ -181,8 +184,8 @@ function ComponentBreakdown({ recommendation }: { recommendation: Recommendation
 }
 
 export function RecommendationResults({
-  recommendations, feasibleRotationCount, dataQuality, sources, warnings, exclusions,
-  onRetryWithIrrigation, retrying = false,
+  recommendations, feasibleRotationCount, dataQuality, status, rulesVersion, catalogVersion,
+  sources, warnings, exclusions, onRetryWithIrrigation, retrying = false,
 }: RecommendationResultsProps): ReactElement {
   return (
     <section aria-label="Recommendation results" className="space-y-5">
@@ -190,7 +193,9 @@ export function RecommendationResults({
         <div>
           <h2 className="text-2xl font-semibold text-[var(--brand-strong)]">Ranked alternatives</h2>
           <p className="mt-1 text-[var(--muted)]">
-            Feasible rotations: {feasibleRotationCount}. Data quality: {dataQuality}.
+            Status: {label(status)}. Feasible rotations: {feasibleRotationCount}. Data quality: {dataQuality}.
+            {rulesVersion ? <> · Rules {rulesVersion}</> : null}
+            {catalogVersion ? <> · Catalog {catalogVersion}</> : null}
           </p>
         </div>
         <div className="rounded-full bg-[var(--brand-soft)] px-3 py-1 text-sm font-semibold text-[var(--brand-strong)]">
@@ -205,8 +210,9 @@ export function RecommendationResults({
         >
           <p className="font-semibold">No feasible rotation was returned.</p>
           <p className="mt-1 text-sm">
-            Under rainfed constraints, wheat is excluded because it requires irrigation, and other catalog crops miss this Rabi planting window.
-            Try irrigation available to unlock the documented wheat alternative.
+            Hard constraints removed every candidate before scoring. Read the exclusions below for the exact calendar,
+            irrigation, disease-break, or soil reasons. If this was the rainfed Faisalabad demo, try irrigation available
+            for the documented wheat alternative.
           </p>
           {onRetryWithIrrigation && (
             <button
@@ -260,6 +266,11 @@ export function RecommendationResults({
                   {source.fixture_id && <> · demo fixture {source.fixture_id}</>}
                   {!source.product && !source.retrieved_at && !source.fixture_id && <>No observational metadata for this source.</>}
                 </p>
+                {source.used_for && source.used_for.length > 0 && (
+                  <p className="text-xs leading-relaxed">
+                    Used for: {source.used_for.join(", ")}
+                  </p>
+                )}
               </div>
             </li>
           ))}

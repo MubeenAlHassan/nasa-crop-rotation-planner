@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useSearchParams } from "next/navigation";
 import { ClimateCharts } from "../../components/climate-charts";
+import { CropTraits } from "../../components/crop-traits";
 import { FieldMap } from "../../components/field-map";
+import { MoistureContext } from "../../components/moisture-context";
 import { RecommendationForm } from "../../components/recommendation-form";
 import { RecommendationResults } from "../../components/recommendation-results";
 import { RotationTimeline } from "../../components/rotation-timeline";
@@ -29,6 +31,7 @@ const DEMO_REQUEST: RecommendationRequest = {
   excluded_crop_ids: [],
   soil_override: null,
   data_mode: "fixture",
+  farmer_objective: "balanced",
   top_k: 3,
 };
 
@@ -62,6 +65,7 @@ function customIrrigatedRequest(location: Location): RecommendationRequest {
     excluded_crop_ids: [],
     soil_override: null,
     data_mode: "auto",
+    farmer_objective: "climate_adaptation",
     top_k: 3,
   };
 }
@@ -400,6 +404,11 @@ export default function PlannerClient(): ReactElement {
                 />
               </div>
             )}
+            {catalog && (
+              <div className="panel p-4 sm:p-5">
+                <CropTraits catalog={catalog} />
+              </div>
+            )}
           </Reveal>
 
           <Reveal delayMs={180} variant="right">
@@ -440,11 +449,13 @@ export default function PlannerClient(): ReactElement {
             {response && <>
               <RecommendationResults recommendations={response.recommendations}
                 feasibleRotationCount={response.feasible_rotation_count} dataQuality={response.data_quality}
+                status={response.status} rulesVersion={response.rules_version} catalogVersion={response.catalog_version}
                 sources={response.sources} warnings={response.warnings} exclusions={response.exclusions}
                 onRetryWithIrrigation={showIrrigationRetry ? () => armDemo("available") : undefined}
                 retrying={pending} />
               {response.recommendations[0] && <RotationTimeline recommendation={response.recommendations[0]} />}
               <ClimateCharts climate={response.features.climate} scenarios={response.features.slot_scenarios} />
+              <MoistureContext moisture={response.features.moisture} scenarios={response.features.slot_scenarios} />
               <SoilRadar soil={response.features.soil} />
             </>}
             </div>

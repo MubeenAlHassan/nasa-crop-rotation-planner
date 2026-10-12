@@ -61,10 +61,12 @@ export function ClimateCharts({ climate, scenarios }: ClimateChartsProps): React
       <div className="overflow-x-auto rounded-xl border border-[var(--panel-border)]">
       <table>
         <caption>Slot scenarios; future conditions remain uncertain</caption>
-        <thead><tr><th scope="col">Slot</th><th scope="col">Scenario kind</th><th scope="col">Rainfall</th><th scope="col">Temperature</th></tr></thead>
+        <thead><tr><th scope="col">Slot</th><th scope="col">Scenario kind</th><th scope="col">Rainfall</th><th scope="col">Temperature</th><th scope="col">Baseline years</th><th scope="col">SMAP adj.</th></tr></thead>
         <tbody>{scenarios.map((scenario) => <tr key={scenario.slot_id}>
           <th scope="row">{scenario.slot_id}</th><td>{band(scenario.kind)}</td>
           <td>{value(scenario.rainfall_mm, "mm")}</td><td>{value(scenario.temperature_c, "°C")}</td>
+          <td>R {scenario.rainfall_baseline_years} · T {scenario.temperature_baseline_years}</td>
+          <td>{scenario.smap_adjustment_applied ? "Yes" : "No"}</td>
         </tr>)}</tbody>
       </table>
       </div>

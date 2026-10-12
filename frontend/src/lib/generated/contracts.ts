@@ -149,6 +149,11 @@ export interface RecommendationRequest {
    */
   slots: [Slot] | [Slot, Slot] | [Slot, Slot, Slot] | [Slot, Slot, Slot, Slot];
   soil_override?: SoilOverride | null;
+  /**
+   * Deterministic objective remapping agronomy-v1 component base weights.
+   * @default balanced
+   */
+  farmer_objective?: "balanced" | "water_conservation" | "soil_health" | "climate_adaptation";
   top_k?: number;
 }
 export interface History {
@@ -326,6 +331,7 @@ export interface Message {
         | "SOIL_PH_FIT"
         | "LIMITED_RESIDUE_BENEFIT"
         | "ROTATION_DIVERSITY"
+        | "FARMER_OBJECTIVE"
       )
     | (
         | "DEMO_FIXTURE"

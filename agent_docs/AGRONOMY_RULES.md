@@ -77,6 +77,8 @@ For a numeric crop interval `[L,U]`, let `distance(x,[L,U]) = max(L-x, 0, x-U)`.
 | `temperature` | 0.15 | `100 - 10*distance(temperature_scenario,[L,U])` |
 | `soil` | 0.10 | 100 inside crop pH range; outside is a hard exclusion; unknown pH omits component |
 
+Request `farmer_objective` remaps these base weights before renormalization of missing components: `balanced` (table above); `water_conservation` (water 0.45, temperature 0.15, nitrogen 0.15, roots 0.15, soil 0.10); `soil_health` (nitrogen 0.30, roots 0.30, soil 0.20, water 0.10, temperature 0.10); `climate_adaptation` (water 0.35, temperature 0.30, nitrogen 0.15, roots 0.10, soil 0.10). Objectives never bypass hard constraints.
+
 Water is a rainfall exposure proxy. Irrigation marked `available` removes irrigation-required exclusions but supplies no quantified water, so it does not erase water stress. Temperature is a seasonal mean proxy and cannot establish frost/extreme-heat safety. SOC, texture and total N are displayed as context in v1; do not invent yield or nutrient-response coefficients from them.
 
 Average slot scores per component over known values only. Return null if no values qualify; a partly evaluated component emits `PARTIAL_COMPONENT_COVERAGE`. Renormalize available weights: `score = sum(w*c)/sum(w for nonnull c)`. Never substitute a neutral 50 or zero for missing features. Rank with full precision; return scores rounded to one decimal with decimal ROUND_HALF_UP. Publish available weights and coverage warnings so users can interpret degraded rankings.

@@ -86,6 +86,7 @@ export function RecommendationForm({
   const [allowed, setAllowed] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
   const [dataMode, setDataMode] = useState<"auto" | "fixture">("auto");
+  const [farmerObjective, setFarmerObjective] = useState<NonNullable<RecommendationRequest["farmer_objective"]>>("balanced");
   const [topK, setTopK] = useState(3);
   const [useSoil, setUseSoil] = useState(false);
   const [sampledOn, setSampledOn] = useState("");
@@ -112,6 +113,7 @@ export function RecommendationForm({
     setAllowed([]);
     setExcluded([]);
     setDataMode("fixture");
+    setFarmerObjective("balanced");
     setTopK(3);
     setUseSoil(false);
     setSampledOn("");
@@ -129,6 +131,7 @@ export function RecommendationForm({
     setAllowed([]);
     setExcluded([]);
     setDataMode("auto");
+    setFarmerObjective("climate_adaptation");
     setTopK(3);
     setUseSoil(false);
     setSampledOn("");
@@ -224,6 +227,7 @@ export function RecommendationForm({
       excluded_crop_ids: excluded as RecommendationRequest["excluded_crop_ids"],
       soil_override: soilOverride,
       data_mode: dataMode,
+      farmer_objective: farmerObjective,
       top_k: topK,
     });
   }
@@ -304,6 +308,23 @@ export function RecommendationForm({
           {errors.history && <p role="alert" className="text-sm text-[var(--danger-ink)]">{errors.history}</p>}
         </fieldset>
         <label>Irrigation<select value={irrigation} onChange={(e) => setIrrigation(e.target.value as RecommendationRequest["irrigation"])}><option value="rainfed">Rainfed</option><option value="available">Available</option></select></label>
+        <label>Farmer priority
+          <select
+            value={farmerObjective}
+            onChange={(e) => setFarmerObjective(e.target.value as NonNullable<RecommendationRequest["farmer_objective"]>)}
+          >
+            <option value="balanced">Balanced (default weights)</option>
+            <option value="water_conservation">Conserve water / drought stress</option>
+            <option value="soil_health">Soil health (N, roots, pH)</option>
+            <option value="climate_adaptation">Adapt to changing climate</option>
+          </select>
+        </label>
+        <p className="text-sm text-[var(--muted)]">
+          Priorities only remap transparent scoring weights. Hard calendar, irrigation, and disease-break rules still apply first.
+          {farmerObjective === "soil_health" && !useSoil
+            ? " For soil-health ranking, add a farmer soil sample (at least pH) when SoilGrids is unavailable."
+            : null}
+        </p>
         <label>Allowed crops<select multiple value={allowed} onChange={(e) => setAllowed(Array.from(e.target.selectedOptions, (option) => option.value))}>
           {catalog.crops.map((crop) => <option key={crop.crop_id} value={crop.crop_id}>{crop.crop_name}</option>)}
         </select></label>
@@ -313,8 +334,11 @@ export function RecommendationForm({
         {errors.crops && <p role="alert" className="text-sm text-[var(--danger-ink)]">{errors.crops}</p>}
         <label>Data mode<select value={dataMode} onChange={(e) => setDataMode(e.target.value as "auto" | "fixture")}><option value="auto">Current data</option><option value="fixture">Authorized demo fixture</option></select></label>
         <label>Alternatives<select value={topK} onChange={(e) => setTopK(Number(e.target.value))}><option value={1}>1</option><option value={2}>2</option><option value={3}>3</option></select></label>
-        <label className="!flex-row items-center gap-2 font-semibold"><input type="checkbox" checked={useSoil} onChange={(e) => setUseSoil(e.target.checked)} /> Add farmer soil observations</label>
+        <label className="!flex-row items-center gap-2 font-semibold"><input type="checkbox" checked={useSoil} onChange={(e) => setUseSoil(e.target.checked)} /> Add farmer soil observations (local soil)</label>
         {useSoil && <fieldset className="space-y-2 rounded-xl border border-[var(--panel-border)] bg-[#fbfffc] p-3"><legend>Farmer soil sample, 0–30 cm</legend>
+          <p className="text-sm text-[var(--muted)]">
+            Local observations override mapped SoilGrids values property-by-property. Texture must sum to 100±2%. Total nitrogen is not plant-available N.
+          </p>
           <label>Soil sample date<input type="date" value={sampledOn} onChange={(e) => setSampledOn(e.target.value)} /></label>
           {soilFields.map((field) => <label key={field.key}>{field.label}<input type="number" step="any" min="0" max={field.max} value={soilValues[field.key]}
             onChange={(e) => setSoilValues((current) => ({ ...current, [field.key]: e.target.value }))} /></label>)}

@@ -42,7 +42,7 @@ describe("formatPlannerNumber", () => {
 
 describe("RecommendationResults", () => {
   it("defaults to chart view and shows rounded table values after switching", () => {
-    render(<RecommendationResults recommendations={[recommendation]} feasibleRotationCount={4} dataQuality="limited" sources={sources}
+    render(<RecommendationResults recommendations={[recommendation]} feasibleRotationCount={4} dataQuality="limited" status="degraded" sources={sources}
       warnings={[{ code: "SMAP_UNAVAILABLE", message: "SMAP is unavailable." }]}
       exclusions={[{ slot_id: "rabi_2025", crop_id: "maize", code: "CALENDAR_INCOMPATIBLE", message: "Outside planting window." }]} />);
 
@@ -74,12 +74,12 @@ describe("RecommendationResults", () => {
 
   it("shows live provider mode as a provenance badge", () => {
     const live = [{ ...sources[0], mode: "live" as const, fixture_id: null }, ...sources.slice(1)];
-    render(<RecommendationResults recommendations={[]} feasibleRotationCount={0} dataQuality="limited" sources={live} warnings={[]} exclusions={[]} />);
+    render(<RecommendationResults recommendations={[]} feasibleRotationCount={0} dataQuality="limited" status="no_feasible_rotation" sources={live} warnings={[]} exclusions={[]} />);
     expect(screen.getByText("live")).toHaveClass("rounded");
   });
 
   it("shows an explicit empty state without fabricating a recommendation", () => {
-    render(<RecommendationResults recommendations={[]} feasibleRotationCount={0} dataQuality="limited" sources={sources} warnings={[]} exclusions={[]} />);
+    render(<RecommendationResults recommendations={[]} feasibleRotationCount={0} dataQuality="limited" status="no_feasible_rotation" sources={sources} warnings={[]} exclusions={[]} />);
     expect(screen.getByRole("status")).toHaveTextContent("No feasible rotation was returned");
     expect(screen.queryByText(/Rank 1:/)).not.toBeInTheDocument();
   });

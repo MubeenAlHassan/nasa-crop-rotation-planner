@@ -18,6 +18,7 @@ Implement Pydantic v2 models and export OpenAPI/JSON Schema as the source of gen
 | `excluded_crop_ids` | string[] | `[]` | Unique known IDs, at most 12; must not overlap allowed IDs |
 | `soil_override` | `SoilOverride` or null | null | Partial, dated farmer observations at 0–30 cm |
 | `data_mode` | enum | `auto` | `auto` or `fixture`; fixture requires server configuration and exact manifest match |
+| `farmer_objective` | enum | `balanced` | `balanced`, `water_conservation`, `soil_health`, or `climate_adaptation`; remaps agronomy-v1 component base weights before renormalization |
 | `top_k` | integer | 3 | 1–3 |
 
 Nested request objects:
@@ -47,6 +48,7 @@ Unknown region/crop IDs, conflicting constraints, invalid fixtures, dates or coo
   "excluded_crop_ids": [],
   "soil_override": null,
   "data_mode": "fixture",
+  "farmer_objective": "balanced",
   "top_k": 3
 }
 ```
@@ -97,7 +99,7 @@ Nested recommendation/provenance objects:
 
 Closed message codes:
 
-- Reasons: `LEGUME_AFTER_HIGH_DEMAND`, `LEGUME_BEFORE_HIGH_DEMAND`, `ROOT_DEPTH_ALTERNATION`, `WATER_STRESS_TOLERANCE`, `SEASONAL_CLIMATE_FIT`, `SOIL_PH_FIT`, `LIMITED_RESIDUE_BENEFIT`, `ROTATION_DIVERSITY`.
+- Reasons: `LEGUME_AFTER_HIGH_DEMAND`, `LEGUME_BEFORE_HIGH_DEMAND`, `ROOT_DEPTH_ALTERNATION`, `WATER_STRESS_TOLERANCE`, `SEASONAL_CLIMATE_FIT`, `SOIL_PH_FIT`, `LIMITED_RESIDUE_BENEFIT`, `ROTATION_DIVERSITY`, `FARMER_OBJECTIVE`.
 - Warnings: `DEMO_FIXTURE`, `SOURCE_STALE`, `SOILGRIDS_UNAVAILABLE`, `SMAP_UNAVAILABLE`, `SMAP_PERCENTILE_UNAVAILABLE`, `CLIMATE_COVERAGE_LOW`, `BASELINE_TOO_DRY`, `HISTORY_UNKNOWN`, `SOIL_SCREEN_INCOMPLETE`, `PARTIAL_COMPONENT_COVERAGE`, `SOIL_TEXTURE_INCONSISTENT`, `NO_FEASIBLE_ROTATION`.
 - Exclusions: `CROP_EXCLUDED`, `CROP_NOT_ALLOWED`, `CALENDAR_INCOMPATIBLE`, `MATURITY_WINDOW_TOO_SHORT`, `IRRIGATION_REQUIRED`, `FAMILY_BREAK_REQUIRED`, `SOIL_PH_OUT_OF_RANGE`.
 

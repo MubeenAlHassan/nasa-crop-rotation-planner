@@ -597,7 +597,8 @@
                 "SEASONAL_CLIMATE_FIT",
                 "SOIL_PH_FIT",
                 "LIMITED_RESIDUE_BENEFIT",
-                "ROTATION_DIVERSITY"
+                "ROTATION_DIVERSITY",
+                "FARMER_OBJECTIVE"
               ],
               "type": "string"
             },
@@ -865,6 +866,16 @@
             }
           ],
           "default": null
+        },
+        "farmer_objective": {
+          "default": "balanced",
+          "enum": [
+            "balanced",
+            "water_conservation",
+            "soil_health",
+            "climate_adaptation"
+          ],
+          "type": "string"
         },
         "top_k": {
           "default": 3,

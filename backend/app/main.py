@@ -14,6 +14,7 @@ from app.providers.cache import DiskHttpCache
 from app.providers.fixtures import create_fixture_provider_bundle, load_fixture_manifest
 from app.providers.http import HttpxJsonFetcher
 from app.providers.power import NasaPowerProvider
+from app.providers.smap import SmapArchiveProvider
 from app.providers.soilgrids import IsricSoilProvider
 from app.schemas.contracts import Error, ErrorEnvelope, RecommendationRequest
 from app.schemas.domain import FixtureMismatch, ProviderBundle, RequiredDataUnavailable
@@ -41,6 +42,14 @@ logging.getLogger("app.api.v1.recommendations").addFilter(_SanitizeRouteErrors()
 class _UnavailableSmap:
     async def get_surface(self, location, assessment_end, *, deadline):
         return None
+
+
+def _smap_provider(data_root: Path):
+    """Prefer a checksum-pinned archive when present; otherwise stay unavailable."""
+    archive = data_root / "backend" / "tests" / "fixtures" / "smap_archive.json"
+    if archive.is_file():
+        return SmapArchiveProvider(archive)
+    return _UnavailableSmap()
 
 
 def _origins() -> list[str]:
@@ -72,7 +81,7 @@ async def lifespan(application: FastAPI):
         application.state.live_providers = ProviderBundle(
             power=NasaPowerProvider(fetcher),
             soil=IsricSoilProvider(fetcher, rest_enabled=os.getenv("ENABLE_SOILGRIDS_REST") == "true"),
-            smap=_UnavailableSmap(),
+            smap=_smap_provider(application.state.data_root),
         )
         try:
             yield

@@ -72,7 +72,7 @@ ComponentName = Literal["nitrogen", "roots", "water", "temperature", "soil"]
 ReasonCode = Literal[
     "LEGUME_AFTER_HIGH_DEMAND", "LEGUME_BEFORE_HIGH_DEMAND", "ROOT_DEPTH_ALTERNATION",
     "WATER_STRESS_TOLERANCE", "SEASONAL_CLIMATE_FIT", "SOIL_PH_FIT",
-    "LIMITED_RESIDUE_BENEFIT", "ROTATION_DIVERSITY",
+    "LIMITED_RESIDUE_BENEFIT", "ROTATION_DIVERSITY", "FARMER_OBJECTIVE",
 ]
 WarningCode = Literal[
     "DEMO_FIXTURE", "SOURCE_STALE", "SOILGRIDS_UNAVAILABLE", "SMAP_UNAVAILABLE",
@@ -168,6 +168,10 @@ class RecommendationRequest(WireModel):
     excluded_crop_ids: tuple[str, ...] = Field(default=(), max_length=12)
     soil_override: SoilOverride | None = None
     data_mode: Literal["auto", "fixture"] = "auto"
+    # Deterministic objective presets remap agronomy-v1 component base weights only.
+    farmer_objective: Literal[
+        "balanced", "water_conservation", "soil_health", "climate_adaptation",
+    ] = "balanced"
     top_k: Integer = Field(default=3, ge=1, le=3)
 
     @model_validator(mode="after")

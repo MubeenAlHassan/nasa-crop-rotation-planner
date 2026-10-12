@@ -15,8 +15,37 @@ from app.schemas.contracts import (
 )
 from app.schemas.domain import ScoredRotation
 
-_WEIGHTS = {"nitrogen": Decimal("0.25"), "roots": Decimal("0.20"), "water": Decimal("0.30"), "temperature": Decimal("0.15"), "soil": Decimal("0.10")}
+_OBJECTIVE_WEIGHTS: dict[str, dict[str, Decimal]] = {
+    # Default agronomy-v1 demonstration weights.
+    "balanced": {
+        "nitrogen": Decimal("0.25"), "roots": Decimal("0.20"), "water": Decimal("0.30"),
+        "temperature": Decimal("0.15"), "soil": Decimal("0.10"),
+    },
+    # Emphasize rainfall/moisture stress fit when water is scarce.
+    "water_conservation": {
+        "nitrogen": Decimal("0.15"), "roots": Decimal("0.15"), "water": Decimal("0.45"),
+        "temperature": Decimal("0.15"), "soil": Decimal("0.10"),
+    },
+    # Emphasize legume/N transitions, root alternation, and pH fit for soil resilience.
+    "soil_health": {
+        "nitrogen": Decimal("0.30"), "roots": Decimal("0.30"), "water": Decimal("0.10"),
+        "temperature": Decimal("0.10"), "soil": Decimal("0.20"),
+    },
+    # Emphasize observed anomaly / seasonal climate fit under changing conditions.
+    "climate_adaptation": {
+        "nitrogen": Decimal("0.15"), "roots": Decimal("0.10"), "water": Decimal("0.35"),
+        "temperature": Decimal("0.30"), "soil": Decimal("0.10"),
+    },
+}
+_WEIGHTS = _OBJECTIVE_WEIGHTS["balanced"]
 _ROOTS = {"shallow": 0, "medium": 1, "deep": 2}
+
+
+def weights_for_objective(objective: str) -> dict[str, Decimal]:
+    try:
+        return _OBJECTIVE_WEIGHTS[objective]
+    except KeyError as exc:
+        raise ValueError(f"Unknown farmer_objective: {objective}") from exc
 
 
 def _distance(value: float, low: float, high: float) -> float:
@@ -36,9 +65,18 @@ def score_rotation(
     crops = {crop.crop_id: crop for crop in catalog.crops}
     if any(crop_id not in crops for crop_id in crop_ids):
         raise ValueError("Unknown crop ID")
-    scores: dict[str, list[float]] = {key: [] for key in _WEIGHTS}
+    base_weights = weights_for_objective(request.farmer_objective)
+    scores: dict[str, list[float]] = {key: [] for key in base_weights}
     warnings: dict[str, Message] = {}
     reasons: dict[str, Message] = {}
+    if request.farmer_objective != "balanced":
+        reasons["FARMER_OBJECTIVE"] = Message(
+            code="FARMER_OBJECTIVE",
+            message=(
+                f"Ranking uses the farmer objective “{request.farmer_objective.replace('_', ' ')}” "
+                "to remap component base weights before renormalization."
+            ),
+        )
     previous = crops.get(request.crop_history[-1].crop_id) if request.crop_history else None
     previous_residue = request.crop_history[-1].residue_management if request.crop_history else "unknown"
     for slot, crop_id, scenario in zip(request.slots, crop_ids, features.slot_scenarios, strict=True):
@@ -96,11 +134,17 @@ def score_rotation(
             warnings["PARTIAL_COMPONENT_COVERAGE"] = Message(code="PARTIAL_COMPONENT_COVERAGE", message="One or more component scores use only part of the planned sequence.")
     if not reasons:
         reasons["ROTATION_DIVERSITY"] = Message(code="ROTATION_DIVERSITY", message="The feasible crop sequence is compared using available rotation components.")
-    active = sum(weight for key, weight in _WEIGHTS.items() if values[key] is not None)
+    active = sum(weight for key, weight in base_weights.items() if values[key] is not None)
     if active == 0:
         raise ValueError("No score components are available")
-    effective = {key: float(weight / active) if values[key] is not None else 0.0 for key, weight in _WEIGHTS.items()}
-    unrounded = sum(Decimal(str(values[key])) * _WEIGHTS[key] for key in _WEIGHTS if values[key] is not None) / active
+    effective = {
+        key: float(weight / active) if values[key] is not None else 0.0
+        for key, weight in base_weights.items()
+    }
+    unrounded = (
+        sum(Decimal(str(values[key])) * base_weights[key] for key in base_weights if values[key] is not None)
+        / active
+    )
     return ScoredRotation(
         crop_ids=crop_ids, components=Components(**values), effective_weights=Weights(**effective),
         unrounded_score=unrounded, reasons=tuple(reasons.values()), warnings=tuple(warnings.values()),

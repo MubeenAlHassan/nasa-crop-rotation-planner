@@ -30,7 +30,11 @@ export function SoilRadar({ soil }: SoilRadarProps): ReactElement {
   return (
     <section aria-label="Soil properties" className="space-y-3 border-t border-[var(--panel-border)] pt-6">
       <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Soil properties, 0–30 cm</h2>
-      <p className="text-sm text-[var(--muted)]">Radar axes are display-only: pH 0–14, soil organic carbon 0–50 g/kg, total nitrogen 0–10 g/kg, and texture 0–100%. Values above a display limit are capped on the radar; the table retains raw values.</p>
+      <p className="text-sm text-[var(--muted)]">
+        Radar axes are display-only: pH 0–14, soil organic carbon 0–50 g/kg, total nitrogen 0–10 g/kg, and texture 0–100%.
+        Values above a display limit are capped on the radar; the table retains raw values. In v1 scoring, only known pH
+        enters the soil suitability component; SOC, total N, and texture remain soil-health context (total N is not plant-available N).
+      </p>
       {axes.length >= 3 ? <figure>
         <figcaption>Available soil properties on fixed display scales</figcaption>
         <div className="h-72"><ResponsiveContainer width="100%" height="100%">
