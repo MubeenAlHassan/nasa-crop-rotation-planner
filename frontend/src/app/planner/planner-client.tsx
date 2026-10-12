@@ -19,7 +19,7 @@ import {
   DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset, regionForLocation, samePoint,
   type FieldPresetId,
 } from "../../lib/field-presets";
-import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse, Slot } from "../../lib/generated/contracts";
+import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse } from "../../lib/generated/contracts";
 
 const DEMO_REQUEST: RecommendationRequest = {
   region_id: "punjab_pk_demo_v1",
@@ -47,7 +47,7 @@ function addUtcDays(iso: string, days: number): string {
   return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
 }
 
-function defaultSlotsForLocation(location: Location, assessment: string): Slot[] {
+function defaultSlotsForLocation(location: Location, assessment: string): RecommendationRequest["slots"] {
   const preset = findPreset(location);
   const year = Number(assessment.slice(0, 4));
   const month = Number(assessment.slice(5, 7));
@@ -96,6 +96,7 @@ export default function PlannerClient(): ReactElement {
   const [demoApplyKey, setDemoApplyKey] = useState(0);
   const [demoIrrigation, setDemoIrrigation] = useState<RecommendationRequest["irrigation"]>("rainfed");
   const [customApplyKey, setCustomApplyKey] = useState(0);
+  const [irrigationRetryKey, setIrrigationRetryKey] = useState(0);
   const [response, setResponse] = useState<RecommendationResponse | null>(null);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -105,7 +106,7 @@ export default function PlannerClient(): ReactElement {
   const resultsRef = useRef<HTMLDivElement | null>(null);
   const autoDemoStarted = useRef(false);
   const pendingCustomIrrigated = useRef<Location | null>(null);
-  const [usingFixtureFallback, setUsingFixtureFallback] = useState(false);
+  const [lastRequest, setLastRequest] = useState<RecommendationRequest | null>(null);
 
   const activeRegionId = regionForLocation(location);
 
@@ -137,12 +138,11 @@ export default function PlannerClient(): ReactElement {
     setPending(false);
     setResponse(null);
     setRequestError(null);
-    if (!samePoint(next, DEMO_POINT)) {
-      demoArmedRef.current = false;
-      setDemoArmed(false);
-      if (!options?.skipCustomFormApply) {
-        setCustomApplyKey((value) => value + 1);
-      }
+    setLastRequest(null);
+    demoArmedRef.current = false;
+    setDemoArmed(false);
+    if (!options?.skipCustomFormApply) {
+      setCustomApplyKey((value) => value + 1);
     }
     setLocation(next);
   }
@@ -157,6 +157,7 @@ export default function PlannerClient(): ReactElement {
       return;
     }
     active.current?.abort();
+    setLastRequest(request);
     const controller = new AbortController();
     active.current = controller;
     const current = ++generation.current;
@@ -170,7 +171,7 @@ export default function PlannerClient(): ReactElement {
         const message = failure instanceof Error ? failure.message : "Recommendation request failed.";
         const custom = !samePoint(request.location, DEMO_POINT);
         setRequestError(custom
-          ? `${message} Custom locations need live POWER climate with prepared baselines. For this offline demo, use the pinned Faisalabad farm.`
+          ? `${message} Custom locations need live POWER climate with prepared baselines. Your farm inputs are unchanged; retry or explicitly select the Faisalabad demo.`
           : message);
       }
     }).finally(() => {
@@ -181,20 +182,15 @@ export default function PlannerClient(): ReactElement {
     });
   }
 
-  function submitPinnedIrrigatedFixture(asFallback = false): void {
-    demoArmedRef.current = true;
-    setDemoArmed(true);
-    setDemoIrrigation("available");
-    setDemoApplyKey((value) => value + 1);
-    setUsingFixtureFallback(asFallback);
-    setRequestError(null);
-    submit({ ...DEMO_REQUEST, irrigation: "available" });
+  function retryWithIrrigation(): void {
+    if (!lastRequest) return;
+    setIrrigationRetryKey((value) => value + 1);
+    submit({ ...lastRequest, irrigation: "available" });
   }
 
   function armDemo(irrigation: RecommendationRequest["irrigation"] = "rainfed"): void {
     pendingCustomIrrigated.current = null;
-    setUsingFixtureFallback(false);
-    selectLocation(DEMO_POINT);
+    selectLocation(DEMO_POINT, { skipCustomFormApply: true });
     demoArmedRef.current = true;
     setDemoArmed(true);
     setDemoIrrigation(irrigation);
@@ -207,12 +203,8 @@ export default function PlannerClient(): ReactElement {
     submit({ ...DEMO_REQUEST, irrigation });
   }
 
-  /** Map/search/preset → try live irrigated climate; fall back to pinned irrigated fixture for offline demo. */
+  /** Map/search/preset → try live climate; fixture playback requires a demo action. */
   function runIrrigatedForLocation(next: Location): void {
-    if (samePoint(next, DEMO_POINT)) {
-      armDemo("available");
-      return;
-    }
     if (!(location && samePoint(location, next))) {
       selectLocation(next);
     } else {
@@ -223,37 +215,16 @@ export default function PlannerClient(): ReactElement {
       setResponse(null);
       setRequestError(null);
     }
-    setUsingFixtureFallback(false);
     setRequestError(null);
     if (!catalog) {
       pendingCustomIrrigated.current = next;
       return;
     }
     pendingCustomIrrigated.current = null;
-    active.current?.abort();
-    const controller = new AbortController();
-    active.current = controller;
-    const current = ++generation.current;
-    setPending(true);
-    setResponse(null);
-    void recommendRotation(customIrrigatedRequest(next), controller.signal).then((result) => {
-      if (current === generation.current && !controller.signal.aborted) {
-        setUsingFixtureFallback(false);
-        setResponse(result);
-      }
-    }).catch(() => {
-      if (current !== generation.current || controller.signal.aborted) return;
-      // Live POWER/baseline unavailable — show irrigated demo results instead of a hard error.
-      submitPinnedIrrigatedFixture(true);
-    }).finally(() => {
-      if (current === generation.current && active.current === controller) {
-        active.current = null;
-        setPending(false);
-      }
-    });
+    submit(customIrrigatedRequest(next));
   }
 
-  function usePreset(id: FieldPresetId): void {
+  function selectPreset(id: FieldPresetId): void {
     const preset = getPreset(id);
     if (preset.kind === "fixture") {
       armDemo("available");
@@ -280,7 +251,7 @@ export default function PlannerClient(): ReactElement {
     const presetId = searchParams.get("location");
     if (presetId && FIELD_PRESETS.some((preset) => preset.id === presetId)) {
       autoDemoStarted.current = true;
-      usePreset(presetId as FieldPresetId);
+      selectPreset(presetId as FieldPresetId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog, searchParams]);
@@ -289,9 +260,6 @@ export default function PlannerClient(): ReactElement {
     response && response.feasible_rotation_count === 0 && demoArmed && location && samePoint(location, DEMO_POINT),
   );
   const activePreset = findPreset(location);
-  const customPinFixturePlayback = Boolean(
-    usingFixtureFallback && location && !samePoint(location, DEMO_POINT) && response,
-  );
 
   return (
     <div className="min-h-full bg-[var(--background)] text-[var(--on-surface)]">
@@ -333,7 +301,7 @@ export default function PlannerClient(): ReactElement {
                     <p className="mt-1 line-clamp-3 text-xs text-[var(--muted)]">{preset.summary}</p>
                     {selected && preset.kind === "custom" && (
                       <p role="status" className="mt-2 text-sm text-[var(--info-ink)]">
-                        {preset.name} selected. Irrigated pinned demo runs automatically (map pin ≠ fixture farm).
+                        {preset.name} selected. Recommendations use live data for this location; the Faisalabad demo requires explicit selection.
                       </p>
                     )}
                   </div>
@@ -348,7 +316,7 @@ export default function PlannerClient(): ReactElement {
                         </button>
                       </>
                     ) : (
-                      <button type="button" onClick={() => usePreset(preset.id)} disabled={pending} className="btn-primary w-full">
+                      <button type="button" onClick={() => selectPreset(preset.id)} disabled={pending} className="btn-primary w-full">
                         Use {preset.name.split(" ")[0]} location
                       </button>
                     )}
@@ -418,7 +386,8 @@ export default function PlannerClient(): ReactElement {
                   demoApplyKey={demoApplyKey}
                   demoIrrigation={demoIrrigation}
                   customApplyKey={customApplyKey}
-                  onLocationCommit={selectLocation}
+                  irrigationRetryKey={irrigationRetryKey}
+                  onLocationCommit={(next) => selectLocation(next, { skipCustomFormApply: true })}
                 />
               </div>
             )}
@@ -433,19 +402,22 @@ export default function PlannerClient(): ReactElement {
             <div ref={resultsRef} className="panel space-y-8 p-4 sm:p-6" aria-live="polite">
             {pending && (
               <p role="status" className="rounded-xl bg-[var(--info-bg)] px-4 py-3 text-[var(--info-ink)]">
-                Building irrigated recommendations…
-              </p>
-            )}
-            {customPinFixturePlayback && (
-              <p role="status" className="rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] px-4 py-3 text-sm text-[var(--warning-ink)]">
-                Live climate for {formatCoords(location!)} was unavailable, so rankings use the authorized Faisalabad
-                demonstration fixture at {formatCoords(DEMO_POINT)}. Retry later once POWER baselines are cached.
+                Building recommendations…
               </p>
             )}
             {requestError && (
-              <p role="alert" className="rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-[var(--danger-ink)]">
-                {requestError}
-              </p>
+              <div role="alert" className="space-y-3 rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-[var(--danger-ink)]">
+                <p>{requestError}</p>
+                <div className="flex flex-wrap gap-2">
+                  {lastRequest && <button type="button" className="btn-secondary"
+                    onClick={() => lastRequest && submit(lastRequest)}>
+                    Retry same request
+                  </button>}
+                  <button type="button" className="btn-primary" onClick={() => armDemo("available")}>
+                    Run Faisalabad demo instead
+                  </button>
+                </div>
+              </div>
             )}
             {catalogError && !requestError && (
               <p role="alert" className="rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-[var(--danger-ink)]">
@@ -469,7 +441,7 @@ export default function PlannerClient(): ReactElement {
                 feasibleRotationCount={response.feasible_rotation_count} dataQuality={response.data_quality}
                 status={response.status} rulesVersion={response.rules_version} catalogVersion={response.catalog_version}
                 sources={response.sources} warnings={response.warnings} exclusions={response.exclusions}
-                onRetryWithIrrigation={showIrrigationRetry ? () => armDemo("available") : undefined}
+                onRetryWithIrrigation={showIrrigationRetry ? retryWithIrrigation : undefined}
                 retrying={pending} />
               {response.recommendations[0] && <RotationTimeline recommendation={response.recommendations[0]} />}
               <ClimateStressAlert climate={response.features.climate} />

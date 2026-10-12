@@ -15,6 +15,8 @@ export interface RecommendationFormProps {
   demoIrrigation?: RecommendationRequest["irrigation"];
   /** Increment when a custom map point is chosen to switch into Current data mode. */
   customApplyKey?: number;
+  /** Increment to change only irrigation when retrying the current plan. */
+  irrigationRetryKey?: number;
   /** Keep parent/map location in sync when the farmer edits coordinates in the form. */
   onLocationCommit?: (location: Location) => void;
 }
@@ -88,7 +90,7 @@ function numeric(value: string, min: number, max: number): number | null {
 
 export function RecommendationForm({
   catalog, initialLocation, submitting, onSubmit, demoApplyKey = 0,
-  demoIrrigation = "rainfed", customApplyKey = 0, onLocationCommit,
+  demoIrrigation = "rainfed", customApplyKey = 0, irrigationRetryKey = 0, onLocationCommit,
 }: RecommendationFormProps): ReactElement {
   const [latitude, setLatitude] = useState(initialLocation?.latitude.toString() ?? "");
   const [longitude, setLongitude] = useState(initialLocation?.longitude.toString() ?? "");
@@ -109,6 +111,7 @@ export function RecommendationForm({
   const [errors, setErrors] = useState<Errors>({});
   const [appliedDemoKey, setAppliedDemoKey] = useState(0);
   const [appliedCustomKey, setAppliedCustomKey] = useState(0);
+  const [appliedIrrigationRetryKey, setAppliedIrrigationRetryKey] = useState(0);
   const cropIds = new Set(catalog.crops.map((crop) => crop.crop_id));
 
   const [external, setExternal] = useState({ latitude: initialLocation?.latitude, longitude: initialLocation?.longitude });
@@ -137,19 +140,14 @@ export function RecommendationForm({
     setAppliedCustomKey(customApplyKey);
     const assessmentDate = isoTodayUtc();
     const plan = customPlanDefaults(assessmentDate, catalog.region_id);
-    setAssessment(assessmentDate);
-    setSlots(plan.slots);
-    setHistory(plan.history);
-    setIrrigation("available");
-    setAllowed([]);
-    setExcluded([]);
+    if (!assessment) setAssessment(assessmentDate);
+    if (slots.every((slot) => !slot.start_date && !slot.end_date)) setSlots(plan.slots);
     setDataMode("auto");
-    setFarmerObjective("climate_adaptation");
-    setTopK(3);
-    setUseSoil(false);
-    setSampledOn("");
-    setSoilValues({ ph: "", soc_g_kg: "", total_n_g_kg: "", sand_pct: "", silt_pct: "", clay_pct: "" });
     setErrors({});
+  }
+  if (irrigationRetryKey !== appliedIrrigationRetryKey) {
+    setAppliedIrrigationRetryKey(irrigationRetryKey);
+    setIrrigation("available");
   }
 
   function commitCoordinates(nextLatitude: string, nextLongitude: string): void {
@@ -158,6 +156,7 @@ export function RecommendationForm({
     const lat = numeric(nextLatitude, -90, 90);
     const lon = numeric(nextLongitude, -180, 180);
     if (lat !== null && lon !== null && onLocationCommit) {
+      if (lat !== initialLocation?.latitude || lon !== initialLocation?.longitude) setDataMode("auto");
       onLocationCommit({ latitude: lat, longitude: lon });
     }
   }

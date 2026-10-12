@@ -29,9 +29,25 @@ function base() {
 function submit() { fireEvent.click(screen.getByRole("button", { name: "Get recommendations" })); }
 
 describe("RecommendationForm", () => {
+  it.each([1, 2, 3, 4])("submits exactly %i ordered slots matching the bounded contract", (count) => {
+    const onSubmit = setup();
+    fireEvent.change(screen.getByLabelText("Assessment date"), { target: { value: "2025-10-15" } });
+    for (let index = 0; index < count; index += 1) {
+      if (index > 0) fireEvent.click(screen.getByRole("button", { name: "Add slot" }));
+      const start = new Date(Date.UTC(2025, 10, 1 + index * 40)).toISOString().slice(0, 10);
+      const end = new Date(Date.UTC(2025, 10, 30 + index * 40)).toISOString().slice(0, 10);
+      fireEvent.change(screen.getByLabelText(`Slot ${index + 1} start`), { target: { value: start } });
+      fireEvent.change(screen.getByLabelText(`Slot ${index + 1} end`), { target: { value: end } });
+    }
+    submit();
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0][0].slots).toHaveLength(count);
+    expect(validateRequest?.(onSubmit.mock.calls[0][0])).toBe(true);
+  });
+
   it("emits a contract-shaped request and preserves numeric zero in a partial soil override", () => {
     const onSubmit = setup(); base();
-    fireEvent.click(screen.getByLabelText("Add farmer soil observations"));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Add farmer soil observations (local soil)" }));
     fireEvent.change(screen.getByLabelText("Soil sample date"), { target: { value: "2025-10-01" } });
     fireEvent.change(screen.getByLabelText("pH"), { target: { value: "0" } });
     submit();
@@ -69,7 +85,7 @@ describe("RecommendationForm", () => {
     submit();
     expect(onSubmit).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText("History 1 crop"), { target: { value: "maize" } });
-    fireEvent.click(screen.getByLabelText("Add farmer soil observations"));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Add farmer soil observations (local soil)" }));
     fireEvent.change(screen.getByLabelText("Soil sample date"), { target: { value: "2025-10-01" } });
     fireEvent.change(screen.getByLabelText("Sand (%)"), { target: { value: "50" } });
     submit();
