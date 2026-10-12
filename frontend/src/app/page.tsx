@@ -16,35 +16,57 @@ const FARMER_IMAGE =
 
 export default function LandingPage(): ReactElement {
   return (
-    <div className="min-h-full bg-[var(--background)] text-[var(--on-surface)]">
+    <div className="landing-page min-h-full bg-[var(--background)] text-[var(--on-surface)]">
       <SiteHeader active="home" />
       <main>
         <section aria-label="Field Shift hero" className="w-full pt-20">
           <HeroSlider>
-            <Reveal immediate delayMs={40} variant="down" className="badge mb-6 border border-white/25 bg-white/15 text-white shadow-sm backdrop-blur-md">
-              <ShieldCheck className="h-4 w-4" aria-hidden />
-              NASA Space Apps · Explainable crop-rotation decision aid
-            </Reveal>
-            <Reveal immediate delayMs={120} as="h1" className="font-display max-w-4xl text-3xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Smarter rotation choices, grounded in observed climate and transparent rules
-            </Reveal>
-            <Reveal immediate delayMs={220} as="p" className="mt-4 max-w-2xl text-base text-white/90 sm:text-lg">
-              Field Shift ranks feasible next crops from NASA POWER climate context, local soil signals, and
-              deterministic agronomic constraints — not yield forecasts or fertilizer prescriptions.
-            </Reveal>
-            <Reveal immediate delayMs={320} className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-              <Link href="/planner" className="btn-primary w-full sm:w-auto">
-                Open the planner
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-              <Link
-                href="/planner?demo=1"
-                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-white/40 bg-white/15 px-6 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/25 sm:w-auto"
-              >
-                <PlayCircle className="h-5 w-5" aria-hidden />
-                Watch pinned field demo
-              </Link>
-            </Reveal>
+            <div className="landing-hero-grid">
+              <div className="landing-hero-copy">
+                <Reveal immediate delayMs={40} variant="down" className="landing-hero-kicker">
+                  <Satellite className="h-4 w-4" aria-hidden /> NASA Space Apps · Field intelligence
+                </Reveal>
+                <Reveal immediate delayMs={120} as="h1" className="font-display landing-hero-title">
+                  A clearer path to <span>your next crop.</span>
+                </Reveal>
+                <Reveal immediate delayMs={220} as="p" className="landing-hero-description">
+                  Turn observed climate, field context, and transparent agronomic rules into rotation choices you can actually explain.
+                </Reveal>
+                <Reveal immediate delayMs={320} className="landing-hero-actions">
+                  <Link href="/planner" className="landing-hero-primary">
+                    Open the planner <ArrowRight className="h-4 w-4" aria-hidden />
+                  </Link>
+                  <Link href="/planner?demo=1" className="landing-hero-secondary">
+                    <PlayCircle className="h-5 w-5" aria-hidden /> Explore the field demo
+                  </Link>
+                </Reveal>
+                <Reveal immediate delayMs={390} className="landing-hero-proof">
+                  <span><CheckCircle2 className="h-4 w-4" aria-hidden /> Constraints before scores</span>
+                  <span><ShieldCheck className="h-4 w-4" aria-hidden /> Sources shown clearly</span>
+                </Reveal>
+              </div>
+              <Reveal immediate delayMs={250} variant="right" className="landing-preview-wrap">
+                <div className="landing-preview-card">
+                  <div className="landing-preview-top">
+                    <span className="landing-preview-mark"><Leaf className="h-5 w-5" aria-hidden /></span>
+                    <div><p className="landing-preview-eyebrow">Decision preview</p><p className="font-display text-lg font-bold">Faisalabad field</p></div>
+                    <span className="landing-preview-live"><span /> Fixture ready</span>
+                  </div>
+                  <div className="landing-preview-main">
+                    <p className="landing-preview-eyebrow">Rabi 2025 · scenario insight</p>
+                    <h2 className="font-display mt-2 text-2xl font-bold tracking-tight">See what changes when irrigation is available.</h2>
+                    <p className="mt-2 text-sm text-[#51635b]">The planner filters infeasible options, then explains which crops become viable.</p>
+                  </div>
+                  <div className="landing-preview-steps">
+                    <div><span>01</span><div><strong>Locate the field</strong><small>Coordinates and planting window</small></div><CheckCircle2 className="h-4 w-4" aria-hidden /></div>
+                    <div><span>02</span><div><strong>Apply constraints</strong><small>Calendar and irrigation checked first</small></div><CheckCircle2 className="h-4 w-4" aria-hidden /></div>
+                    <div className="is-highlight"><span>03</span><div><strong>Compare alternatives</strong><small>Wheat unlocked in the irrigated scenario</small></div><ArrowRight className="h-4 w-4" aria-hidden /></div>
+                  </div>
+                  <div className="landing-preview-footer"><span><Satellite className="h-4 w-4" aria-hidden /> NASA POWER climate context</span><span>View provenance <ArrowRight className="h-3.5 w-3.5" aria-hidden /></span></div>
+                </div>
+                <div className="landing-preview-float"><CloudSun className="h-5 w-5" aria-hidden /><span>Weather for fieldwork</span><Link href="/weather" aria-label="Open weather dashboard"><ArrowRight className="h-4 w-4" aria-hidden /></Link></div>
+              </Reveal>
+            </div>
           </HeroSlider>
         </section>
 

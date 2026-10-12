@@ -40,7 +40,9 @@ export function WeatherAtmosphere({
       aria-hidden
     >
       <div className="weather-sky-wash" />
+      <div className="weather-scene-fields" />
       <div className="weather-horizon" />
+      {showClouds && <div className="weather-scene-cloudbank" />}
 
       {showSun && (
         <WeatherSunlight soft={theme === "partly"} hot={showHeat} />
@@ -66,18 +68,21 @@ export function WeatherAtmosphere({
       )}
 
       {showRain && (
-        <div className={`weather-rain${theme === "storm" ? " is-heavy" : ""}`}>
-          {particles(70, 1.45).map((drop, index) => (
-            <i
-              key={index}
-              style={{
-                left: drop.left,
-                animationDelay: drop.delay,
-                animationDuration: theme === "storm" ? "0.55s" : drop.duration,
-              }}
-            />
-          ))}
-        </div>
+        <>
+          <div className="weather-rain-curtain" />
+          <div className={`weather-rain${theme === "storm" ? " is-heavy" : ""}`}>
+            {particles(theme === "storm" ? 110 : 85, 1.19).map((drop, index) => (
+              <i
+                key={index}
+                style={{
+                  left: drop.left,
+                  animationDelay: drop.delay,
+                  animationDuration: theme === "storm" ? "0.55s" : drop.duration,
+                }}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {showSnow && (

@@ -30,8 +30,8 @@ const DEFAULT_SLIDES: readonly HeroSlide[] = [
   },
 ];
 
-const INTERVAL_MS = 3000;
-const FADE_MS = 900;
+const INTERVAL_MS = 5500;
+const FADE_MS = 1100;
 
 export interface HeroSliderProps {
   slides?: readonly HeroSlide[];
@@ -103,8 +103,8 @@ export function HeroSlider({ slides = DEFAULT_SLIDES, children }: HeroSliderProp
 
       <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-b from-[rgba(12,20,10,0.55)] via-[rgba(12,20,10,0.4)] to-[rgba(12,20,10,0.65)]" />
 
-      <div className="relative z-[4] flex flex-1 flex-col items-center justify-center px-4 pb-24 pt-16 text-center sm:px-8 sm:pb-28 sm:pt-20">
-        <div className="pointer-events-auto mx-auto flex w-full max-w-4xl flex-col items-center">
+      <div className="relative z-[4] flex flex-1 flex-col justify-center px-4 pb-24 pt-16 sm:px-8 sm:pb-28 sm:pt-20">
+        <div className="pointer-events-auto mx-auto w-full max-w-[1340px]">
           {children}
         </div>
       </div>
