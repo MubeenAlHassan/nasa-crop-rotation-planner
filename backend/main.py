@@ -2,7 +2,7 @@ import json
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from schemas import RecommendationRequest, RecommendationResponse
+from backend.schemas import RecommendationRequest, RecommendationResponse
 
 app = FastAPI(title="Field Shift API")
 
