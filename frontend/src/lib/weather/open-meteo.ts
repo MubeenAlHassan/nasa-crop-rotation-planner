@@ -29,6 +29,8 @@ export interface CurrentWeather {
   windGustsKmh: number;
   uvIndex: number;
   isDay: boolean;
+  /** Modelled volumetric water content in the top 1 cm, not field capacity. */
+  surfaceSoilMoisturePct: number | null;
 }
 
 export interface DailyForecast {
@@ -44,6 +46,7 @@ export interface DailyForecast {
   uvIndexMax: number;
   sunrise: string;
   sunset: string;
+  referenceEtMm: number | null;
 }
 
 export interface HourlyPoint {
@@ -89,6 +92,7 @@ interface ForecastPayload {
     wind_direction_10m: number;
     wind_gusts_10m: number;
     uv_index: number;
+    soil_moisture_0_to_1cm?: number | null;
   };
   daily: {
     time: string[];
@@ -101,6 +105,7 @@ interface ForecastPayload {
     uv_index_max: number[];
     sunrise: string[];
     sunset: string[];
+    et0_fao_evapotranspiration?: (number | null)[];
   };
   hourly: {
     time: string[];
@@ -219,6 +224,7 @@ export async function fetchWeather(
       "wind_direction_10m",
       "wind_gusts_10m",
       "uv_index",
+      "soil_moisture_0_to_1cm",
     ].join(","),
   );
   url.searchParams.set(
@@ -233,6 +239,7 @@ export async function fetchWeather(
       "uv_index_max",
       "sunrise",
       "sunset",
+      "et0_fao_evapotranspiration",
     ].join(","),
   );
   url.searchParams.set(
@@ -245,6 +252,20 @@ export async function fetchWeather(
   const data = await response.json() as ForecastPayload;
   const currentCode = assertFinite(data.current.weather_code, "weather code");
   const currentInfo = describeWeatherCode(currentCode);
+  const currentPrecipitation = assertFinite(data.current.precipitation, "current precipitation");
+  const currentHour = data.current.time.slice(0, 13);
+  const firstHour = Math.max(0, data.hourly.time.findIndex((time) => time.slice(0, 13) >= currentHour));
+  const hourlyCondition = data.hourly.time[firstHour]?.slice(0, 13) === currentHour
+    ? describeWeatherCode(data.hourly.weather_code[firstHour])
+    : null;
+  const currentCondition = ["rain", "storm", "snow"].includes(currentInfo.theme)
+    ? currentInfo
+    : currentPrecipitation >= 0.1
+      ? { label: "Rain", theme: "rain" as const }
+      : (data.hourly.precipitation[firstHour] ?? 0) >= 0.1
+        && (hourlyCondition?.theme === "rain" || hourlyCondition?.theme === "storm")
+        ? hourlyCondition
+        : currentInfo;
 
   const daily: DailyForecast[] = data.daily.time.map((date, index) => {
     const code = assertFinite(data.daily.weather_code[index], "daily weather code");
@@ -265,10 +286,14 @@ export async function fetchWeather(
       uvIndexMax: assertFinite(data.daily.uv_index_max[index] ?? 0, "uv"),
       sunrise: data.daily.sunrise[index],
       sunset: data.daily.sunset[index],
+      referenceEtMm: Number.isFinite(data.daily.et0_fao_evapotranspiration?.[index])
+        ? data.daily.et0_fao_evapotranspiration![index]!
+        : null,
     };
   });
 
-  const hourly: HourlyPoint[] = data.hourly.time.slice(0, 24).map((time, index) => {
+  const hourly: HourlyPoint[] = data.hourly.time.slice(firstHour, firstHour + 24).map((time, offset) => {
+    const index = firstHour + offset;
     const code = assertFinite(data.hourly.weather_code[index], "hourly weather code");
     return {
       time,
@@ -290,10 +315,10 @@ export async function fetchWeather(
       temperatureC: assertFinite(data.current.temperature_2m, "temperature"),
       feelsLikeC: assertFinite(data.current.apparent_temperature, "feels like"),
       humidityPct: assertFinite(data.current.relative_humidity_2m, "humidity"),
-      precipitationMm: assertFinite(data.current.precipitation, "current precipitation"),
+      precipitationMm: currentPrecipitation,
       weatherCode: currentCode,
-      label: currentInfo.label,
-      theme: currentInfo.theme,
+      label: currentCondition.label,
+      theme: currentCondition.theme,
       cloudCoverPct: assertFinite(data.current.cloud_cover, "cloud cover"),
       pressureHpa: assertFinite(data.current.pressure_msl, "pressure"),
       windSpeedKmh: assertFinite(data.current.wind_speed_10m, "wind speed"),
@@ -301,6 +326,9 @@ export async function fetchWeather(
       windGustsKmh: assertFinite(data.current.wind_gusts_10m, "wind gusts"),
       uvIndex: assertFinite(data.current.uv_index, "uv index"),
       isDay: data.current.is_day === 1,
+      surfaceSoilMoisturePct: Number.isFinite(data.current.soil_moisture_0_to_1cm)
+        ? data.current.soil_moisture_0_to_1cm! * 100
+        : null,
     },
     daily,
     hourly,
