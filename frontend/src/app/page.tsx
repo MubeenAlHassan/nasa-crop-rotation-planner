@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import {
-  ArrowRight, CheckCircle2, CloudSun, Leaf, PlayCircle, Satellite, ShieldCheck, Sprout,
+  ArrowRight, CheckCircle2, CloudSun, Droplets, Leaf, MapPin, PlayCircle, Satellite,
+  ShieldCheck, SlidersHorizontal, Sprout, ThermometerSun, Wheat, Zap,
 } from "lucide-react";
 import type { ReactElement } from "react";
 import { HeroSlider } from "../components/hero-slider";
@@ -181,6 +182,95 @@ export default function LandingPage(): ReactElement {
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="challenge-coverage" className="px-4 py-12 sm:px-8">
+          <div className="mx-auto max-w-[1440px]">
+            <Reveal className="mx-auto mb-10 max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">NASA Space Apps challenge</p>
+              <h2 className="font-display mt-2 text-3xl font-bold">Every challenge requirement, answered in the product</h2>
+              <p className="mt-3 text-[var(--on-surface-variant)]">
+                The challenge asks for a decision-support tool built on NASA Earth observations, local soil, crop
+                characteristics, and farmer priorities. Here is where each one lives in Field Shift.
+              </p>
+            </Reveal>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  icon: ThermometerSun,
+                  need: "Shifting temperatures & rainfall",
+                  how: "NASA POWER daily rainfall and temperature are compared against the 1991–2020 baseline, with anomaly bands shown for every assessment window.",
+                  where: "Planner → Weather & climate tab",
+                },
+                {
+                  icon: Zap,
+                  need: "Extreme weather",
+                  how: "Severe-dry, severe-wet, and high-heat bands raise an explicit stress alert and feed the climate adaptation score of every crop option.",
+                  where: "Planner → Weather & climate tab",
+                },
+                {
+                  icon: Droplets,
+                  need: "Water shortages",
+                  how: "Rainfed versus irrigated scenarios are first-class: infeasible rainfed plans show exactly which crops irrigation would unlock, plus a water-conservation priority.",
+                  where: "Planner → Plan step, irrigation setting",
+                },
+                {
+                  icon: Sprout,
+                  need: "Declining soil health",
+                  how: "Nitrogen transitions, root-class diversity, and pH/organic-carbon context are scored per rotation and summarized as soil & rotation fit signals.",
+                  where: "Planner → Soil & water tab",
+                },
+                {
+                  icon: MapPin,
+                  need: "Local soil information",
+                  how: "SoilGrids map estimates when available, and a farmer-entered 0–30 cm soil sample (pH, carbon, nitrogen, texture) that overrides the map for screening.",
+                  where: "Planner → Plan step, farmer soil observations",
+                },
+                {
+                  icon: Wheat,
+                  need: "Crop characteristics",
+                  how: "Versioned regional catalogs (Punjab, Maryland, England) carry each crop's calendar, family, nitrogen demand, rooting class, rainfall, temperature, and pH ranges.",
+                  where: "Planner → crop guide & crop characteristics",
+                },
+                {
+                  icon: SlidersHorizontal,
+                  need: "Farmer priorities",
+                  how: "A balanced, water-conservation, soil-health, or climate-adaptation objective transparently remaps scoring weights — hard agronomic rules always apply first.",
+                  where: "Planner → Plan step, farmer priority",
+                },
+                {
+                  icon: Satellite,
+                  need: "NASA Earth observations",
+                  how: "POWER climate context on every request; SMAP surface moisture from versioned Earthdata captures where prepared — never invented for unsupported farms.",
+                  where: "Planner → Data notes tab",
+                },
+                {
+                  icon: ShieldCheck,
+                  need: "Rotation strategies & resilience",
+                  how: "Feasibility rules filter the calendar and water constraints first, then ranked, explainable alternatives show scores, reasons, and exclusions side by side.",
+                  where: "Planner → Recommended crops tab",
+                },
+              ].map((item, index) => (
+                <Reveal key={item.need} delayMs={index * 70} variant="up" className="panel flex h-full flex-col gap-3 p-5">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-fixed)] text-[var(--primary)]">
+                      <item.icon className="h-5 w-5" aria-hidden />
+                    </span>
+                    <h3 className="font-display text-base font-bold leading-snug">{item.need}</h3>
+                  </div>
+                  <p className="flex-1 text-sm text-[var(--on-surface-variant)]">{item.how}</p>
+                  <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)]">
+                    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> {item.where}
+                  </p>
+                </Reveal>
+              ))}
+            </div>
+            <Reveal delayMs={120} className="mx-auto mt-8 max-w-3xl rounded-xl border border-[var(--outline-variant)] bg-[var(--surface-container-low)] px-5 py-4 text-center text-sm text-[var(--on-surface-variant)]">
+              Honest limits: scores are heuristic suitability — not yield, revenue, or water-savings guarantees. Missing
+              SoilGrids or SMAP data is labeled unavailable instead of being invented, and climate context is observed
+              history, not a weather forecast.
+            </Reveal>
           </div>
         </section>
 
