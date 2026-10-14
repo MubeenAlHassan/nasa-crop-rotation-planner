@@ -58,9 +58,21 @@ export default function LandingPage(): ReactElement {
                     <p className="mt-2 text-sm text-[#51635b]">The planner filters infeasible options, then explains which crops become viable.</p>
                   </div>
                   <div className="landing-preview-steps">
-                    <div><span>01</span><div><strong>Locate the field</strong><small>Coordinates and planting window</small></div><CheckCircle2 className="h-4 w-4" aria-hidden /></div>
-                    <div><span>02</span><div><strong>Apply constraints</strong><small>Calendar and irrigation checked first</small></div><CheckCircle2 className="h-4 w-4" aria-hidden /></div>
-                    <div className="is-highlight"><span>03</span><div><strong>Compare alternatives</strong><small>Wheat unlocked in the irrigated scenario</small></div><ArrowRight className="h-4 w-4" aria-hidden /></div>
+                    <div className="landing-preview-step" style={{ ["--step-delay" as string]: "80ms" }}>
+                      <span>01</span>
+                      <div><strong>Locate the field</strong><small>Coordinates and planting window</small></div>
+                      <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    </div>
+                    <div className="landing-preview-step" style={{ ["--step-delay" as string]: "180ms" }}>
+                      <span>02</span>
+                      <div><strong>Apply constraints</strong><small>Calendar and irrigation checked first</small></div>
+                      <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    </div>
+                    <div className="landing-preview-step is-highlight" style={{ ["--step-delay" as string]: "280ms" }}>
+                      <span>03</span>
+                      <div><strong>Compare alternatives</strong><small>Wheat unlocked in the irrigated scenario</small></div>
+                      <ArrowRight className="h-4 w-4" aria-hidden />
+                    </div>
                   </div>
                   <div className="landing-preview-footer">
                     <span><Satellite className="h-4 w-4" aria-hidden /> NASA POWER climate context</span>
