@@ -21,7 +21,7 @@ ENABLE_DEMO_FIXTURES=true BACKEND_DATA_DIR="$PWD" \
   .venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-Open `/planner` and select **Rainfed demo** or **Irrigated demo (wheat)**. The landing-page demo link (`/planner?demo=1`) explicitly selects the rainfed demo. Choosing Faisalabad coordinates alone does not authorize fixture mode. A failed custom request keeps its farm and form inputs; **Retry same request** repeats those inputs, and **Run Faisalabad demo instead** explicitly switches to the demonstration farm and applies its defaults.
+Opening `/planner` (or `/planner?location=sahiwal`) selects the default **Sahiwal** field and runs it with live NASA POWER climate in `auto` mode. For the offline fixture, choose the **Faisalabad** chip and select **Rainfed demo** or **Irrigated demo (wheat)**; `/planner?demo=1` explicitly selects the rainfed fixture demo. Choosing Faisalabad coordinates alone does not authorize fixture mode. A failed custom request keeps its farm and form inputs; **Retry same request** repeats those inputs, and **Run Faisalabad demo instead** explicitly switches to the demonstration farm and applies its defaults.
 
 The browser uses the Next.js same-origin `/api/recommend-rotation` BFF, which forwards to `/api/v1/recommend-rotation`. Its default backend is `http://127.0.0.1:8000`; deployment configuration uses server-only `BACKEND_BASE_URL` and the matching `BACKEND_ALLOWED_UPSTREAM_ORIGINS` allowlist.
 

@@ -267,7 +267,7 @@ export function RecommendationForm({
           if (preset?.kind === "fixture") {
             return (
               <p className="rounded-lg bg-[var(--surface-container-low)] px-3 py-2 text-sm text-[var(--on-surface-variant)]">
-                Pinned Faisalabad point selected. Use <strong>Authorized demo fixture</strong> for offline results, or run the demo buttons above.
+                Pinned Faisalabad point selected. Use <strong>Authorized demo fixture</strong> for offline results, or run the demo buttons on the Field step.
               </p>
             );
           }

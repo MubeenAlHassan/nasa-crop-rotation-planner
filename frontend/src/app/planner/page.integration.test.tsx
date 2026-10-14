@@ -28,10 +28,40 @@ const catalog = JSON.parse(readFileSync(resolve(process.cwd(), "../backend/data/
 const samples = [...readFileSync(resolve(process.cwd(), "../agent_docs/DATA_SCHEMA.md"), "utf8")
   .matchAll(/```json\n([\s\S]*?)\n```/g)].map((match) => JSON.parse(match[1]));
 
-function endpoint(response = structuredClone(samples[1])) {
+type RequestLike = {
+  location: { latitude: number; longitude: number };
+  slots: Array<{ slot_id: string; start_date: string; end_date: string }>;
+};
+
+/** Mirror the backend contract: a response must echo the requested location and slots. */
+function echo(template: Record<string, unknown>, request: RequestLike) {
+  const response = structuredClone(template) as {
+    location: RequestLike["location"];
+    features: { slot_scenarios: Array<{ slot_id: string }> };
+    recommendations: Array<{ slots: Array<{ slot_id: string; start_date: string; end_date: string }> }>;
+  };
+  response.location = request.location;
+  response.features.slot_scenarios = response.features.slot_scenarios.map((scenario, index) => ({
+    ...scenario, slot_id: request.slots[index]?.slot_id ?? scenario.slot_id,
+  }));
+  response.recommendations = response.recommendations.map((recommendation) => ({
+    ...recommendation,
+    slots: recommendation.slots.map((slot, index) => ({
+      ...slot,
+      slot_id: request.slots[index]?.slot_id ?? slot.slot_id,
+      start_date: request.slots[index]?.start_date ?? slot.start_date,
+      end_date: request.slots[index]?.end_date ?? slot.end_date,
+    })),
+  }));
+  return response;
+}
+
+function endpoint(template: Record<string, unknown> = samples[1]) {
   const fetcher = vi.fn(async (url: string, init?: RequestInit) => {
     if (url.includes("?region_id=")) return Response.json(catalog);
-    if (url === "/api/recommend-rotation" && init?.method === "POST") return Response.json(response);
+    if (url === "/api/recommend-rotation" && init?.method === "POST") {
+      return Response.json(echo(template, JSON.parse(init.body as string) as RequestLike));
+    }
     throw new Error(`Unexpected same-origin path: ${url}`);
   });
   vi.stubGlobal("fetch", fetcher);
@@ -49,29 +79,63 @@ function expectPinnedFormFilled(): void {
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
+const SAHIWAL = { latitude: 30.6612, longitude: 73.1086 };
+const FAISALABAD = { latitude: 31.4504, longitude: 73.135 };
+const RESULTS_HEADING = { name: "Best next crops" };
+
+/** Navigate from results to the field step and arm the pinned Faisalabad rainfed fixture demo. */
+function startPinnedRainfedDemo(): void {
+  fireEvent.click(screen.getByRole("button", { name: "Change field" }));
+  // Preset chips render as list items inside the "Saved fields" list, so match by text.
+  fireEvent.click(screen.getByText(/^Faisalabad/, { selector: "button" }));
+  fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
+}
+
 describe("farmer dashboard integration", () => {
-  it("runs the pinned demo on button click, sends exact contract JSON, and renders every returned panel and warning", async () => {
+  it("opens on the Sahiwal live field by default and renders tabbed results", async () => {
     const fetcher = endpoint();
     render(<PlannerPage />);
-    await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
+    await screen.findByRole("heading", RESULTS_HEADING);
+    expect(posts(fetcher)).toHaveLength(1);
+    const body = posts(fetcher)[0];
+    expect(body.region_id).toBe("punjab_pk_demo_v1");
+    expect(body.location).toEqual(SAHIWAL);
+    expect(body.irrigation).toBe("available");
+    expect(body.data_mode).toBe("auto");
+    expect(body.farmer_objective).toBe("climate_adaptation");
+    expect(body.slots).toHaveLength(1);
+    expect(screen.getByLabelText("Recommendation results")).toBeInTheDocument();
+    expect(screen.getByText(/Rotation timeline, rank 1/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Weather & climate" }));
+    expect(screen.getByLabelText("Climate observations and historical stress scenarios")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Soil & water" }));
+    expect(screen.getByLabelText("Soil properties")).toBeInTheDocument();
+    expect(screen.getByLabelText("Surface moisture context")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Data notes" }));
+    expect(screen.getByLabelText("Data provenance")).toBeInTheDocument();
+    // The plan form mirrors the default field even though it is on another step.
+    expect(screen.getAllByLabelText("Latitude")[1]).toHaveValue(SAHIWAL.latitude);
+    expect(screen.getAllByLabelText("Longitude")[1]).toHaveValue(SAHIWAL.longitude);
+    expect(screen.getByLabelText("Data mode")).toHaveValue("auto");
+  });
+
+  it("runs the pinned Faisalabad fixture only through the explicit demo action and sends exact contract JSON", async () => {
+    const fetcher = endpoint();
+    render(<PlannerPage />);
+    await screen.findByRole("heading", RESULTS_HEADING);
+    startPinnedRainfedDemo();
     expectPinnedFormFilled();
-    await screen.findByRole("heading", { name: "Ranked alternatives" });
-    const post = fetcher.mock.calls.find(([url]) => url === "/api/recommend-rotation");
-    expect(post).toBeDefined();
-    expect(JSON.parse(post![1]!.body as string)).toEqual({
-      region_id: "punjab_pk_demo_v1", location: { latitude: 31.4504, longitude: 73.135 },
+    await waitFor(() => expect(posts(fetcher)).toHaveLength(2));
+    expect(posts(fetcher)[1]).toEqual({
+      region_id: "punjab_pk_demo_v1", location: FAISALABAD,
       assessment_end: "2025-10-15",
       slots: [{ slot_id: "rabi_2025", start_date: "2025-11-01", end_date: "2026-03-31" }],
       crop_history: [{ crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "retained" }],
       irrigation: "rainfed", allowed_crop_ids: [], excluded_crop_ids: [],
       soil_override: null, data_mode: "fixture", farmer_objective: "balanced", top_k: 3,
     });
-    expect(screen.getByLabelText("Recommendation results")).toBeInTheDocument();
+    await screen.findByRole("heading", RESULTS_HEADING);
     expect(screen.getByText(/Rotation timeline, rank 1/)).toBeInTheDocument();
-    expect(screen.getByLabelText("Climate observations and historical stress scenarios")).toBeInTheDocument();
-    expect(screen.getByLabelText("Soil properties")).toBeInTheDocument();
-    expect(screen.getByText(/Surface soil moisture is unavailable/)).toBeInTheDocument();
   });
 
   it("renders zero-result state without a timeline and can retry with irrigation", async () => {
@@ -80,29 +144,28 @@ describe("farmer dashboard integration", () => {
     response.feasible_rotation_count = 0;
     response.recommendations = [];
     response.warnings.push({ code: "NO_FEASIBLE_ROTATION", message: "No feasible rotation." });
-    const irrigated = structuredClone(samples[1]);
     const fetcher = vi.fn(async (url: string, init?: RequestInit) => {
       if (url.includes("?region_id=")) return Response.json(catalog);
       if (url === "/api/recommend-rotation" && init?.method === "POST") {
-        const body = JSON.parse(init.body as string) as { irrigation: string };
-        return Response.json(body.irrigation === "available" ? irrigated : response);
+        const body = JSON.parse(init.body as string) as RequestLike & { irrigation: string };
+        return Response.json(echo(body.irrigation === "available" ? samples[1] : response, body));
       }
       throw new Error(`Unexpected same-origin path: ${url}`);
     });
     vi.stubGlobal("fetch", fetcher);
     render(<PlannerPage />);
-    await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
+    await screen.findByRole("heading", RESULTS_HEADING);
+    startPinnedRainfedDemo();
     expectPinnedFormFilled();
-    expect(await screen.findByText(/No feasible rotation was returned/)).toBeInTheDocument();
+    expect(await screen.findByText("No crop works with these settings")).toBeInTheDocument();
     expect(screen.queryByText(/Rotation timeline, rank/)).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Retry with irrigation available" }));
-    await screen.findByRole("heading", { name: "Ranked alternatives" });
+    fireEvent.click(screen.getByRole("button", { name: "Try with irrigation available" }));
+    await screen.findByRole("heading", RESULTS_HEADING);
     expect(screen.getByText(/Rotation timeline, rank 1/)).toBeInTheDocument();
     expect(screen.getByLabelText("Irrigation")).toHaveValue("available");
   });
 
-  it("cancels a pending request on coordinate change and switches custom points to current data", async () => {
+  it("cancels a pending request on map coordinate change and keeps custom points on current data", async () => {
     const resolvers: Array<(response: Response) => void> = [];
     const fetcher = vi.fn((url: string, init?: RequestInit) => {
       if (url.includes("?region_id=")) return Promise.resolve(Response.json(catalog));
@@ -113,32 +176,21 @@ describe("farmer dashboard integration", () => {
     });
     vi.stubGlobal("fetch", fetcher);
     render(<PlannerPage />);
-    await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
-    expectPinnedFormFilled();
+    // Default Sahiwal live request is in flight.
     await waitFor(() => expect(resolvers.length).toBe(1));
     const first = fetcher.mock.calls.find(([, init]) => init?.method === "POST");
-    // Field map latitude change tries live irrigated climate first.
+    const bodyOf = (index: number) => posts(fetcher)[index] as RequestLike;
+    fireEvent.click(screen.getByRole("button", { name: "Change field" }));
+    // Field map latitude change tries live irrigated climate for the new point.
     fireEvent.change(screen.getAllByLabelText("Latitude")[0], { target: { value: "31.4505" } });
     expect(first?.[1]?.signal?.aborted).toBe(true);
     await waitFor(() => expect(resolvers.length).toBe(2));
-    const secondBody = JSON.parse(
-      fetcher.mock.calls.filter(([, init]) => init?.method === "POST").at(-1)![1]!.body as string,
-    );
+    const secondBody = posts(fetcher).at(-1);
     expect(secondBody.irrigation).toBe("available");
     expect(secondBody.data_mode).toBe("auto");
-    expect(secondBody.location).toEqual({ latitude: 31.4505, longitude: 73.135 });
-    resolvers[0]!(Response.json(samples[1]));
-    resolvers[1]!(Response.json({
-      schema_version: "1.0.0",
-      request_id: "00000000-0000-4000-8000-000000000099",
-      error: {
-        code: "REQUIRED_DATA_UNAVAILABLE",
-        message: "Live providers are not configured.",
-        retryable: true,
-        details: [],
-      },
-    }, { status: 503 }));
+    expect(secondBody.location).toEqual({ latitude: 31.4505, longitude: SAHIWAL.longitude });
+    resolvers[0]!(Response.json(echo(samples[1], bodyOf(0))));
+    resolvers[1]!(unavailable());
     await screen.findByText(/Your farm inputs are unchanged/);
     expect(resolvers).toHaveLength(2);
     expect(screen.getByLabelText("Data mode")).toHaveValue("auto");
@@ -147,34 +199,17 @@ describe("farmer dashboard integration", () => {
     // Only an explicit action may switch the farm and submit a fixture request.
     fireEvent.click(screen.getByRole("button", { name: "Run Faisalabad demo instead" }));
     await waitFor(() => expect(resolvers).toHaveLength(3));
-    const demoBody = JSON.parse(
-      fetcher.mock.calls.filter(([, init]) => init?.method === "POST").at(-1)![1]!.body as string,
-    );
+    const demoBody = posts(fetcher).at(-1);
     expect(demoBody.data_mode).toBe("fixture");
-    expect(demoBody.location).toEqual({ latitude: 31.4504, longitude: 73.135 });
+    expect(demoBody.location).toEqual(FAISALABAD);
     expectPinnedFormFilled();
-    expect(screen.getAllByLabelText("Latitude")[0]).toHaveValue(31.4504);
-    resolvers[2]!(Response.json(samples[1]));
-    await screen.findByRole("heading", { name: "Ranked alternatives" });
+    expect(screen.getAllByLabelText("Latitude")[0]).toHaveValue(FAISALABAD.latitude);
+    resolvers[2]!(Response.json(echo(samples[1], bodyOf(2))));
+    await screen.findByRole("heading", RESULTS_HEADING);
     expect(screen.getByLabelText("Data mode")).toHaveValue("fixture");
   });
 
-  it("auto-runs irrigated recommendations when a custom place is chosen on the map form path", async () => {
-    const fetcher = endpoint();
-    render(<PlannerPage />);
-    await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: /Sahiwal/i }));
-    await waitFor(() => {
-      const posts = fetcher.mock.calls.filter(([url, init]) => url === "/api/recommend-rotation" && init?.method === "POST");
-      expect(posts.length).toBeGreaterThanOrEqual(1);
-      const body = JSON.parse(posts[posts.length - 1]![1]!.body as string);
-      expect(body.irrigation).toBe("available");
-      expect(body.data_mode).toBe("auto");
-      expect(body.location).toEqual({ latitude: 30.6612, longitude: 73.1086 });
-    });
-  });
-
-  it("keeps all farmer inputs after a failed form request and resends the same request on retry", async () => {
+  it("keeps all farmer inputs across steps after a failed form request and resends the same request on retry", async () => {
     const fetcher = vi.fn(async (url: string, init?: RequestInit) => {
       if (url.includes("?region_id=")) return Response.json(catalog);
       if (url === "/api/recommend-rotation" && init?.method === "POST") return unavailable();
@@ -182,22 +217,26 @@ describe("farmer dashboard integration", () => {
     });
     vi.stubGlobal("fetch", fetcher);
     render(<PlannerPage />);
-    await screen.findByLabelText("Rotation request");
-    expect(posts(fetcher)).toHaveLength(0);
+    // The default Sahiwal live run fails honestly and offers a retry.
+    await screen.findByText(/Your farm inputs are unchanged/);
+    expect(posts(fetcher)).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Adjust plan" }));
     fillFarmInputs();
     fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
     await screen.findByRole("button", { name: "Retry same request" });
-    const original = posts(fetcher)[0];
+    const original = posts(fetcher)[1];
     expect(original).toEqual(expectedFarmRequest);
     expectFarmInputs();
-    expect(posts(fetcher)).toHaveLength(1);
+    expect(posts(fetcher)).toHaveLength(2);
     fireEvent.click(screen.getByRole("button", { name: "Retry same request" }));
-    await screen.findByRole("button", { name: "Retry same request" });
-    expect(posts(fetcher)).toEqual([original, original]);
+    await waitFor(() => expect(posts(fetcher)).toHaveLength(3));
+    expect(posts(fetcher).slice(1)).toEqual([original, original]);
+    // Switching steps must not reset any farmer input.
+    fireEvent.click(screen.getByRole("button", { name: "Adjust plan" }));
     expectFarmInputs();
     fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
-    await screen.findByRole("button", { name: "Retry same request" });
-    expect(posts(fetcher)).toEqual([original, original, original]);
+    await waitFor(() => expect(posts(fetcher)).toHaveLength(4));
+    expect(posts(fetcher).slice(1)).toEqual([original, original, original]);
     expectFarmInputs();
   });
 
@@ -209,12 +248,11 @@ describe("farmer dashboard integration", () => {
     });
     vi.stubGlobal("fetch", fetcher);
     render(<PlannerPage />);
-    await screen.findByLabelText("Rotation request");
-    fireEvent.change(screen.getAllByLabelText("Longitude")[0], { target: { value: "73.135" } });
-    fireEvent.change(screen.getAllByLabelText("Latitude")[0], { target: { value: "31.4504" } });
-    await screen.findByRole("button", { name: "Retry same request" });
+    await screen.findByText(/Your farm inputs are unchanged/);
     expect(posts(fetcher)).toHaveLength(1);
-    expect(posts(fetcher)[0].data_mode).toBe("auto");
+    fireEvent.click(screen.getByRole("button", { name: "Adjust plan" }));
+    fireEvent.change(screen.getAllByLabelText("Longitude")[1], { target: { value: "73.135" } });
+    fireEvent.change(screen.getAllByLabelText("Latitude")[1], { target: { value: "31.4504" } });
     fireEvent.change(screen.getByLabelText("Assessment date"), { target: { value: "2025-10-15" } });
     fireEvent.change(screen.getByLabelText("Slot 1 ID"), { target: { value: "rabi_2025" } });
     fireEvent.change(screen.getByLabelText("Slot 1 start"), { target: { value: "2025-11-01" } });
@@ -233,18 +271,22 @@ describe("farmer dashboard integration", () => {
     empty.warnings.push({ code: "NO_FEASIBLE_ROTATION", message: "No feasible rotation." });
     const fetcher = endpoint(empty);
     render(<PlannerPage />);
-    await screen.findByLabelText("Rotation request");
-    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
-    await screen.findByRole("button", { name: "Retry with irrigation available" });
+    await screen.findByText("No crop works with these settings");
+    // The default Sahiwal run is already irrigated, so no irrigation retry is offered.
+    expect(screen.queryByRole("button", { name: "Try with irrigation available" })).not.toBeInTheDocument();
+    startPinnedRainfedDemo();
+    await screen.findByRole("button", { name: "Try with irrigation available" });
+    fireEvent.click(screen.getByRole("button", { name: "Adjust plan" }));
     fireEvent.change(screen.getByLabelText("Farmer priority"), { target: { value: "soil_health" } });
     fireEvent.click(screen.getByRole("checkbox", { name: "Add farmer soil observations (local soil)" }));
     fireEvent.change(screen.getByLabelText("Soil sample date"), { target: { value: "2025-10-01" } });
     fireEvent.change(screen.getByLabelText("pH"), { target: { value: "7" } });
     fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
-    await screen.findByRole("button", { name: "Retry with irrigation available" });
+    await screen.findByRole("button", { name: "Try with irrigation available" });
     const edited = posts(fetcher).at(-1);
-    fireEvent.click(screen.getByRole("button", { name: "Retry with irrigation available" }));
-    await screen.findByRole("button", { name: "Get recommendations" });
+    const before = posts(fetcher).length;
+    fireEvent.click(screen.getByRole("button", { name: "Try with irrigation available" }));
+    await waitFor(() => expect(posts(fetcher)).toHaveLength(before + 1));
     expect(posts(fetcher).at(-1)).toEqual({ ...edited, irrigation: "available" });
     expect(screen.getByLabelText("Irrigation")).toHaveValue("available");
     expect(screen.getByLabelText("Farmer priority")).toHaveValue("soil_health");

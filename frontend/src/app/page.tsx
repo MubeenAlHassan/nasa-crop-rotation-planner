@@ -37,8 +37,8 @@ export default function LandingPage(): ReactElement {
                   <Link href="/planner" className="landing-hero-primary">
                     Open the planner <ArrowRight className="h-4 w-4" aria-hidden />
                   </Link>
-                  <Link href="/planner?demo=1" className="landing-hero-secondary">
-                    <PlayCircle className="h-5 w-5" aria-hidden /> Explore the field demo
+                  <Link href="/planner?location=sahiwal" className="landing-hero-secondary">
+                    <PlayCircle className="h-5 w-5" aria-hidden /> Explore the Sahiwal field
                   </Link>
                 </Reveal>
                 <Reveal immediate delayMs={390} className="landing-hero-proof">
@@ -50,18 +50,18 @@ export default function LandingPage(): ReactElement {
                 <div className="landing-preview-card">
                   <div className="landing-preview-top">
                     <span className="landing-preview-mark"><Leaf className="h-5 w-5" aria-hidden /></span>
-                    <div><p className="landing-preview-eyebrow">Decision preview</p><p className="font-display text-lg font-bold">Faisalabad field</p></div>
-                    <span className="landing-preview-live"><span /> Fixture ready</span>
+                    <div><p className="landing-preview-eyebrow">Decision preview</p><p className="font-display text-lg font-bold">Sahiwal field</p></div>
+                    <span className="landing-preview-live"><span /> Live NASA POWER</span>
                   </div>
                   <div className="landing-preview-main">
-                    <p className="landing-preview-eyebrow">Rabi 2025 · scenario insight</p>
-                    <h2 className="font-display mt-2 text-2xl font-bold tracking-tight">See what changes when irrigation is available.</h2>
-                    <p className="mt-2 text-sm text-[#51635b]">The planner filters infeasible options, then explains which crops become viable.</p>
+                    <p className="landing-preview-eyebrow">Rabi season · live climate insight</p>
+                    <h2 className="font-display mt-2 text-2xl font-bold tracking-tight">See which crops fit Sahiwal&apos;s observed season.</h2>
+                    <p className="mt-2 text-sm text-[#51635b]">Current rainfall and temperature are compared with the 1991–2020 baseline before any crop is ranked.</p>
                   </div>
                   <div className="landing-preview-steps">
                     <div className="landing-preview-step" style={{ ["--step-delay" as string]: "80ms" }}>
                       <span>01</span>
-                      <div><strong>Locate the field</strong><small>Coordinates and planting window</small></div>
+                      <div><strong>Locate the field</strong><small>Sahiwal, Punjab · 30.66° N, 73.11° E</small></div>
                       <CheckCircle2 className="h-4 w-4" aria-hidden />
                     </div>
                     <div className="landing-preview-step" style={{ ["--step-delay" as string]: "180ms" }}>
@@ -71,7 +71,7 @@ export default function LandingPage(): ReactElement {
                     </div>
                     <div className="landing-preview-step is-highlight" style={{ ["--step-delay" as string]: "280ms" }}>
                       <span>03</span>
-                      <div><strong>Compare alternatives</strong><small>Wheat unlocked in the irrigated scenario</small></div>
+                      <div><strong>Compare alternatives</strong><small>Ranked by observed climate, soil context, and your priority</small></div>
                       <ArrowRight className="h-4 w-4" aria-hidden />
                     </div>
                   </div>
@@ -119,7 +119,7 @@ export default function LandingPage(): ReactElement {
                 </p>
               </Reveal>
               {[
-                ["1", "Select the field", "Pin a map location or enter WGS84 coordinates. The Faisalabad demo is pre-authorized with fixture data."],
+                ["1", "Select the field", "Sahiwal opens by default with live NASA POWER climate. Pin any map location, or use the pre-authorized Faisalabad offline fixture."],
                 ["2", "Enter history and slots", "Add completed crops, irrigation, and dated Rabi/Kharif planting windows."],
                 ["3", "Review ranked alternatives", "Read scores, reasons, exclusions, climate charts, and source provenance side by side."],
               ].map(([step, title, body], index) => (
@@ -145,9 +145,9 @@ export default function LandingPage(): ReactElement {
               <div className="landing-explainable-card absolute inset-x-6 bottom-6 rounded-2xl p-5 shadow-xl">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="text-xs font-bold uppercase tracking-wider text-[var(--on-surface)]">
-                    Faisalabad demo · Rabi slot
+                    Sahiwal field · Rabi slot
                   </span>
-                  <span className="badge bg-[var(--primary-fixed)] text-[var(--on-primary-fixed)]">Fixture ready</span>
+                  <span className="badge bg-[var(--primary-fixed)] text-[var(--on-primary-fixed)]">Live climate</span>
                 </div>
                 <p className="font-display text-3xl font-bold text-[var(--primary)]">Explainable</p>
                 <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
@@ -282,30 +282,38 @@ export default function LandingPage(): ReactElement {
                   <div className="relative h-[360px] overflow-hidden rounded-xl shadow-md sm:h-[440px]">
                     <img src={FARMER_IMAGE} alt="Grower standing in a sunlit wheat field near an irrigation channel" className="h-full w-full object-cover" />
                     <div className="absolute bottom-4 left-4 rounded-full bg-[rgba(255,255,255,0.92)] px-3 py-1 text-xs font-semibold text-[var(--primary)] shadow">
-                      Faisalabad, Punjab
+                      Sahiwal, Punjab
                     </div>
                   </div>
                 </div>
                 <div className="lg:col-span-7">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">Pinned demonstration</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">Default demonstration field</p>
                   <blockquote className="font-display mt-3 text-2xl font-semibold leading-snug tracking-tight">
-                    “Only one authorized farm has captured fixture data. The rainfed Rabi demo shows exclusions honestly —
-                    then irrigation availability unlocks a wheat alternative with transparent reasons.”
+                    “Sahiwal runs on current NASA POWER climate — observed rainfall and temperature against the 1991–2020
+                    baseline — then ranks Rabi crops with transparent reasons. Soil and satellite moisture are labeled
+                    honestly whenever they are unavailable.”
                   </blockquote>
-                  <p className="mt-6 font-semibold">Authorized demo capture</p>
+                  <p className="mt-6 font-semibold">What the Sahiwal run uses</p>
                   <p className="text-sm text-[var(--on-surface-variant)]">
-                    Assessment 2025-10-15 · Slot rabi_2025 · Fixture faisalabad_2025 · SoilGrids & SMAP unavailable in this capture
+                    Live POWER rainfall & temperature · Punjab crop catalog · irrigated scenario by default · SoilGrids & SMAP shown as unavailable unless captured
                   </p>
                   <div className="mt-6 rounded-xl bg-[var(--surface-container-low)] p-4 sm:flex sm:items-center sm:justify-between">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">Next step</p>
-                      <p className="font-display text-lg font-bold text-[var(--primary)]">Run the pinned Faisalabad demo in the planner</p>
+                      <p className="font-display text-lg font-bold text-[var(--primary)]">Open the Sahiwal field in the planner</p>
                     </div>
-                    <Link href="/planner?demo=1" className="btn-primary mt-3 sm:mt-0">
-                      Launch demo
+                    <Link href="/planner?location=sahiwal" className="btn-primary mt-3 sm:mt-0">
+                      Launch Sahiwal
                       <ArrowRight className="h-4 w-4" aria-hidden />
                     </Link>
                   </div>
+                  <p className="mt-3 text-xs text-[var(--on-surface-variant)]">
+                    Offline judging without internet? The pinned{" "}
+                    <Link href="/planner?demo=1" className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline">
+                      Faisalabad fixture demo
+                    </Link>{" "}
+                    (assessment 2025-10-15, slot rabi_2025) is the only captured archive.
+                  </p>
                 </div>
               </div>
             </Reveal>
@@ -316,11 +324,11 @@ export default function LandingPage(): ReactElement {
           <Reveal variant="up" className="relative mx-auto max-w-[1440px] overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--primary)] via-[var(--primary-container)] to-[#006d30] px-6 py-14 text-center text-white shadow-[var(--shadow-lift)] sm:px-20">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Ready to explore your next rotation?</h2>
             <p className="mx-auto mt-3 max-w-xl text-[var(--on-primary-container)]">
-              Open the planner, run the pinned demo, then change irrigation to see how constraints reshape feasible crops.
+              Open the planner, see Sahiwal&apos;s live results, then change irrigation or your priority to see how the ranking shifts.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/planner?demo=1" className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-bold text-[var(--primary)] shadow-md">
-                Watch pinned field demo
+              <Link href="/planner?location=sahiwal" className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-bold text-[var(--primary)] shadow-md">
+                See the Sahiwal field
               </Link>
               <Link href="/planner" className="inline-flex items-center justify-center rounded-full border border-white/40 px-6 py-3 text-sm font-bold text-white">
                 Open planner

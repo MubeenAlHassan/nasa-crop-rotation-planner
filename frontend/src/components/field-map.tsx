@@ -219,7 +219,7 @@ export function FieldMap({ initialLocation, onChange, disabled }: FieldMapProps)
     const start = initialLocationRef.current;
     const center: [number, number] = start
       ? [start.latitude, start.longitude]
-      : [31.4504, 73.135];
+      : [30.6612, 73.1086];
 
     let map: LeafletMap;
     try {

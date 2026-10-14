@@ -15,8 +15,18 @@ export interface FieldPreset {
   slotKind: "rabi_pk" | "winter_cereal" | "summer_row";
 }
 
-/** Documented agricultural / research field presets (WGS84). */
+/** Documented agricultural / research field presets (WGS84). Sahiwal is the default live field. */
 export const FIELD_PRESETS: ReadonlyArray<FieldPreset> = [
+  {
+    id: "sahiwal",
+    name: "Sahiwal",
+    region: "Punjab, Pakistan",
+    regionId: "punjab_pk_demo_v1",
+    location: { latitude: 30.6612, longitude: 73.1086 },
+    kind: "custom",
+    summary: "Default live field — irrigated cotton–wheat belt, Punjab. Uses current NASA POWER climate.",
+    slotKind: "rabi_pk",
+  },
   {
     id: "faisalabad",
     name: "Faisalabad",
@@ -25,16 +35,6 @@ export const FIELD_PRESETS: ReadonlyArray<FieldPreset> = [
     location: { latitude: 31.4504, longitude: 73.135 },
     kind: "fixture",
     summary: "Pinned offline fixture farm for the NASA Space Apps demo.",
-    slotKind: "rabi_pk",
-  },
-  {
-    id: "sahiwal",
-    name: "Sahiwal",
-    region: "Punjab, Pakistan",
-    regionId: "punjab_pk_demo_v1",
-    location: { latitude: 30.6612, longitude: 73.1086 },
-    kind: "custom",
-    summary: "Irrigated cotton–wheat belt city center, Punjab.",
     slotKind: "rabi_pk",
   },
   {
@@ -59,7 +59,12 @@ export const FIELD_PRESETS: ReadonlyArray<FieldPreset> = [
   },
 ];
 
-export const DEMO_POINT: Location = FIELD_PRESETS[0].location;
+/** Default live field shown when the planner opens without an explicit location. */
+export const DEFAULT_PRESET_ID: FieldPresetId = "sahiwal";
+export const DEFAULT_POINT: Location = FIELD_PRESETS.find((preset) => preset.id === DEFAULT_PRESET_ID)!.location;
+
+/** The only pinned offline fixture farm (Faisalabad). Fixture mode never applies anywhere else. */
+export const DEMO_POINT: Location = FIELD_PRESETS.find((preset) => preset.kind === "fixture")!.location;
 
 export function formatCoords(location: Location): string {
   const latHemisphere = location.latitude >= 0 ? "N" : "S";

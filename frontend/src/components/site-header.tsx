@@ -60,8 +60,8 @@ export function SiteHeader({ active = "home" }: SiteHeaderProps): ReactElement {
           <Link href="/planner" className="hidden text-sm font-semibold text-[var(--on-surface-variant)] hover:text-[var(--primary)] md:inline-flex">
             Open planner
           </Link>
-          <Link href="/planner?demo=1" className="btn-primary whitespace-nowrap px-4 text-xs sm:px-6 sm:text-sm">
-            <span className="sm:hidden">Try demo</span><span className="hidden sm:inline">Run pinned demo</span>
+          <Link href="/planner?location=sahiwal" className="btn-primary whitespace-nowrap px-4 text-xs sm:px-6 sm:text-sm">
+            <span className="sm:hidden">Sahiwal demo</span><span className="hidden sm:inline">Run Sahiwal demo</span>
           </Link>
         </div>
       </div>

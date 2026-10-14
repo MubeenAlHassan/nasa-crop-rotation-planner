@@ -11,8 +11,8 @@ import { SiteHeader } from "../../components/site-header";
 import { Reveal } from "../../components/reveal";
 import { fetchCropCatalog, recommendRotation } from "../../lib/api/client";
 import {
-  DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset, regionForLocation, samePoint,
-  type FieldPresetId,
+  DEFAULT_POINT, DEFAULT_PRESET_ID, DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset,
+  regionForLocation, samePoint, type FieldPresetId,
 } from "../../lib/field-presets";
 import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse } from "../../lib/generated/contracts";
 
@@ -86,8 +86,7 @@ export default function PlannerClient(): ReactElement {
   const [catalog, setCatalog] = useState<CropCatalogResponse | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [catalogAttempt, setCatalogAttempt] = useState(0);
-  const [location, setLocation] = useState<Location | null>(null);
-  const [demoArmed, setDemoArmed] = useState(false);
+  const [location, setLocation] = useState<Location | null>(DEFAULT_POINT);
   const [demoApplyKey, setDemoApplyKey] = useState(0);
   const [demoIrrigation, setDemoIrrigation] = useState<RecommendationRequest["irrigation"]>("rainfed");
   const [customApplyKey, setCustomApplyKey] = useState(0);
@@ -137,7 +136,6 @@ export default function PlannerClient(): ReactElement {
     setRequestError(null);
     setLastRequest(null);
     demoArmedRef.current = false;
-    setDemoArmed(false);
     if (!options?.skipCustomFormApply) {
       setCustomApplyKey((value) => value + 1);
     }
@@ -190,7 +188,6 @@ export default function PlannerClient(): ReactElement {
     pendingCustomIrrigated.current = null;
     selectLocation(DEMO_POINT, { skipCustomFormApply: true });
     demoArmedRef.current = true;
-    setDemoArmed(true);
     setDemoIrrigation(irrigation);
     setDemoApplyKey((value) => value + 1);
     setRequestError(null);
@@ -248,17 +245,22 @@ export default function PlannerClient(): ReactElement {
       return;
     }
     const presetId = searchParams.get("location");
+    autoDemoStarted.current = true;
     if (presetId && FIELD_PRESETS.some((preset) => preset.id === presetId)) {
-      autoDemoStarted.current = true;
       selectPreset(presetId as FieldPresetId);
+      return;
     }
+    // Default: show the Sahiwal live field with current NASA POWER climate.
+    selectPreset(DEFAULT_PRESET_ID);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog, searchParams]);
 
+  // Offer an irrigated re-run whenever a rainfed plan found no feasible crop.
   const showIrrigationRetry = Boolean(
-    response && response.feasible_rotation_count === 0 && demoArmed && location && samePoint(location, DEMO_POINT),
+    response && response.feasible_rotation_count === 0 && lastRequest && lastRequest.irrigation !== "available",
   );
   const activePreset = findPreset(location);
+  const defaultPreset = getPreset(DEFAULT_PRESET_ID);
 
   return (
     <div className="min-h-full bg-[var(--background)] text-[var(--on-surface)]">
@@ -277,13 +279,15 @@ export default function PlannerClient(): ReactElement {
           resultsReady={Boolean(response || requestError || pending)}
         />
 
-        {step === "field" && (
+        {/* Step panels stay mounted so farmer inputs and the map survive step changes. */}
+        <div hidden={step !== "field"}>
           <Reveal immediate className="space-y-4">
             <section className="panel space-y-4 p-4 sm:p-5" aria-label="Choose field">
               <div>
                 <h2 className="font-display text-xl font-semibold text-[var(--primary)]">Where is your field?</h2>
                 <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
-                  Pick a saved place, or use the map. Faisalabad has a ready offline demo.
+                  {defaultPreset.name} ({defaultPreset.region}) is the default live field. Pick another saved place, or use the map.
+                  Faisalabad also has a ready offline demo.
                 </p>
               </div>
 
@@ -298,10 +302,11 @@ export default function PlannerClient(): ReactElement {
                       disabled={pending}
                       onClick={() => {
                         if (preset.kind === "fixture") {
+                          // Stay on this step so the offline demo actions are visible.
                           selectLocation(DEMO_POINT, { skipCustomFormApply: true });
-                        } else {
-                          selectLocation(getPreset(preset.id).location);
+                          return;
                         }
+                        selectLocation(getPreset(preset.id).location);
                         setStep("plan");
                       }}
                       className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
@@ -371,9 +376,9 @@ export default function PlannerClient(): ReactElement {
               </div>
             </section>
           </Reveal>
-        )}
+        </div>
 
-        {step === "plan" && (
+        <div hidden={step !== "plan"}>
           <Reveal immediate className="space-y-4">
             <section className="panel space-y-4 p-4 sm:p-5" aria-label="Plan rotation">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -424,9 +429,9 @@ export default function PlannerClient(): ReactElement {
               )}
             </section>
           </Reveal>
-        )}
+        </div>
 
-        {step === "results" && (
+        <div hidden={step !== "results"}>
           <Reveal immediate>
             <div ref={resultsRef} className="panel space-y-4 p-4 sm:p-6" aria-live="polite">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -453,11 +458,11 @@ export default function PlannerClient(): ReactElement {
                   <div className="flex flex-wrap gap-2">
                     {lastRequest && (
                       <button type="button" className="btn-secondary" onClick={() => lastRequest && submit(lastRequest)}>
-                        Retry
+                        Retry same request
                       </button>
                     )}
                     <button type="button" className="btn-primary" onClick={() => armDemo("available")}>
-                      Run Faisalabad demo
+                      Run Faisalabad demo instead
                     </button>
                   </div>
                 </div>
@@ -467,10 +472,10 @@ export default function PlannerClient(): ReactElement {
                 <div className="rounded-xl border border-dashed border-[var(--outline-variant)] bg-[var(--surface-container-low)] px-4 py-8 text-center">
                   <p className="font-display text-lg text-[var(--primary)]">No results yet</p>
                   <p className="mt-2 text-sm text-[var(--on-surface-variant)]">
-                    Go back to Plan and submit, or run the irrigated Faisalabad demo.
+                    Go back to Plan and submit, or run the {defaultPreset.name} live field.
                   </p>
-                  <button type="button" className="btn-primary mt-4" onClick={() => armDemo("available")}>
-                    Run irrigated demo
+                  <button type="button" className="btn-primary mt-4" onClick={() => selectPreset(DEFAULT_PRESET_ID)}>
+                    Run {defaultPreset.name} live
                   </button>
                 </div>
               )}
@@ -484,7 +489,7 @@ export default function PlannerClient(): ReactElement {
               )}
             </div>
           </Reveal>
-        )}
+        </div>
       </main>
     </div>
   );
