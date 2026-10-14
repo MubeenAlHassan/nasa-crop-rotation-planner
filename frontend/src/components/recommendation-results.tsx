@@ -11,11 +11,18 @@ export interface RecommendationResultsProps {
   recommendations: ReadonlyArray<Recommendation>;
   feasibleRotationCount: number;
   dataQuality: "complete" | "limited";
+  status: "ok" | "degraded" | "no_feasible_rotation";
+  rulesVersion?: string;
+  catalogVersion?: string;
   sources: ReadonlyArray<Source>;
   warnings: ReadonlyArray<Message>;
   exclusions: ReadonlyArray<Exclusion>;
   onRetryWithIrrigation?: () => void;
   retrying?: boolean;
+  /** Hide sources/warnings (shown in a separate planner tab). */
+  hideProvenance?: boolean;
+  /** Hide ranking header and recommendation list (notes-only mode). */
+  hideChoices?: boolean;
 }
 
 const components = ["nitrogen", "roots", "water", "temperature", "soil"] as const;
@@ -181,94 +188,117 @@ function ComponentBreakdown({ recommendation }: { recommendation: Recommendation
 }
 
 export function RecommendationResults({
-  recommendations, feasibleRotationCount, dataQuality, sources, warnings, exclusions,
-  onRetryWithIrrigation, retrying = false,
+  recommendations, feasibleRotationCount, dataQuality, status, rulesVersion, catalogVersion,
+  sources, warnings, exclusions, onRetryWithIrrigation, retrying = false,
+  hideProvenance = false, hideChoices = false,
 }: RecommendationResultsProps): ReactElement {
   return (
     <section aria-label="Recommendation results" className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold text-[var(--brand-strong)]">Ranked alternatives</h2>
-          <p className="mt-1 text-[var(--muted)]">
-            Feasible rotations: {feasibleRotationCount}. Data quality: {dataQuality}.
-          </p>
-        </div>
-        <div className="rounded-full bg-[var(--brand-soft)] px-3 py-1 text-sm font-semibold text-[var(--brand-strong)]">
-          {feasibleRotationCount} feasible
-        </div>
-      </div>
+      {!hideChoices && (
+        <>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-semibold text-[var(--brand-strong)]">Best next crops</h2>
+              <p className="mt-1 text-[var(--muted)]">
+                {feasibleRotationCount === 0
+                  ? "No crop cleared the rules for this plan."
+                  : `${feasibleRotationCount} crop option${feasibleRotationCount === 1 ? "" : "s"} fit your dates and water setting.`}
+                {" "}
+                Data: {dataQuality === "complete" ? "complete" : "limited (some sources missing)"}.
+              </p>
+            </div>
+            <div className="rounded-full bg-[var(--brand-soft)] px-3 py-1 text-sm font-semibold text-[var(--brand-strong)]">
+              {feasibleRotationCount} feasible
+            </div>
+          </div>
 
-      {recommendations.length === 0 ? (
-        <div
-          role="status"
-          className="rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] p-4 text-[var(--warning-ink)]"
-        >
-          <p className="font-semibold">No feasible rotation was returned.</p>
-          <p className="mt-1 text-sm">
-            Under rainfed constraints, wheat is excluded because it requires irrigation, and other catalog crops miss this Rabi planting window.
-            Try irrigation available to unlock the documented wheat alternative.
-          </p>
-          {onRetryWithIrrigation && (
-            <button
-              type="button"
-              className="btn-primary mt-4"
-              disabled={retrying}
-              onClick={onRetryWithIrrigation}
+          {recommendations.length === 0 ? (
+            <div
+              role="status"
+              className="rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] p-4 text-[var(--warning-ink)]"
             >
-              {retrying ? "Running irrigated demo…" : "Retry with irrigation available"}
-            </button>
+              <p className="font-semibold">No crop works with these settings</p>
+              <p className="mt-1 text-sm">
+                Calendar, irrigation, or other farm rules blocked every option. See why below.
+                If you ran the rainfed Faisalabad demo, try irrigation available for wheat.
+              </p>
+              {onRetryWithIrrigation && (
+                <button
+                  type="button"
+                  className="btn-primary mt-4"
+                  disabled={retrying}
+                  onClick={onRetryWithIrrigation}
+                >
+                  {retrying ? "Running irrigated demo…" : "Try with irrigation available"}
+                </button>
+              )}
+            </div>
+          ) : (
+            <ol className="space-y-4">
+              {recommendations.map((recommendation) => (
+                <li key={recommendation.rotation_id} className="rounded-xl border border-[var(--panel-border)] bg-white p-4 shadow-sm">
+                  <h3 className="text-lg font-semibold text-[var(--brand-strong)]">
+                    #{recommendation.rank}: {recommendation.slots.map((slot) => slot.crop_name).join(" → ")}
+                  </h3>
+                  <p className="mt-1 text-sm text-[var(--muted)]">
+                    Suitability score {formatPlannerNumber(recommendation.score)} / 100
+                  </p>
+                  <details className="mt-3" open={recommendation.rank === 1}>
+                    <summary className="cursor-pointer text-sm font-semibold text-[var(--brand-strong)]">
+                      Why this ranked here (scores & reasons)
+                    </summary>
+                    <ComponentBreakdown recommendation={recommendation} />
+                    <h4 className="mt-4 font-semibold text-[var(--brand-strong)]">Reasons</h4>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[var(--foreground)]">
+                      {recommendation.reasons.map((reason, index) => (
+                        <li key={`${reason.code}-${index}`}>{reason.message}</li>
+                      ))}
+                    </ul>
+                  </details>
+                </li>
+              ))}
+            </ol>
           )}
-        </div>
-      ) : (
-        <ol className="space-y-4">
-          {recommendations.map((recommendation) => (
-            <li key={recommendation.rotation_id} className="rounded-xl border border-[var(--panel-border)] bg-white p-4 shadow-sm">
-              <h3 className="text-lg font-semibold text-[var(--brand-strong)]">
-                Rank {recommendation.rank}: score {formatPlannerNumber(recommendation.score)}
-              </h3>
-              <p className="mt-1 text-base font-medium">{recommendation.slots.map((slot) => slot.crop_name).join(" → ")}</p>
-              <ComponentBreakdown recommendation={recommendation} />
-              <h4 className="mt-4 font-semibold text-[var(--brand-strong)]">Reasons</h4>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[var(--foreground)]">
-                {recommendation.reasons.map((reason, index) => (
-                  <li key={`${reason.code}-${index}`}>{reason.message}</li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ol>
+        </>
       )}
 
-      <section aria-label="Data provenance" className="space-y-3">
-        <h3 className="text-lg font-semibold text-[var(--brand-strong)]">Sources</h3>
-        <ul className="space-y-2">
-          {sources.map((source) => (
-            <li
-              key={source.provider}
-              className="grid gap-2 rounded-xl border border-[var(--panel-border)] bg-[#fbfffc] px-3 py-3 sm:grid-cols-[8rem_1fr] sm:items-start"
-            >
-              <strong className="capitalize text-[var(--foreground)]">{label(source.provider)}</strong>
-              <div className="min-w-0 space-y-1 text-sm text-[var(--muted)]">
-                <div>
-                  <span className={`inline-flex rounded px-2 py-1 text-xs font-semibold uppercase tracking-wide ring-1 ${modeTone(source.mode)}`}>
-                    {label(source.mode)}
-                  </span>
+      {!hideProvenance && sources.length > 0 && (
+        <section aria-label="Data provenance" className="space-y-3">
+          <h3 className="text-lg font-semibold text-[var(--brand-strong)]">Where the data came from</h3>
+          <ul className="space-y-2">
+            {sources.map((source) => (
+              <li
+                key={source.provider}
+                className="grid gap-2 rounded-xl border border-[var(--panel-border)] bg-[#fbfffc] px-3 py-3 sm:grid-cols-[8rem_1fr] sm:items-start"
+              >
+                <strong className="capitalize text-[var(--foreground)]">{label(source.provider)}</strong>
+                <div className="min-w-0 space-y-1 text-sm text-[var(--muted)]">
+                  <div>
+                    <span className={`inline-flex rounded px-2 py-1 text-xs font-semibold uppercase tracking-wide ring-1 ${modeTone(source.mode)}`}>
+                      {label(source.mode)}
+                    </span>
+                  </div>
+                  <p className="leading-relaxed break-words">
+                    {source.product && <>{source.product}</>}
+                    {source.retrieved_at && <> · retrieved {source.retrieved_at}</>}
+                    {source.fixture_id && <> · demo fixture {source.fixture_id}</>}
+                    {!source.product && !source.retrieved_at && !source.fixture_id && <>No observational metadata for this source.</>}
+                  </p>
+                  {source.used_for && source.used_for.length > 0 && (
+                    <p className="text-xs leading-relaxed">
+                      Used for: {source.used_for.join(", ")}
+                    </p>
+                  )}
                 </div>
-                <p className="leading-relaxed break-words">
-                  {source.product && <>{source.product}</>}
-                  {source.retrieved_at && <> · retrieved {source.retrieved_at}</>}
-                  {source.fixture_id && <> · demo fixture {source.fixture_id}</>}
-                  {!source.product && !source.retrieved_at && !source.fixture_id && <>No observational metadata for this source.</>}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-      {warnings.length > 0 && (
+      {!hideProvenance && warnings.length > 0 && (
         <section aria-label="Data quality warnings" className="space-y-2">
-          <h3 className="text-lg font-semibold text-[var(--brand-strong)]">Warnings</h3>
+          <h3 className="text-lg font-semibold text-[var(--brand-strong)]">Things to know</h3>
           <ul className="space-y-2">
             {warnings.map((warning, index) => (
               <li
@@ -282,20 +312,29 @@ export function RecommendationResults({
         </section>
       )}
 
-      {exclusions.length > 0 && (
+      {!hideChoices && exclusions.length > 0 && (
         <section aria-label="Excluded crops" className="space-y-2">
-          <h3 className="text-lg font-semibold text-[var(--brand-strong)]">Exclusions</h3>
+          <h3 className="text-lg font-semibold text-[var(--brand-strong)]">Crops ruled out</h3>
           <ul className="space-y-2">
             {exclusions.map((exclusion, index) => (
               <li
                 key={`${exclusion.slot_id}-${exclusion.crop_id}-${exclusion.code}-${index}`}
                 className="rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] px-3 py-2 text-sm text-[var(--danger-ink)]"
               >
-                {exclusion.slot_id}: {exclusion.crop_id} — {exclusion.message}
+                {exclusion.crop_id}: {exclusion.message}
               </li>
             ))}
           </ul>
         </section>
+      )}
+
+      {hideChoices && (
+        <p className="text-xs text-[var(--muted)]">
+          Status {label(status)}
+          {rulesVersion ? ` · rules ${rulesVersion}` : ""}
+          {catalogVersion ? ` · catalog ${catalogVersion}` : ""}
+          {" · "}data {dataQuality}.
+        </p>
       )}
     </section>
   );

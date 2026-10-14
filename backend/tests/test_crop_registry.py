@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from app.catalog.registry import load_crop_catalog
+from app.catalog.registry import CATALOG_FILES, load_crop_catalog
 from app.schemas.contracts import CropCatalogResponse
 
 CATALOG = Path(__file__).parents[1] / "data" / "punjab_crops.json"
@@ -14,6 +14,14 @@ def test_real_catalog_version_order_and_contract():
     assert result.catalog_version == "1.0.1"
     assert [crop.crop_id for crop in result.crops] == ["wheat", "chickpea", "maize"]
     assert CropCatalogResponse.model_validate_json(result.model_dump_json()) == result
+
+
+def test_world_demo_catalogs_load():
+    usa = load_crop_catalog(CATALOG_FILES["maryland_usa_demo_v1"], "maryland_usa_demo_v1")
+    uk = load_crop_catalog(CATALOG_FILES["uk_england_demo_v1"], "uk_england_demo_v1")
+    assert [crop.crop_id for crop in usa.crops] == ["wheat", "soybean", "maize"]
+    assert [crop.crop_id for crop in uk.crops] == ["wheat", "barley", "field_bean"]
+
 
 
 def test_rejects_region_duplicates_and_invalid_traits(tmp_path):

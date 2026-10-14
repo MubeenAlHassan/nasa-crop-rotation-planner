@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useSearchParams } from "next/navigation";
-import { ClimateCharts } from "../../components/climate-charts";
+import { CropTraits } from "../../components/crop-traits";
 import { FieldMap } from "../../components/field-map";
+import { PlannerResultsPanel } from "../../components/planner-results-panel";
+import { PlannerStepNav, type PlannerStep } from "../../components/planner-step-nav";
 import { RecommendationForm } from "../../components/recommendation-form";
-import { RecommendationResults } from "../../components/recommendation-results";
-import { RotationTimeline } from "../../components/rotation-timeline";
-import { SoilRadar } from "../../components/soil-radar";
 import { SiteHeader } from "../../components/site-header";
 import { Reveal } from "../../components/reveal";
 import { fetchCropCatalog, recommendRotation } from "../../lib/api/client";
 import {
-  DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset, samePoint, type FieldPresetId,
+  DEMO_POINT, FIELD_PRESETS, findPreset, formatCoords, getPreset, regionForLocation, samePoint,
+  type FieldPresetId,
 } from "../../lib/field-presets";
 import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse } from "../../lib/generated/contracts";
 
@@ -29,6 +29,7 @@ const DEMO_REQUEST: RecommendationRequest = {
   excluded_crop_ids: [],
   soil_override: null,
   data_mode: "fixture",
+  farmer_objective: "balanced",
   top_k: 3,
 };
 
@@ -41,27 +42,41 @@ function addUtcDays(iso: string, days: number): string {
   return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
 }
 
-/** Live irrigated request for a custom map / search point. */
-function customIrrigatedRequest(location: Location): RecommendationRequest {
-  const assessment = isoTodayUtc();
+function defaultSlotsForLocation(location: Location, assessment: string): RecommendationRequest["slots"] {
+  const preset = findPreset(location);
   const year = Number(assessment.slice(0, 4));
   const month = Number(assessment.slice(5, 7));
+  if (preset?.slotKind === "winter_cereal") {
+    const startYear = month >= 9 ? year : year;
+    const start = `${startYear}-09-20`;
+    const end = `${startYear + 1}-07-15`;
+    const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
+    const slotEnd = end <= slotStart ? addUtcDays(slotStart, 240) : end;
+    return [{ slot_id: "winter_slot", start_date: slotStart, end_date: slotEnd }];
+  }
   const startYear = month >= 11 ? year + 1 : year;
   const start = `${startYear}-11-01`;
   const end = `${startYear + 1}-03-31`;
   const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
   const slotEnd = end <= slotStart ? addUtcDays(slotStart, 120) : end;
+  return [{ slot_id: "rabi_slot", start_date: slotStart, end_date: slotEnd }];
+}
+
+/** Live irrigated request for a custom map / search point. */
+function customIrrigatedRequest(location: Location): RecommendationRequest {
+  const assessment = isoTodayUtc();
   return {
-    region_id: "punjab_pk_demo_v1",
+    region_id: regionForLocation(location),
     location,
     assessment_end: assessment,
-    slots: [{ slot_id: "rabi_slot", start_date: slotStart, end_date: slotEnd }],
+    slots: defaultSlotsForLocation(location, assessment),
     crop_history: [],
     irrigation: "available",
     allowed_crop_ids: [],
     excluded_crop_ids: [],
     soil_override: null,
     data_mode: "auto",
+    farmer_objective: "climate_adaptation",
     top_k: 3,
   };
 }
@@ -76,6 +91,7 @@ export default function PlannerClient(): ReactElement {
   const [demoApplyKey, setDemoApplyKey] = useState(0);
   const [demoIrrigation, setDemoIrrigation] = useState<RecommendationRequest["irrigation"]>("rainfed");
   const [customApplyKey, setCustomApplyKey] = useState(0);
+  const [irrigationRetryKey, setIrrigationRetryKey] = useState(0);
   const [response, setResponse] = useState<RecommendationResponse | null>(null);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -85,27 +101,31 @@ export default function PlannerClient(): ReactElement {
   const resultsRef = useRef<HTMLDivElement | null>(null);
   const autoDemoStarted = useRef(false);
   const pendingCustomIrrigated = useRef<Location | null>(null);
-  const [usingFixtureFallback, setUsingFixtureFallback] = useState(false);
+  const [lastRequest, setLastRequest] = useState<RecommendationRequest | null>(null);
+  const [step, setStep] = useState<PlannerStep>("field");
+  const [showCropGuide, setShowCropGuide] = useState(false);
+
+  const activeRegionId = regionForLocation(location);
 
   useEffect(() => {
     const controller = new AbortController();
     setCatalog(null);
     setCatalogError(null);
-    void fetchCropCatalog("punjab_pk_demo_v1", controller.signal).then(setCatalog).catch((failure: unknown) => {
+    void fetchCropCatalog(activeRegionId, controller.signal).then(setCatalog).catch((failure: unknown) => {
       if (!controller.signal.aborted) {
         setCatalogError(failure instanceof Error ? failure.message : "Crop catalog is unavailable.");
       }
     });
     return () => controller.abort();
-  }, [catalogAttempt]);
+  }, [catalogAttempt, activeRegionId]);
 
   useEffect(() => () => active.current?.abort(), []);
 
   useEffect(() => {
-    if ((pending || response || requestError) && resultsRef.current?.scrollIntoView) {
+    if ((pending || response || requestError) && step === "results" && resultsRef.current?.scrollIntoView) {
       resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [pending, response, requestError]);
+  }, [pending, response, requestError, step]);
 
   function selectLocation(next: Location, options?: { skipCustomFormApply?: boolean }): void {
     if (location && samePoint(location, next)) return;
@@ -115,17 +135,17 @@ export default function PlannerClient(): ReactElement {
     setPending(false);
     setResponse(null);
     setRequestError(null);
-    if (!samePoint(next, DEMO_POINT)) {
-      demoArmedRef.current = false;
-      setDemoArmed(false);
-      if (!options?.skipCustomFormApply) {
-        setCustomApplyKey((value) => value + 1);
-      }
+    setLastRequest(null);
+    demoArmedRef.current = false;
+    setDemoArmed(false);
+    if (!options?.skipCustomFormApply) {
+      setCustomApplyKey((value) => value + 1);
     }
     setLocation(next);
   }
 
   function submit(request: RecommendationRequest): void {
+    setStep("results");
     if (request.data_mode === "fixture" && (!demoArmedRef.current || !samePoint(request.location, DEMO_POINT) ||
         request.assessment_end !== "2025-10-15" || request.slots.length !== 1 ||
         request.slots[0].slot_id !== "rabi_2025" ||
@@ -135,6 +155,7 @@ export default function PlannerClient(): ReactElement {
       return;
     }
     active.current?.abort();
+    setLastRequest(request);
     const controller = new AbortController();
     active.current = controller;
     const current = ++generation.current;
@@ -148,7 +169,7 @@ export default function PlannerClient(): ReactElement {
         const message = failure instanceof Error ? failure.message : "Recommendation request failed.";
         const custom = !samePoint(request.location, DEMO_POINT);
         setRequestError(custom
-          ? `${message} Custom locations need live POWER climate with prepared baselines. For this offline demo, use the pinned Faisalabad farm.`
+          ? `${message} Custom locations need live POWER climate with prepared baselines. Your farm inputs are unchanged; retry or explicitly select the Faisalabad demo.`
           : message);
       }
     }).finally(() => {
@@ -159,38 +180,30 @@ export default function PlannerClient(): ReactElement {
     });
   }
 
-  function submitPinnedIrrigatedFixture(asFallback = false): void {
-    demoArmedRef.current = true;
-    setDemoArmed(true);
-    setDemoIrrigation("available");
-    setDemoApplyKey((value) => value + 1);
-    setUsingFixtureFallback(asFallback);
-    setRequestError(null);
-    submit({ ...DEMO_REQUEST, irrigation: "available" });
+  function retryWithIrrigation(): void {
+    if (!lastRequest) return;
+    setIrrigationRetryKey((value) => value + 1);
+    submit({ ...lastRequest, irrigation: "available" });
   }
 
   function armDemo(irrigation: RecommendationRequest["irrigation"] = "rainfed"): void {
     pendingCustomIrrigated.current = null;
-    setUsingFixtureFallback(false);
-    selectLocation(DEMO_POINT);
+    selectLocation(DEMO_POINT, { skipCustomFormApply: true });
     demoArmedRef.current = true;
     setDemoArmed(true);
     setDemoIrrigation(irrigation);
     setDemoApplyKey((value) => value + 1);
     setRequestError(null);
     if (!catalog) {
+      setStep("results");
       setRequestError("Crop catalog is still loading. Wait a moment, then click the pinned demo again.");
       return;
     }
     submit({ ...DEMO_REQUEST, irrigation });
   }
 
-  /** Map/search/preset → try live irrigated climate; fall back to pinned irrigated fixture for offline demo. */
+  /** Map/search/preset → try live climate; fixture playback requires a demo action. */
   function runIrrigatedForLocation(next: Location): void {
-    if (samePoint(next, DEMO_POINT)) {
-      armDemo("available");
-      return;
-    }
     if (!(location && samePoint(location, next))) {
       selectLocation(next);
     } else {
@@ -201,37 +214,16 @@ export default function PlannerClient(): ReactElement {
       setResponse(null);
       setRequestError(null);
     }
-    setUsingFixtureFallback(false);
     setRequestError(null);
     if (!catalog) {
       pendingCustomIrrigated.current = next;
       return;
     }
     pendingCustomIrrigated.current = null;
-    active.current?.abort();
-    const controller = new AbortController();
-    active.current = controller;
-    const current = ++generation.current;
-    setPending(true);
-    setResponse(null);
-    void recommendRotation(customIrrigatedRequest(next), controller.signal).then((result) => {
-      if (current === generation.current && !controller.signal.aborted) {
-        setUsingFixtureFallback(false);
-        setResponse(result);
-      }
-    }).catch(() => {
-      if (current !== generation.current || controller.signal.aborted) return;
-      // Live POWER/baseline unavailable — show irrigated demo results instead of a hard error.
-      submitPinnedIrrigatedFixture(true);
-    }).finally(() => {
-      if (current === generation.current && active.current === controller) {
-        active.current = null;
-        setPending(false);
-      }
-    });
+    submit(customIrrigatedRequest(next));
   }
 
-  function usePreset(id: FieldPresetId): void {
+  function selectPreset(id: FieldPresetId): void {
     const preset = getPreset(id);
     if (preset.kind === "fixture") {
       armDemo("available");
@@ -258,7 +250,7 @@ export default function PlannerClient(): ReactElement {
     const presetId = searchParams.get("location");
     if (presetId && FIELD_PRESETS.some((preset) => preset.id === presetId)) {
       autoDemoStarted.current = true;
-      usePreset(presetId as FieldPresetId);
+      selectPreset(presetId as FieldPresetId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog, searchParams]);
@@ -267,127 +259,139 @@ export default function PlannerClient(): ReactElement {
     response && response.feasible_rotation_count === 0 && demoArmed && location && samePoint(location, DEMO_POINT),
   );
   const activePreset = findPreset(location);
-  const customPinFixturePlayback = Boolean(
-    usingFixtureFallback && location && !samePoint(location, DEMO_POINT) && response,
-  );
 
   return (
     <div className="min-h-full bg-[var(--background)] text-[var(--on-surface)]">
       <SiteHeader active="planner" />
-      <main className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-28 sm:px-6 lg:px-8">
-        <Reveal immediate as="header" className="soft-panel px-5 py-6 sm:px-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">NASA data · transparent rules</p>
-          <h1 className="font-display mt-2 text-4xl font-bold text-[var(--primary)] sm:text-5xl">Rotation planner</h1>
-          <p className="mt-3 max-w-2xl text-base text-[var(--on-surface-variant)] sm:text-lg">
-            Explore crop rotation choices using observed climate, local soil context, and transparent agronomic rules.
-            Pick an agricultural field preset below, or click the map for any WGS84 point.
+      <main className="mx-auto max-w-5xl space-y-5 px-4 pb-10 pt-28 sm:px-6 lg:px-8">
+        <Reveal immediate as="header" className="soft-panel px-5 py-5 sm:px-7">
+          <h1 className="font-display text-3xl font-bold text-[var(--primary)] sm:text-4xl">Rotation planner</h1>
+          <p className="mt-2 max-w-2xl text-sm text-[var(--on-surface-variant)] sm:text-base">
+            Three simple steps: choose your field, set your plan, then read clear crop recommendations.
           </p>
         </Reveal>
 
-        <Reveal immediate delayMs={120} as="section" aria-label="Field presets" className="panel p-5 sm:p-6">
-          <h2 className="font-display text-xl font-semibold text-[var(--primary)]">Quick agricultural locations</h2>
-          <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
-            Presets fill map coordinates for known farm / research fields. Only Faisalabad has authorized offline fixture data.
-          </p>
-          <div className="mt-4 grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {FIELD_PRESETS.map((preset, index) => {
-              const selected = activePreset?.id === preset.id;
-              return (
-                <Reveal
-                  key={preset.id}
-                  immediate
-                  delayMs={180 + index * 80}
-                  variant="up"
-                  className={`flex h-full min-h-[17.5rem] flex-col rounded-xl border p-4 ${selected
-                    ? "border-[var(--primary)] bg-[var(--surface-container-low)]"
-                    : "border-[var(--outline-variant)] bg-white"}`}
+        <PlannerStepNav
+          step={step}
+          onChange={setStep}
+          resultsReady={Boolean(response || requestError || pending)}
+        />
+
+        {step === "field" && (
+          <Reveal immediate className="space-y-4">
+            <section className="panel space-y-4 p-4 sm:p-5" aria-label="Choose field">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-[var(--primary)]">Where is your field?</h2>
+                <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
+                  Pick a saved place, or use the map. Faisalabad has a ready offline demo.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2" role="list">
+                {FIELD_PRESETS.map((preset) => {
+                  const selected = activePreset?.id === preset.id;
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      role="listitem"
+                      disabled={pending}
+                      onClick={() => {
+                        if (preset.kind === "fixture") {
+                          selectLocation(DEMO_POINT, { skipCustomFormApply: true });
+                        } else {
+                          selectLocation(getPreset(preset.id).location);
+                        }
+                        setStep("plan");
+                      }}
+                      className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
+                        selected
+                          ? "bg-[var(--primary)] text-white"
+                          : "bg-[var(--surface-container-low)] text-[var(--on-surface)] ring-1 ring-[var(--outline-variant)]"
+                      }`}
+                    >
+                      {preset.name}
+                      <span className="ml-1 font-normal opacity-80">· {preset.region.split(",")[0]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {activePreset?.kind === "fixture" && (
+                <div className="rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] px-4 py-3 text-sm text-[var(--warning-ink)]">
+                  <p className="font-semibold">Faisalabad offline demo</p>
+                  <p className="mt-1">
+                    Rainfed often finds no crop. Irrigated unlocks wheat. Soil and satellite moisture were unavailable in this capture.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button type="button" className="btn-secondary" disabled={pending} onClick={() => armDemo("rainfed")}>
+                      Rainfed demo
+                    </button>
+                    <button type="button" className="btn-primary" disabled={pending} onClick={() => armDemo("available")}>
+                      Irrigated demo (wheat)
+                    </button>
+                    <button type="button" className="btn-secondary" onClick={() => setStep("plan")}>
+                      Edit plan first
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {catalogError && (
+                <section role="alert" className="space-y-2 rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] p-3 text-[var(--danger-ink)]">
+                  <p>Crop list unavailable: {catalogError}</p>
+                  <button
+                    type="button"
+                    className="rounded-lg border border-[var(--danger-ink)] px-3 py-1.5 text-sm font-semibold"
+                    onClick={() => setCatalogAttempt((value) => value + 1)}
+                  >
+                    Retry
+                  </button>
+                </section>
+              )}
+
+              <div className="overflow-hidden rounded-xl border border-[var(--outline-variant)]">
+                <FieldMap initialLocation={location} onChange={runIrrigatedForLocation} disabled={false} />
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-[var(--on-surface-variant)]">
+                  {location
+                    ? <>Selected: {formatCoords(location)}{activePreset ? ` (${activePreset.name})` : ""}</>
+                    : "No field selected yet — use a chip or the map."}
+                </p>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  disabled={!location}
+                  onClick={() => setStep("plan")}
                 >
-                  <div className="flex min-h-0 flex-1 flex-col gap-1">
-                    <p className="line-clamp-2 min-h-[2.5rem] text-xs font-semibold uppercase tracking-wide text-[var(--on-surface-variant)]">
-                      {preset.region}
-                    </p>
-                    <p className="font-display line-clamp-2 min-h-[3rem] font-semibold leading-snug">{preset.name}</p>
-                    <p className="text-sm text-[var(--on-surface-variant)]">{formatCoords(preset.location)}</p>
-                    <p className="mt-1 line-clamp-3 text-xs text-[var(--muted)]">{preset.summary}</p>
-                    {selected && preset.kind === "custom" && (
-                      <p role="status" className="mt-2 text-sm text-[var(--info-ink)]">
-                        {preset.name} selected. Irrigated pinned demo runs automatically (map pin ≠ fixture farm).
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-auto flex min-h-[5.75rem] flex-col justify-end gap-2 pt-3">
-                    {preset.kind === "fixture" ? (
-                      <>
-                        <button type="button" onClick={() => armDemo("rainfed")} disabled={pending} className="btn-secondary w-full">
-                          Rainfed demo
-                        </button>
-                        <button type="button" onClick={() => armDemo("available")} disabled={pending} className="btn-primary w-full">
-                          Irrigated demo (wheat)
-                        </button>
-                      </>
-                    ) : (
-                      <button type="button" onClick={() => usePreset(preset.id)} disabled={pending} className="btn-primary w-full">
-                        Use {preset.name.split(" ")[0]} location
-                      </button>
-                    )}
-                  </div>
-                </Reveal>
-              );
-            })}
-          </div>
-        </Reveal>
-
-        <Reveal delayMs={80} as="section" aria-label="Pinned demonstration" className="overflow-hidden rounded-2xl border border-[var(--warning-border)] bg-[var(--warning-bg)] p-5 shadow-sm sm:p-6">
-          <div className="max-w-3xl space-y-2 text-[var(--warning-ink)]">
-            <h2 className="font-display text-xl font-semibold">Pinned Faisalabad demonstration</h2>
-            <p className="text-sm leading-relaxed sm:text-base">
-              Only the documented farm at {formatCoords(DEMO_POINT)} has captured fixture data.
-              Assessment: 2025-10-15; Rabi 2025: 2025-11-01 to 2026-03-31. SoilGrids and SMAP were unavailable in this capture.
-              Rainfed returns zero feasible crops; irrigation available unlocks wheat. USA (Beltsville) and UK (Rothamsted) presets are custom points above.
-            </p>
-          </div>
-          {demoArmed && !catalogError && !pending && !response && !requestError && (
-            <p role="status" className="mt-3 text-sm text-[var(--warning-ink)]">
-              Pinned demo selected. The form is filled with the authorized fixture dates.
-            </p>
-          )}
-          {demoArmed && pending && (
-            <p role="status" className="mt-3 text-sm font-medium text-[var(--warning-ink)]">
-              Running the pinned Faisalabad demonstration…
-            </p>
-          )}
-          {demoArmed && response && !pending && (
-            <p role="status" className="mt-3 text-sm text-[var(--warning-ink)]">
-              {response.feasible_rotation_count === 0
-                ? "Rainfed demo complete with no feasible crops. Use Irrigated demo (wheat) for a ranked alternative."
-                : "Pinned demo complete. Ranked alternatives are shown on the right."}
-            </p>
-          )}
-          {catalogError && (
-            <section role="alert" className="mt-4 space-y-2 rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] p-3 text-[var(--danger-ink)]">
-              <p>Crop catalog unavailable: {catalogError}</p>
-              <p>The recommendation form cannot load until the API backend is reachable.</p>
-              <button
-                type="button"
-                className="rounded-lg border border-[var(--danger-ink)] px-3 py-1.5 text-sm font-semibold"
-                onClick={() => setCatalogAttempt((value) => value + 1)}
-              >
-                Retry crop catalog
-              </button>
+                  Continue to plan
+                </button>
+              </div>
             </section>
-          )}
-        </Reveal>
+          </Reveal>
+        )}
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start">
-          <Reveal immediate delayMs={100} variant="left" className="space-y-6">
-            <div className="panel p-4 sm:p-5">
-              <FieldMap initialLocation={location} onChange={runIrrigatedForLocation} disabled={false} />
-            </div>
-            {!catalog && !catalogError && (
-              <p role="status" className="panel px-4 py-3 text-sm text-[var(--on-surface-variant)]">Loading crop catalog…</p>
-            )}
-            {catalog && (
-              <div className="panel p-4 sm:p-5">
+        {step === "plan" && (
+          <Reveal immediate className="space-y-4">
+            <section className="panel space-y-4 p-4 sm:p-5" aria-label="Plan rotation">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-display text-xl font-semibold text-[var(--primary)]">Set your planting plan</h2>
+                  <p className="mt-1 text-sm text-[var(--on-surface-variant)]">
+                    Choose dates, water access, and what matters most. Then get recommendations.
+                  </p>
+                </div>
+                <button type="button" className="btn-secondary" onClick={() => setStep("field")}>
+                  Back to field
+                </button>
+              </div>
+
+              {!catalog && !catalogError && (
+                <p role="status" className="text-sm text-[var(--on-surface-variant)]">Loading crop list…</p>
+              )}
+              {catalog && (
                 <RecommendationForm
                   catalog={catalog}
                   initialLocation={location}
@@ -396,60 +400,91 @@ export default function PlannerClient(): ReactElement {
                   demoApplyKey={demoApplyKey}
                   demoIrrigation={demoIrrigation}
                   customApplyKey={customApplyKey}
-                  onLocationCommit={selectLocation}
+                  irrigationRetryKey={irrigationRetryKey}
+                  onLocationCommit={(next) => selectLocation(next, { skipCustomFormApply: true })}
                 />
-              </div>
-            )}
-          </Reveal>
+              )}
 
-          <Reveal delayMs={180} variant="right">
-            <div ref={resultsRef} className="panel space-y-8 p-4 sm:p-6" aria-live="polite">
-            {pending && (
-              <p role="status" className="rounded-xl bg-[var(--info-bg)] px-4 py-3 text-[var(--info-ink)]">
-                Building irrigated recommendations…
-              </p>
-            )}
-            {customPinFixturePlayback && (
-              <p role="status" className="rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] px-4 py-3 text-sm text-[var(--warning-ink)]">
-                Live climate for {formatCoords(location!)} was unavailable, so rankings use the authorized Faisalabad
-                demonstration fixture at {formatCoords(DEMO_POINT)}. Retry later once POWER baselines are cached.
-              </p>
-            )}
-            {requestError && (
-              <p role="alert" className="rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-[var(--danger-ink)]">
-                {requestError}
-              </p>
-            )}
-            {catalogError && !requestError && (
-              <p role="alert" className="rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-[var(--danger-ink)]">
-                Crop catalog unavailable. Retry after the backend is running.
-              </p>
-            )}
-            {!response && !pending && !requestError && !catalogError && (
-              <div className="rounded-xl border border-dashed border-[var(--outline-variant)] bg-[var(--surface-container-low)] px-4 py-10 text-center">
-                <p className="font-display text-xl text-[var(--primary)]">Ready when you are</p>
-                <p className="mt-2 text-sm text-[var(--on-surface-variant)]">
-                  Search a place, use your location, or click the map — irrigated recommendations run automatically.
-                  Or start from the pinned Faisalabad irrigated demo.
-                </p>
-                <button type="button" className="btn-primary mt-4" onClick={() => armDemo("available")}>
-                  Run irrigated demo (wheat)
-                </button>
+              {catalog && (
+                <div>
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-[var(--primary)]"
+                    onClick={() => setShowCropGuide((value) => !value)}
+                    aria-expanded={showCropGuide}
+                  >
+                    {showCropGuide ? "Hide crop guide" : "Show crop guide (optional)"}
+                  </button>
+                  {showCropGuide && (
+                    <div className="mt-3 rounded-xl border border-[var(--outline-variant)] p-3">
+                      <CropTraits catalog={catalog} />
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          </Reveal>
+        )}
+
+        {step === "results" && (
+          <Reveal immediate>
+            <div ref={resultsRef} className="panel space-y-4 p-4 sm:p-6" aria-live="polite">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-display text-xl font-semibold text-[var(--primary)]">Your results</h2>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" className="btn-secondary" onClick={() => setStep("plan")}>
+                    Adjust plan
+                  </button>
+                  <button type="button" className="btn-secondary" onClick={() => setStep("field")}>
+                    Change field
+                  </button>
+                </div>
               </div>
-            )}
-            {response && <>
-              <RecommendationResults recommendations={response.recommendations}
-                feasibleRotationCount={response.feasible_rotation_count} dataQuality={response.data_quality}
-                sources={response.sources} warnings={response.warnings} exclusions={response.exclusions}
-                onRetryWithIrrigation={showIrrigationRetry ? () => armDemo("available") : undefined}
-                retrying={pending} />
-              {response.recommendations[0] && <RotationTimeline recommendation={response.recommendations[0]} />}
-              <ClimateCharts climate={response.features.climate} scenarios={response.features.slot_scenarios} />
-              <SoilRadar soil={response.features.soil} />
-            </>}
+
+              {pending && (
+                <p role="status" className="rounded-xl bg-[var(--info-bg)] px-4 py-3 text-[var(--info-ink)]">
+                  Working out recommendations…
+                </p>
+              )}
+
+              {requestError && (
+                <div role="alert" className="space-y-3 rounded-xl border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-[var(--danger-ink)]">
+                  <p>{requestError}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {lastRequest && (
+                      <button type="button" className="btn-secondary" onClick={() => lastRequest && submit(lastRequest)}>
+                        Retry
+                      </button>
+                    )}
+                    <button type="button" className="btn-primary" onClick={() => armDemo("available")}>
+                      Run Faisalabad demo
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!response && !pending && !requestError && (
+                <div className="rounded-xl border border-dashed border-[var(--outline-variant)] bg-[var(--surface-container-low)] px-4 py-8 text-center">
+                  <p className="font-display text-lg text-[var(--primary)]">No results yet</p>
+                  <p className="mt-2 text-sm text-[var(--on-surface-variant)]">
+                    Go back to Plan and submit, or run the irrigated Faisalabad demo.
+                  </p>
+                  <button type="button" className="btn-primary mt-4" onClick={() => armDemo("available")}>
+                    Run irrigated demo
+                  </button>
+                </div>
+              )}
+
+              {response && (
+                <PlannerResultsPanel
+                  response={response}
+                  onRetryWithIrrigation={showIrrigationRetry ? retryWithIrrigation : undefined}
+                  retrying={pending}
+                />
+              )}
             </div>
           </Reveal>
-        </div>
+        )}
       </main>
     </div>
   );

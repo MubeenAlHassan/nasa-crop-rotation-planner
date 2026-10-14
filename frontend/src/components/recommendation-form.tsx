@@ -15,6 +15,8 @@ export interface RecommendationFormProps {
   demoIrrigation?: RecommendationRequest["irrigation"];
   /** Increment when a custom map point is chosen to switch into Current data mode. */
   customApplyKey?: number;
+  /** Increment to change only irrigation when retrying the current plan. */
+  irrigationRetryKey?: number;
   /** Keep parent/map location in sync when the farmer edits coordinates in the form. */
   onLocationCommit?: (location: Location) => void;
 }
@@ -34,8 +36,21 @@ function addUtcDays(iso: string, days: number): string {
   return new Date(time + days * 86_400_000).toISOString().slice(0, 10);
 }
 
-function customPlanDefaults(assessment: string): { slots: Slot[]; history: History[] } {
+function customPlanDefaults(
+  assessment: string,
+  regionId: RecommendationRequest["region_id"],
+): { slots: Slot[]; history: History[] } {
   const year = Number(assessment.slice(0, 4));
+  if (regionId === "maryland_usa_demo_v1" || regionId === "uk_england_demo_v1") {
+    const start = `${year}-09-20`;
+    const end = `${year + 1}-07-15`;
+    const slotStart = start <= assessment ? addUtcDays(assessment, 14) : start;
+    const slotEnd = end <= slotStart ? addUtcDays(slotStart, 240) : end;
+    return {
+      slots: [{ slot_id: "winter_slot", start_date: slotStart, end_date: slotEnd }],
+      history: [],
+    };
+  }
   const month = Number(assessment.slice(5, 7));
   // Prefer an upcoming Rabi-like window after assessment.
   const startYear = month >= 11 ? year + 1 : year;
@@ -75,7 +90,7 @@ function numeric(value: string, min: number, max: number): number | null {
 
 export function RecommendationForm({
   catalog, initialLocation, submitting, onSubmit, demoApplyKey = 0,
-  demoIrrigation = "rainfed", customApplyKey = 0, onLocationCommit,
+  demoIrrigation = "rainfed", customApplyKey = 0, irrigationRetryKey = 0, onLocationCommit,
 }: RecommendationFormProps): ReactElement {
   const [latitude, setLatitude] = useState(initialLocation?.latitude.toString() ?? "");
   const [longitude, setLongitude] = useState(initialLocation?.longitude.toString() ?? "");
@@ -86,6 +101,7 @@ export function RecommendationForm({
   const [allowed, setAllowed] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
   const [dataMode, setDataMode] = useState<"auto" | "fixture">("auto");
+  const [farmerObjective, setFarmerObjective] = useState<NonNullable<RecommendationRequest["farmer_objective"]>>("balanced");
   const [topK, setTopK] = useState(3);
   const [useSoil, setUseSoil] = useState(false);
   const [sampledOn, setSampledOn] = useState("");
@@ -95,6 +111,7 @@ export function RecommendationForm({
   const [errors, setErrors] = useState<Errors>({});
   const [appliedDemoKey, setAppliedDemoKey] = useState(0);
   const [appliedCustomKey, setAppliedCustomKey] = useState(0);
+  const [appliedIrrigationRetryKey, setAppliedIrrigationRetryKey] = useState(0);
   const cropIds = new Set(catalog.crops.map((crop) => crop.crop_id));
 
   const [external, setExternal] = useState({ latitude: initialLocation?.latitude, longitude: initialLocation?.longitude });
@@ -112,6 +129,7 @@ export function RecommendationForm({
     setAllowed([]);
     setExcluded([]);
     setDataMode("fixture");
+    setFarmerObjective("balanced");
     setTopK(3);
     setUseSoil(false);
     setSampledOn("");
@@ -121,19 +139,15 @@ export function RecommendationForm({
   if (customApplyKey > 0 && customApplyKey !== appliedCustomKey) {
     setAppliedCustomKey(customApplyKey);
     const assessmentDate = isoTodayUtc();
-    const plan = customPlanDefaults(assessmentDate);
-    setAssessment(assessmentDate);
-    setSlots(plan.slots);
-    setHistory(plan.history);
-    setIrrigation("available");
-    setAllowed([]);
-    setExcluded([]);
+    const plan = customPlanDefaults(assessmentDate, catalog.region_id);
+    if (!assessment) setAssessment(assessmentDate);
+    if (slots.every((slot) => !slot.start_date && !slot.end_date)) setSlots(plan.slots);
     setDataMode("auto");
-    setTopK(3);
-    setUseSoil(false);
-    setSampledOn("");
-    setSoilValues({ ph: "", soc_g_kg: "", total_n_g_kg: "", sand_pct: "", silt_pct: "", clay_pct: "" });
     setErrors({});
+  }
+  if (irrigationRetryKey !== appliedIrrigationRetryKey) {
+    setAppliedIrrigationRetryKey(irrigationRetryKey);
+    setIrrigation("available");
   }
 
   function commitCoordinates(nextLatitude: string, nextLongitude: string): void {
@@ -142,6 +156,7 @@ export function RecommendationForm({
     const lat = numeric(nextLatitude, -90, 90);
     const lon = numeric(nextLongitude, -180, 180);
     if (lat !== null && lon !== null && onLocationCommit) {
+      if (lat !== initialLocation?.latitude || lon !== initialLocation?.longitude) setDataMode("auto");
       onLocationCommit({ latitude: lat, longitude: lon });
     }
   }
@@ -224,6 +239,7 @@ export function RecommendationForm({
       excluded_crop_ids: excluded as RecommendationRequest["excluded_crop_ids"],
       soil_override: soilOverride,
       data_mode: dataMode,
+      farmer_objective: farmerObjective,
       top_k: topK,
     });
   }
@@ -304,6 +320,23 @@ export function RecommendationForm({
           {errors.history && <p role="alert" className="text-sm text-[var(--danger-ink)]">{errors.history}</p>}
         </fieldset>
         <label>Irrigation<select value={irrigation} onChange={(e) => setIrrigation(e.target.value as RecommendationRequest["irrigation"])}><option value="rainfed">Rainfed</option><option value="available">Available</option></select></label>
+        <label>Farmer priority
+          <select
+            value={farmerObjective}
+            onChange={(e) => setFarmerObjective(e.target.value as NonNullable<RecommendationRequest["farmer_objective"]>)}
+          >
+            <option value="balanced">Balanced (default weights)</option>
+            <option value="water_conservation">Conserve water / drought stress</option>
+            <option value="soil_health">Soil health (N, roots, pH)</option>
+            <option value="climate_adaptation">Adapt to changing climate</option>
+          </select>
+        </label>
+        <p className="text-sm text-[var(--muted)]">
+          Priorities only remap transparent scoring weights. Hard calendar, irrigation, and disease-break rules still apply first.
+          {farmerObjective === "soil_health" && !useSoil
+            ? " For soil-health ranking, add a farmer soil sample (at least pH) when SoilGrids is unavailable."
+            : null}
+        </p>
         <label>Allowed crops<select multiple value={allowed} onChange={(e) => setAllowed(Array.from(e.target.selectedOptions, (option) => option.value))}>
           {catalog.crops.map((crop) => <option key={crop.crop_id} value={crop.crop_id}>{crop.crop_name}</option>)}
         </select></label>
@@ -313,8 +346,11 @@ export function RecommendationForm({
         {errors.crops && <p role="alert" className="text-sm text-[var(--danger-ink)]">{errors.crops}</p>}
         <label>Data mode<select value={dataMode} onChange={(e) => setDataMode(e.target.value as "auto" | "fixture")}><option value="auto">Current data</option><option value="fixture">Authorized demo fixture</option></select></label>
         <label>Alternatives<select value={topK} onChange={(e) => setTopK(Number(e.target.value))}><option value={1}>1</option><option value={2}>2</option><option value={3}>3</option></select></label>
-        <label className="!flex-row items-center gap-2 font-semibold"><input type="checkbox" checked={useSoil} onChange={(e) => setUseSoil(e.target.checked)} /> Add farmer soil observations</label>
+        <label className="!flex-row items-center gap-2 font-semibold"><input type="checkbox" checked={useSoil} onChange={(e) => setUseSoil(e.target.checked)} /> Add farmer soil observations (local soil)</label>
         {useSoil && <fieldset className="space-y-2 rounded-xl border border-[var(--panel-border)] bg-[#fbfffc] p-3"><legend>Farmer soil sample, 0–30 cm</legend>
+          <p className="text-sm text-[var(--muted)]">
+            Local observations override mapped SoilGrids values property-by-property. Texture must sum to 100±2%. Total nitrogen is not plant-available N.
+          </p>
           <label>Soil sample date<input type="date" value={sampledOn} onChange={(e) => setSampledOn(e.target.value)} /></label>
           {soilFields.map((field) => <label key={field.key}>{field.label}<input type="number" step="any" min="0" max={field.max} value={soilValues[field.key]}
             onChange={(e) => setSoilValues((current) => ({ ...current, [field.key]: e.target.value }))} /></label>)}

@@ -65,7 +65,7 @@ describe("farmer dashboard integration", () => {
       slots: [{ slot_id: "rabi_2025", start_date: "2025-11-01", end_date: "2026-03-31" }],
       crop_history: [{ crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "retained" }],
       irrigation: "rainfed", allowed_crop_ids: [], excluded_crop_ids: [],
-      soil_override: null, data_mode: "fixture", top_k: 3,
+      soil_override: null, data_mode: "fixture", farmer_objective: "balanced", top_k: 3,
     });
     expect(screen.getByLabelText("Recommendation results")).toBeInTheDocument();
     expect(screen.getByText(/Rotation timeline, rank 1/)).toBeInTheDocument();
@@ -139,14 +139,23 @@ describe("farmer dashboard integration", () => {
         details: [],
       },
     }, { status: 503 }));
-    await waitFor(() => expect(resolvers.length).toBe(3));
-    const fallbackBody = JSON.parse(
+    await screen.findByText(/Your farm inputs are unchanged/);
+    expect(resolvers).toHaveLength(2);
+    expect(screen.getByLabelText("Data mode")).toHaveValue("auto");
+    expect(screen.getAllByLabelText("Latitude")[0]).toHaveValue(31.4505);
+    expect(screen.queryByText(/Rotation timeline, rank/)).not.toBeInTheDocument();
+    // Only an explicit action may switch the farm and submit a fixture request.
+    fireEvent.click(screen.getByRole("button", { name: "Run Faisalabad demo instead" }));
+    await waitFor(() => expect(resolvers).toHaveLength(3));
+    const demoBody = JSON.parse(
       fetcher.mock.calls.filter(([, init]) => init?.method === "POST").at(-1)![1]!.body as string,
     );
-    expect(fallbackBody.data_mode).toBe("fixture");
-    expect(fallbackBody.location).toEqual({ latitude: 31.4504, longitude: 73.135 });
+    expect(demoBody.data_mode).toBe("fixture");
+    expect(demoBody.location).toEqual({ latitude: 31.4504, longitude: 73.135 });
+    expectPinnedFormFilled();
+    expect(screen.getAllByLabelText("Latitude")[0]).toHaveValue(31.4504);
     resolvers[2]!(Response.json(samples[1]));
-    await waitFor(() => expect(screen.getByText(/Live climate for/)).toBeInTheDocument());
+    await screen.findByRole("heading", { name: "Ranked alternatives" });
     expect(screen.getByLabelText("Data mode")).toHaveValue("fixture");
   });
 
@@ -164,4 +173,143 @@ describe("farmer dashboard integration", () => {
       expect(body.location).toEqual({ latitude: 30.6612, longitude: 73.1086 });
     });
   });
+
+  it("keeps all farmer inputs after a failed form request and resends the same request on retry", async () => {
+    const fetcher = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.includes("?region_id=")) return Response.json(catalog);
+      if (url === "/api/recommend-rotation" && init?.method === "POST") return unavailable();
+      throw new Error(`Unexpected path: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<PlannerPage />);
+    await screen.findByLabelText("Rotation request");
+    expect(posts(fetcher)).toHaveLength(0);
+    fillFarmInputs();
+    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
+    await screen.findByRole("button", { name: "Retry same request" });
+    const original = posts(fetcher)[0];
+    expect(original).toEqual(expectedFarmRequest);
+    expectFarmInputs();
+    expect(posts(fetcher)).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Retry same request" }));
+    await screen.findByRole("button", { name: "Retry same request" });
+    expect(posts(fetcher)).toEqual([original, original]);
+    expectFarmInputs();
+    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
+    await screen.findByRole("button", { name: "Retry same request" });
+    expect(posts(fetcher)).toEqual([original, original, original]);
+    expectFarmInputs();
+  });
+
+  it("does not authorize fixture mode just because the selected coordinates are Faisalabad", async () => {
+    const fetcher = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.includes("?region_id=")) return Response.json(catalog);
+      if (init?.method === "POST") return unavailable();
+      throw new Error(`Unexpected path: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<PlannerPage />);
+    await screen.findByLabelText("Rotation request");
+    fireEvent.change(screen.getAllByLabelText("Longitude")[0], { target: { value: "73.135" } });
+    fireEvent.change(screen.getAllByLabelText("Latitude")[0], { target: { value: "31.4504" } });
+    await screen.findByRole("button", { name: "Retry same request" });
+    expect(posts(fetcher)).toHaveLength(1);
+    expect(posts(fetcher)[0].data_mode).toBe("auto");
+    fireEvent.change(screen.getByLabelText("Assessment date"), { target: { value: "2025-10-15" } });
+    fireEvent.change(screen.getByLabelText("Slot 1 ID"), { target: { value: "rabi_2025" } });
+    fireEvent.change(screen.getByLabelText("Slot 1 start"), { target: { value: "2025-11-01" } });
+    fireEvent.change(screen.getByLabelText("Slot 1 end"), { target: { value: "2026-03-31" } });
+    fireEvent.change(screen.getByLabelText("Data mode"), { target: { value: "fixture" } });
+    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
+    await screen.findByText(/Use the pinned Faisalabad demo action/);
+    expect(posts(fetcher)).toHaveLength(1);
+  });
+
+  it("changes only irrigation for the pinned no-feasible retry, preserving edited soil and priorities", async () => {
+    const empty = structuredClone(samples[1]);
+    empty.status = "no_feasible_rotation";
+    empty.feasible_rotation_count = 0;
+    empty.recommendations = [];
+    empty.warnings.push({ code: "NO_FEASIBLE_ROTATION", message: "No feasible rotation." });
+    const fetcher = endpoint(empty);
+    render(<PlannerPage />);
+    await screen.findByLabelText("Rotation request");
+    fireEvent.click(screen.getByRole("button", { name: "Rainfed demo" }));
+    await screen.findByRole("button", { name: "Retry with irrigation available" });
+    fireEvent.change(screen.getByLabelText("Farmer priority"), { target: { value: "soil_health" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Add farmer soil observations (local soil)" }));
+    fireEvent.change(screen.getByLabelText("Soil sample date"), { target: { value: "2025-10-01" } });
+    fireEvent.change(screen.getByLabelText("pH"), { target: { value: "7" } });
+    fireEvent.click(screen.getByRole("button", { name: "Get recommendations" }));
+    await screen.findByRole("button", { name: "Retry with irrigation available" });
+    const edited = posts(fetcher).at(-1);
+    fireEvent.click(screen.getByRole("button", { name: "Retry with irrigation available" }));
+    await screen.findByRole("button", { name: "Get recommendations" });
+    expect(posts(fetcher).at(-1)).toEqual({ ...edited, irrigation: "available" });
+    expect(screen.getByLabelText("Irrigation")).toHaveValue("available");
+    expect(screen.getByLabelText("Farmer priority")).toHaveValue("soil_health");
+    expect(screen.getByLabelText("pH")).toHaveValue(7);
+    expect(screen.getByLabelText("Soil sample date")).toHaveValue("2025-10-01");
+  });
 });
+
+function unavailable(): Response {
+  return Response.json({
+    schema_version: "1.0.0", request_id: "00000000-0000-4000-8000-000000000099",
+    error: { code: "REQUIRED_DATA_UNAVAILABLE", message: "Live providers are not configured.", retryable: true, details: [] },
+  }, { status: 503 });
+}
+
+function posts(fetcher: ReturnType<typeof endpoint>) {
+  return fetcher.mock.calls.filter(([url, init]) => url === "/api/recommend-rotation" && init?.method === "POST")
+    .map(([, init]) => JSON.parse(init!.body as string));
+}
+
+const expectedFarmRequest = {
+  region_id: "punjab_pk_demo_v1", location: { latitude: 31.5, longitude: 73.2 },
+  assessment_end: "2025-10-15", slots: [{ slot_id: "my_rabi", start_date: "2025-11-01", end_date: "2026-03-31" }],
+  crop_history: [{ crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "removed" }],
+  irrigation: "rainfed", farmer_objective: "soil_health", top_k: 2,
+  allowed_crop_ids: ["wheat"], excluded_crop_ids: ["chickpea"], data_mode: "auto",
+  soil_override: { sampled_on: "2025-10-01", depth_top_cm: 0, depth_bottom_cm: 30,
+    ph: 7, soc_g_kg: 8, total_n_g_kg: 0.8, sand_pct: 40, silt_pct: 35, clay_pct: 25 },
+};
+
+function fillFarmInputs(): void {
+  const change = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
+  change("Assessment date", "2025-10-15");
+  change("Slot 1 ID", "my_rabi"); change("Slot 1 start", "2025-11-01"); change("Slot 1 end", "2026-03-31");
+  fireEvent.click(screen.getByRole("button", { name: "Add completed crop" }));
+  change("History 1 crop", "maize"); change("History 1 start", "2025-05-01"); change("History 1 end", "2025-09-30");
+  change("History 1 residues", "removed"); change("Irrigation", "rainfed"); change("Farmer priority", "soil_health");
+  change("Alternatives", "2"); change("Allowed crops", "wheat"); change("Excluded crops", "chickpea");
+  fireEvent.click(screen.getByRole("checkbox", { name: "Add farmer soil observations (local soil)" }));
+  change("Soil sample date", "2025-10-01"); change("pH", "7"); change("Soil organic carbon (g/kg)", "8");
+  change("Total nitrogen (g/kg)", "0.8"); change("Sand (%)", "40"); change("Silt (%)", "35"); change("Clay (%)", "25");
+  // Coordinate edits after all other inputs must not reset those inputs.
+  fireEvent.change(screen.getAllByLabelText("Latitude")[1], { target: { value: "31.5" } });
+  fireEvent.change(screen.getAllByLabelText("Longitude")[1], { target: { value: "73.2" } });
+}
+
+function expectFarmInputs(): void {
+  expect(screen.getAllByLabelText("Latitude")[1]).toHaveValue(31.5);
+  expect(screen.getAllByLabelText("Longitude")[1]).toHaveValue(73.2);
+  expect(screen.getByLabelText("Assessment date")).toHaveValue("2025-10-15");
+  expect(screen.getByLabelText("Slot 1 ID")).toHaveValue("my_rabi");
+  expect(screen.getByLabelText("Slot 1 start")).toHaveValue("2025-11-01");
+  expect(screen.getByLabelText("Slot 1 end")).toHaveValue("2026-03-31");
+  expect(screen.getByLabelText("History 1 crop")).toHaveValue("maize");
+  expect(screen.getByLabelText("History 1 start")).toHaveValue("2025-05-01");
+  expect(screen.getByLabelText("History 1 end")).toHaveValue("2025-09-30");
+  expect(screen.getByLabelText("History 1 residues")).toHaveValue("removed");
+  expect(screen.getByLabelText("Irrigation")).toHaveValue("rainfed");
+  expect(screen.getByLabelText("Farmer priority")).toHaveValue("soil_health");
+  expect(screen.getByLabelText("Alternatives")).toHaveValue("2");
+  expect(screen.getByLabelText("Allowed crops")).toHaveValue(["wheat"]);
+  expect(screen.getByLabelText("Excluded crops")).toHaveValue(["chickpea"]);
+  expect(screen.getByLabelText("Data mode")).toHaveValue("auto");
+  expect(screen.getByLabelText("Soil sample date")).toHaveValue("2025-10-01");
+  for (const [label, value] of [["pH", 7], ["Soil organic carbon (g/kg)", 8], ["Total nitrogen (g/kg)", 0.8], ["Sand (%)", 40], ["Silt (%)", 35], ["Clay (%)", 25]] as const) {
+    expect(screen.getByLabelText(label)).toHaveValue(value);
+  }
+}

@@ -14,6 +14,7 @@ from app.providers.cache import DiskHttpCache
 from app.providers.fixtures import create_fixture_provider_bundle, load_fixture_manifest
 from app.providers.http import HttpxJsonFetcher
 from app.providers.power import NasaPowerProvider
+from app.providers.smap import SmapArchiveProvider
 from app.providers.soilgrids import IsricSoilProvider
 from app.schemas.contracts import Error, ErrorEnvelope, RecommendationRequest
 from app.schemas.domain import FixtureMismatch, ProviderBundle, RequiredDataUnavailable
@@ -43,6 +44,14 @@ class _UnavailableSmap:
         return None
 
 
+def _smap_provider(data_root: Path):
+    """Prefer a checksum-pinned archive when present; otherwise stay unavailable."""
+    archive = data_root / "backend" / "tests" / "fixtures" / "smap_archive.json"
+    if archive.is_file():
+        return SmapArchiveProvider(archive)
+    return _UnavailableSmap()
+
+
 def _origins() -> list[str]:
     raw = os.getenv("BACKEND_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
     origins = [item.strip() for item in raw.split(",") if item.strip()]
@@ -69,10 +78,12 @@ async def lifespan(application: FastAPI):
     async with httpx.AsyncClient(timeout=timeout) as client:
         application.state.http_client = client
         fetcher = HttpxJsonFetcher(client, provider_cache)
+        # SoilGrids REST is attempted unless explicitly disabled. Failures stay degraded/unavailable.
+        soilgrids_rest = os.getenv("ENABLE_SOILGRIDS_REST", "true").lower() not in {"0", "false", "no"}
         application.state.live_providers = ProviderBundle(
             power=NasaPowerProvider(fetcher),
-            soil=IsricSoilProvider(fetcher, rest_enabled=os.getenv("ENABLE_SOILGRIDS_REST") == "true"),
-            smap=_UnavailableSmap(),
+            soil=IsricSoilProvider(fetcher, rest_enabled=soilgrids_rest),
+            smap=_smap_provider(application.state.data_root),
         )
         try:
             yield

@@ -65,14 +65,15 @@ Integer = Annotated[int, BeforeValidator(_integer)]
 IsoDate = Annotated[date, BeforeValidator(_iso_date)]
 UtcDateTime = Annotated[datetime, BeforeValidator(_utc_datetime)]
 
-RegionId = Literal["punjab_pk_demo_v1"]
+RegionId = Literal["punjab_pk_demo_v1", "maryland_usa_demo_v1", "uk_england_demo_v1"]
 ProviderName = Literal["power", "soilgrids", "smap", "farmer_input"]
 SoilOrigin = Literal["soilgrids", "farmer_input", "unavailable"]
 ComponentName = Literal["nitrogen", "roots", "water", "temperature", "soil"]
 ReasonCode = Literal[
     "LEGUME_AFTER_HIGH_DEMAND", "LEGUME_BEFORE_HIGH_DEMAND", "ROOT_DEPTH_ALTERNATION",
     "WATER_STRESS_TOLERANCE", "SEASONAL_CLIMATE_FIT", "SOIL_PH_FIT",
-    "LIMITED_RESIDUE_BENEFIT", "ROTATION_DIVERSITY",
+    "LIMITED_RESIDUE_BENEFIT", "ROTATION_DIVERSITY", "FARMER_OBJECTIVE",
+    "SOIL_ORGANIC_CONTEXT", "EXTREME_CLIMATE_ANOMALY", "SOIL_HEALTH_TRANSITION",
 ]
 WarningCode = Literal[
     "DEMO_FIXTURE", "SOURCE_STALE", "SOILGRIDS_UNAVAILABLE", "SMAP_UNAVAILABLE",
@@ -168,13 +169,20 @@ class RecommendationRequest(WireModel):
     excluded_crop_ids: tuple[str, ...] = Field(default=(), max_length=12)
     soil_override: SoilOverride | None = None
     data_mode: Literal["auto", "fixture"] = "auto"
+    # Deterministic objective presets remap agronomy-v1 component base weights only.
+    farmer_objective: Literal[
+        "balanced", "water_conservation", "soil_health", "climate_adaptation",
+    ] = "balanced"
     top_k: Integer = Field(default=3, ge=1, le=3)
 
     @model_validator(mode="after")
     def check_request(self, info: ValidationInfo) -> RecommendationRequest:
         context = info.context if isinstance(info.context, dict) else {}
         today = context.get("today_utc", datetime.now(UTC).date())
-        known = context.get("known_crop_ids", frozenset(("wheat", "chickpea", "maize")))
+        known = context.get(
+            "known_crop_ids",
+            frozenset(("wheat", "chickpea", "maize", "soybean", "barley", "field_bean")),
+        )
         if self.assessment_end > today:
             raise ValueError("Assessment date is in the future")
         if self.assessment_end - timedelta(days=89) < date(1991, 1, 1):

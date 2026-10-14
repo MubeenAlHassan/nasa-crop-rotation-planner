@@ -65,12 +65,19 @@ async function forward(request: Request, path: string, body?: string): Promise<R
   }
 }
 
+const SUPPORTED_REGIONS = new Set([
+  "punjab_pk_demo_v1",
+  "maryland_usa_demo_v1",
+  "uk_england_demo_v1",
+]);
+
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
-  if (url.searchParams.size !== 1 || url.searchParams.get("region_id") !== "punjab_pk_demo_v1") {
-    return error(422, "VALIDATION_ERROR", "Only the supported region_id is accepted.");
+  const regionId = url.searchParams.get("region_id");
+  if (url.searchParams.size !== 1 || regionId === null || !SUPPORTED_REGIONS.has(regionId)) {
+    return error(422, "VALIDATION_ERROR", "Only supported region_id values are accepted.");
   }
-  return forward(request, "/api/v1/crops?region_id=punjab_pk_demo_v1");
+  return forward(request, `/api/v1/crops?region_id=${encodeURIComponent(regionId)}`);
 }
 
 export async function POST(request: Request): Promise<Response> {

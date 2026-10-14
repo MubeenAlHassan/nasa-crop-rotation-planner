@@ -30,7 +30,7 @@ export interface CropCatalogResponse {
     | [Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop]
     | [Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop]
     | [Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop, Crop];
-  region_id: "punjab_pk_demo_v1";
+  region_id: "punjab_pk_demo_v1" | "maryland_usa_demo_v1" | "uk_england_demo_v1";
   schema_version: "1.0.0";
 }
 export interface Crop {
@@ -142,13 +142,18 @@ export interface RecommendationRequest {
     | [string, string, string, string, string, string, string, string, string, string, string, string];
   irrigation: "rainfed" | "available";
   location: Location;
-  region_id: "punjab_pk_demo_v1";
+  region_id: "punjab_pk_demo_v1" | "maryland_usa_demo_v1" | "uk_england_demo_v1";
   /**
    * @minItems 1
    * @maxItems 4
    */
   slots: [Slot] | [Slot, Slot] | [Slot, Slot, Slot] | [Slot, Slot, Slot, Slot];
   soil_override?: SoilOverride | null;
+  /**
+   * Deterministic objective remapping agronomy-v1 component base weights.
+   * @default balanced
+   */
+  farmer_objective?: "balanced" | "water_conservation" | "soil_health" | "climate_adaptation";
   top_k?: number;
 }
 export interface History {
@@ -326,6 +331,10 @@ export interface Message {
         | "SOIL_PH_FIT"
         | "LIMITED_RESIDUE_BENEFIT"
         | "ROTATION_DIVERSITY"
+        | "FARMER_OBJECTIVE"
+        | "SOIL_ORGANIC_CONTEXT"
+        | "EXTREME_CLIMATE_ANOMALY"
+        | "SOIL_HEALTH_TRANSITION"
       )
     | (
         | "DEMO_FIXTURE"

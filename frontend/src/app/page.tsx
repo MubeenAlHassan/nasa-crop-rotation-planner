@@ -58,13 +58,31 @@ export default function LandingPage(): ReactElement {
                     <p className="mt-2 text-sm text-[#51635b]">The planner filters infeasible options, then explains which crops become viable.</p>
                   </div>
                   <div className="landing-preview-steps">
-                    <div><span>01</span><div><strong>Locate the field</strong><small>Coordinates and planting window</small></div><CheckCircle2 className="h-4 w-4" aria-hidden /></div>
-                    <div><span>02</span><div><strong>Apply constraints</strong><small>Calendar and irrigation checked first</small></div><CheckCircle2 className="h-4 w-4" aria-hidden /></div>
-                    <div className="is-highlight"><span>03</span><div><strong>Compare alternatives</strong><small>Wheat unlocked in the irrigated scenario</small></div><ArrowRight className="h-4 w-4" aria-hidden /></div>
+                    <div className="landing-preview-step" style={{ ["--step-delay" as string]: "80ms" }}>
+                      <span>01</span>
+                      <div><strong>Locate the field</strong><small>Coordinates and planting window</small></div>
+                      <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    </div>
+                    <div className="landing-preview-step" style={{ ["--step-delay" as string]: "180ms" }}>
+                      <span>02</span>
+                      <div><strong>Apply constraints</strong><small>Calendar and irrigation checked first</small></div>
+                      <CheckCircle2 className="h-4 w-4" aria-hidden />
+                    </div>
+                    <div className="landing-preview-step is-highlight" style={{ ["--step-delay" as string]: "280ms" }}>
+                      <span>03</span>
+                      <div><strong>Compare alternatives</strong><small>Wheat unlocked in the irrigated scenario</small></div>
+                      <ArrowRight className="h-4 w-4" aria-hidden />
+                    </div>
                   </div>
-                  <div className="landing-preview-footer"><span><Satellite className="h-4 w-4" aria-hidden /> NASA POWER climate context</span><span>View provenance <ArrowRight className="h-3.5 w-3.5" aria-hidden /></span></div>
+                  <div className="landing-preview-footer">
+                    <span><Satellite className="h-4 w-4" aria-hidden /> NASA POWER climate context</span>
+                    <Link href="/weather" className="landing-preview-weather" aria-label="Open weather dashboard">
+                      <CloudSun className="h-4 w-4" aria-hidden />
+                      <span>Weather for fieldwork</span>
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                    </Link>
+                  </div>
                 </div>
-                <div className="landing-preview-float"><CloudSun className="h-5 w-5" aria-hidden /><span>Weather for fieldwork</span><Link href="/weather" aria-label="Open weather dashboard"><ArrowRight className="h-4 w-4" aria-hidden /></Link></div>
               </Reveal>
             </div>
           </HeroSlider>
@@ -116,12 +134,18 @@ export default function LandingPage(): ReactElement {
               ))}
             </div>
             <Reveal delayMs={120} variant="right" className="relative lg:col-span-6">
-              <div className="overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
-                <img src={FIELD_IMAGE} alt="Soil moisture probe among leafy crops in bright daylight" className="h-[420px] w-full object-cover sm:h-[480px]" />
+              <div className="landing-explainable overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
+                <img
+                  src={FIELD_IMAGE}
+                  alt="Soil moisture probe among leafy crops in bright daylight"
+                  className="h-[420px] w-full object-cover sm:h-[480px]"
+                />
               </div>
-              <div className="absolute inset-x-6 bottom-6 rounded-2xl bg-[rgba(255,255,255,0.95)] p-5 shadow-xl backdrop-blur">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--on-surface)]">Faisalabad demo · Rabi slot</span>
+              <div className="landing-explainable-card absolute inset-x-6 bottom-6 rounded-2xl p-5 shadow-xl">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--on-surface)]">
+                    Faisalabad demo · Rabi slot
+                  </span>
                   <span className="badge bg-[var(--primary-fixed)] text-[var(--on-primary-fixed)]">Fixture ready</span>
                 </div>
                 <p className="font-display text-3xl font-bold text-[var(--primary)]">Explainable</p>

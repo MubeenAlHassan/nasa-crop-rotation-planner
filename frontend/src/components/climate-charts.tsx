@@ -22,8 +22,10 @@ export function ClimateCharts({ climate, scenarios }: ClimateChartsProps): React
   const temperature = [{ period: "Previous 90 days", observed: climate.temperature_observed_c, baseline: climate.temperature_baseline_c }];
   return (
     <section aria-label="Climate observations and historical stress scenarios" className="space-y-4 border-t border-[var(--panel-border)] pt-6">
-      <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Observed climate compared with 1991–2020</h2>
-      <p className="text-sm text-[var(--muted)]">Observation window: {climate.window_start} to {climate.window_end}</p>
+      <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Recent weather vs a typical season</h2>
+      <p className="text-sm text-[var(--muted)]">
+        Window {climate.window_start} to {climate.window_end}, compared with 1991–2020 averages.
+      </p>
       <div className="grid gap-4 md:grid-cols-2">
         <figure>
           <figcaption>Rainfall (mm): observed and matched historical baseline</figcaption>
@@ -61,10 +63,12 @@ export function ClimateCharts({ climate, scenarios }: ClimateChartsProps): React
       <div className="overflow-x-auto rounded-xl border border-[var(--panel-border)]">
       <table>
         <caption>Slot scenarios; future conditions remain uncertain</caption>
-        <thead><tr><th scope="col">Slot</th><th scope="col">Scenario kind</th><th scope="col">Rainfall</th><th scope="col">Temperature</th></tr></thead>
+        <thead><tr><th scope="col">Slot</th><th scope="col">Scenario kind</th><th scope="col">Rainfall</th><th scope="col">Temperature</th><th scope="col">Baseline years</th><th scope="col">SMAP adj.</th></tr></thead>
         <tbody>{scenarios.map((scenario) => <tr key={scenario.slot_id}>
           <th scope="row">{scenario.slot_id}</th><td>{band(scenario.kind)}</td>
           <td>{value(scenario.rainfall_mm, "mm")}</td><td>{value(scenario.temperature_c, "°C")}</td>
+          <td>R {scenario.rainfall_baseline_years} · T {scenario.temperature_baseline_years}</td>
+          <td>{scenario.smap_adjustment_applied ? "Yes" : "No"}</td>
         </tr>)}</tbody>
       </table>
       </div>

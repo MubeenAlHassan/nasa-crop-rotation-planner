@@ -17,11 +17,11 @@ from app.schemas.contracts import (
 CATALOG = load_crop_catalog(Path(__file__).parents[1] / "data" / "punjab_crops.json", "punjab_pk_demo_v1")
 
 
-def request(start="2025-10-25", history=(), irrigation="rainfed"):
+def request(start="2025-10-25", history=(), irrigation="rainfed", farmer_objective="balanced"):
     return RecommendationRequest.model_validate({
         "location": {"latitude": 31.4504, "longitude": 73.135}, "region_id": "punjab_pk_demo_v1",
         "assessment_end": "2025-10-15", "slots": [{"slot_id": "slot", "start_date": start, "end_date": "2026-03-31"}],
-        "crop_history": history, "irrigation": irrigation,
+        "crop_history": history, "irrigation": irrigation, "farmer_objective": farmer_objective,
     }, context={"today_utc": date(2025, 10, 15)})
 
 
@@ -70,3 +70,16 @@ def test_residue_moisture_and_wet_threshold_deductions():
     assert any(item.code == "LIMITED_RESIDUE_BENEFIT" for item in dry.reasons)
     wet = score_rotation(("wheat",), req, CATALOG, features(rain=500, band="severe_wet", percentile=20))
     assert wet.components.water == 80
+
+
+def test_farmer_objective_remaps_base_weights():
+    history = [{"crop_id": "maize", "start_date": "2025-05-01", "end_date": "2025-09-30", "residue_management": "retained"}]
+    balanced = score_rotation(("chickpea",), request(history=history), CATALOG, features())
+    soil_focus = score_rotation(
+        ("chickpea",), request(history=history, farmer_objective="soil_health"), CATALOG, features(),
+    )
+    assert balanced.unrounded_score == 85.5
+    # soil_health raises nitrogen/roots/soil weights → different composite score
+    assert soil_focus.unrounded_score != balanced.unrounded_score
+    assert any(item.code == "FARMER_OBJECTIVE" for item in soil_focus.reasons)
+    assert soil_focus.effective_weights.nitrogen > balanced.effective_weights.nitrogen

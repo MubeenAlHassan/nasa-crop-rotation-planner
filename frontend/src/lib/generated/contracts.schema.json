@@ -364,7 +364,11 @@
           "type": "array"
         },
         "region_id": {
-          "const": "punjab_pk_demo_v1",
+          "enum": [
+            "punjab_pk_demo_v1",
+            "maryland_usa_demo_v1",
+            "uk_england_demo_v1"
+          ],
           "type": "string"
         },
         "schema_version": {
@@ -597,7 +601,11 @@
                 "SEASONAL_CLIMATE_FIT",
                 "SOIL_PH_FIT",
                 "LIMITED_RESIDUE_BENEFIT",
-                "ROTATION_DIVERSITY"
+                "ROTATION_DIVERSITY",
+                "FARMER_OBJECTIVE",
+                "SOIL_ORGANIC_CONTEXT",
+                "EXTREME_CLIMATE_ANOMALY",
+                "SOIL_HEALTH_TRANSITION"
               ],
               "type": "string"
             },
@@ -844,7 +852,11 @@
           "$ref": "#/$defs/Location"
         },
         "region_id": {
-          "const": "punjab_pk_demo_v1",
+          "enum": [
+            "punjab_pk_demo_v1",
+            "maryland_usa_demo_v1",
+            "uk_england_demo_v1"
+          ],
           "type": "string"
         },
         "slots": {
@@ -865,6 +877,16 @@
             }
           ],
           "default": null
+        },
+        "farmer_objective": {
+          "default": "balanced",
+          "enum": [
+            "balanced",
+            "water_conservation",
+            "soil_health",
+            "climate_adaptation"
+          ],
+          "type": "string"
         },
         "top_k": {
           "default": 3,
