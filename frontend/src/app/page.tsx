@@ -134,12 +134,18 @@ export default function LandingPage(): ReactElement {
               ))}
             </div>
             <Reveal delayMs={120} variant="right" className="relative lg:col-span-6">
-              <div className="overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
-                <img src={FIELD_IMAGE} alt="Soil moisture probe among leafy crops in bright daylight" className="h-[420px] w-full object-cover sm:h-[480px]" />
+              <div className="landing-explainable overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
+                <img
+                  src={FIELD_IMAGE}
+                  alt="Soil moisture probe among leafy crops in bright daylight"
+                  className="h-[420px] w-full object-cover sm:h-[480px]"
+                />
               </div>
-              <div className="absolute inset-x-6 bottom-6 rounded-2xl bg-[rgba(255,255,255,0.95)] p-5 shadow-xl backdrop-blur">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--on-surface)]">Faisalabad demo · Rabi slot</span>
+              <div className="landing-explainable-card absolute inset-x-6 bottom-6 rounded-2xl p-5 shadow-xl">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--on-surface)]">
+                    Faisalabad demo · Rabi slot
+                  </span>
                   <span className="badge bg-[var(--primary-fixed)] text-[var(--on-primary-fixed)]">Fixture ready</span>
                 </div>
                 <p className="font-display text-3xl font-bold text-[var(--primary)]">Explainable</p>
