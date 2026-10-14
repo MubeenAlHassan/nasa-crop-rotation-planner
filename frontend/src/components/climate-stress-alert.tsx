@@ -22,13 +22,13 @@ export function ClimateStressAlert({ climate }: ClimateStressAlertProps): ReactE
       className="rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] px-4 py-3 text-sm text-[var(--warning-ink)]"
       aria-label="Extreme climate anomaly alert"
     >
-      <p className="font-semibold">Extreme observed climate stress</p>
+      <p className="font-semibold">Unusual weather in this window</p>
       <p className="mt-1">
-        Versus the 1991–2020 baseline, this assessment window shows
-        {extremeRain ? <> rainfall band <strong>{bandLabel(climate.rainfall_band)}</strong></> : null}
+        Compared with a typical 1991–2020 season, this period looks
+        {extremeRain ? <> <strong>{bandLabel(climate.rainfall_band)}</strong> for rain</> : null}
         {extremeRain && extremeHeat ? " and" : null}
-        {extremeHeat ? <> heat band <strong>{bandLabel(climate.heat_band)}</strong></> : null}
-        . This is a historical stress signal used in ranking — not a daily forecast or climate-change projection.
+        {extremeHeat ? <> <strong>{bandLabel(climate.heat_band)}</strong> for heat</> : null}
+        . This helps rank crops — it is not tomorrow&apos;s forecast.
       </p>
     </aside>
   );

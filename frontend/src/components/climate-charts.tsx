@@ -22,8 +22,10 @@ export function ClimateCharts({ climate, scenarios }: ClimateChartsProps): React
   const temperature = [{ period: "Previous 90 days", observed: climate.temperature_observed_c, baseline: climate.temperature_baseline_c }];
   return (
     <section aria-label="Climate observations and historical stress scenarios" className="space-y-4 border-t border-[var(--panel-border)] pt-6">
-      <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Observed climate compared with 1991–2020</h2>
-      <p className="text-sm text-[var(--muted)]">Observation window: {climate.window_start} to {climate.window_end}</p>
+      <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Recent weather vs a typical season</h2>
+      <p className="text-sm text-[var(--muted)]">
+        Window {climate.window_start} to {climate.window_end}, compared with 1991–2020 averages.
+      </p>
       <div className="grid gap-4 md:grid-cols-2">
         <figure>
           <figcaption>Rainfall (mm): observed and matched historical baseline</figcaption>

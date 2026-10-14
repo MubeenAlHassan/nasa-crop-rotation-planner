@@ -18,10 +18,10 @@ export function SoilHealthOutcomes({ recommendation, soil }: SoilHealthOutcomesP
   const composite = parts.length > 0 ? parts.reduce((sum, value) => sum + value, 0) / parts.length : null;
   return (
     <section aria-label="Soil health resilience signals" className="space-y-3 border-t border-[var(--panel-border)] pt-6">
-      <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Soil-health resilience signals</h2>
+      <h2 className="text-xl font-semibold text-[var(--brand-strong)]">Soil & rotation fit</h2>
       <p className="text-sm text-[var(--muted)]">
-        These values summarize nitrogen transitions, root-class diversity, and pH/SOC context for the top feasible
-        rotation. They are suitability heuristics for comparing alternatives — not measured soil improvement or yield gains.
+        Simple scores for how the top crop choice supports nitrogen, root variety, and soil context.
+        Use them to compare options — not as a soil test or yield promise.
       </p>
       <div className="overflow-x-auto rounded-xl border border-[var(--panel-border)]">
         <table>
