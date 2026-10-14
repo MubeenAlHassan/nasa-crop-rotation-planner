@@ -62,9 +62,15 @@ export default function LandingPage(): ReactElement {
                     <div><span>02</span><div><strong>Apply constraints</strong><small>Calendar and irrigation checked first</small></div><CheckCircle2 className="h-4 w-4" aria-hidden /></div>
                     <div className="is-highlight"><span>03</span><div><strong>Compare alternatives</strong><small>Wheat unlocked in the irrigated scenario</small></div><ArrowRight className="h-4 w-4" aria-hidden /></div>
                   </div>
-                  <div className="landing-preview-footer"><span><Satellite className="h-4 w-4" aria-hidden /> NASA POWER climate context</span><span>View provenance <ArrowRight className="h-3.5 w-3.5" aria-hidden /></span></div>
+                  <div className="landing-preview-footer">
+                    <span><Satellite className="h-4 w-4" aria-hidden /> NASA POWER climate context</span>
+                    <Link href="/weather" className="landing-preview-weather" aria-label="Open weather dashboard">
+                      <CloudSun className="h-4 w-4" aria-hidden />
+                      <span>Weather for fieldwork</span>
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                    </Link>
+                  </div>
                 </div>
-                <div className="landing-preview-float"><CloudSun className="h-5 w-5" aria-hidden /><span>Weather for fieldwork</span><Link href="/weather" aria-label="Open weather dashboard"><ArrowRight className="h-4 w-4" aria-hidden /></Link></div>
               </Reveal>
             </div>
           </HeroSlider>
