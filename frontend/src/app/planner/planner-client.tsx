@@ -447,9 +447,26 @@ export default function PlannerClient(): ReactElement {
               </div>
 
               {pending && (
-                <p role="status" className="rounded-xl bg-[var(--info-bg)] px-4 py-3 text-[var(--info-ink)]">
-                  Working out recommendations…
-                </p>
+                <div role="status" aria-live="polite" className="planner-loading space-y-4">
+                  <div className="planner-loading-banner">
+                    <span className="planner-loading-spinner" aria-hidden="true" />
+                    <p className="planner-loading-label">
+                      Working out recommendations
+                      <span className="planner-loading-dots" aria-hidden="true">
+                        <span /><span /><span />
+                      </span>
+                    </p>
+                    <span className="planner-loading-bar" aria-hidden="true" />
+                  </div>
+                  {!response && (
+                    <div className="planner-loading-skeleton" aria-hidden="true">
+                      <span className="planner-skel planner-skel-tabs" />
+                      <span className="planner-skel planner-skel-title" />
+                      <span className="planner-skel planner-skel-card" />
+                      <span className="planner-skel planner-skel-card-sm" />
+                    </div>
+                  )}
+                </div>
               )}
 
               {requestError && (
