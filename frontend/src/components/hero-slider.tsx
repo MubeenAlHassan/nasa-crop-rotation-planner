@@ -30,7 +30,7 @@ const DEFAULT_SLIDES: readonly HeroSlide[] = [
   },
 ];
 
-const INTERVAL_MS = 5500;
+const INTERVAL_MS = 5000;
 const FADE_MS = 1100;
 
 export interface HeroSliderProps {
