@@ -16,6 +16,13 @@ import {
 } from "../../lib/field-presets";
 import type { CropCatalogResponse, Location, RecommendationRequest, RecommendationResponse } from "../../lib/generated/contracts";
 
+const LOADING_STEPS = [
+  "Reading climate for your field",
+  "Comparing this season with the baseline",
+  "Checking which crops fit your dates",
+  "Ranking options by your priority",
+] as const;
+
 const DEMO_REQUEST: RecommendationRequest = {
   region_id: "punjab_pk_demo_v1",
   location: DEMO_POINT,
@@ -94,6 +101,7 @@ export default function PlannerClient(): ReactElement {
   const [response, setResponse] = useState<RecommendationResponse | null>(null);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const active = useRef<AbortController | null>(null);
   const generation = useRef(0);
   const demoArmedRef = useRef(false);
@@ -125,6 +133,18 @@ export default function PlannerClient(): ReactElement {
       resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [pending, response, requestError, step]);
+
+  useEffect(() => {
+    if (!pending) {
+      setLoadingStep(0);
+      return;
+    }
+    setLoadingStep(0);
+    const timer = window.setInterval(() => {
+      setLoadingStep((index) => (index + 1) % LOADING_STEPS.length);
+    }, 1500);
+    return () => window.clearInterval(timer);
+  }, [pending]);
 
   function selectLocation(next: Location, options?: { skipCustomFormApply?: boolean }): void {
     if (location && samePoint(location, next)) return;
@@ -447,16 +467,34 @@ export default function PlannerClient(): ReactElement {
               </div>
 
               {pending && (
-                <div role="status" aria-live="polite" className="planner-loading space-y-4">
-                  <div className="planner-loading-banner">
-                    <span className="planner-loading-spinner" aria-hidden="true" />
-                    <p className="planner-loading-label">
-                      Working out recommendations
-                      <span className="planner-loading-dots" aria-hidden="true">
-                        <span /><span /><span />
-                      </span>
-                    </p>
-                    <span className="planner-loading-bar" aria-hidden="true" />
+                <div role="status" aria-live="polite" className="planner-loading">
+                  <div className="planner-loading-card">
+                    <div className="planner-loading-top">
+                      <span className="planner-loading-spinner" aria-hidden="true" />
+                      <div className="planner-loading-copy">
+                        <p className="planner-loading-title">Building your crop report</p>
+                        <p className="planner-loading-subtitle">
+                          {LOADING_STEPS[loadingStep]}
+                          <span className="planner-loading-dots" aria-hidden="true">
+                            <span /><span /><span />
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="planner-loading-track" aria-hidden="true">
+                      <span className="planner-loading-fill" />
+                    </div>
+                    <ol className="planner-loading-steps" aria-hidden="true">
+                      {LOADING_STEPS.map((label, index) => {
+                        const state = index < loadingStep ? "done" : index === loadingStep ? "active" : "todo";
+                        return (
+                          <li key={label} data-state={state}>
+                            <span className="planner-loading-step-mark" />
+                            <span>{label}</span>
+                          </li>
+                        );
+                      })}
+                    </ol>
                   </div>
                   {!response && (
                     <div className="planner-loading-skeleton" aria-hidden="true">
