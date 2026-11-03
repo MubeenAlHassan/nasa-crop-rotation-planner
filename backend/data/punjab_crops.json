@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.1",
+  "region_id": "punjab_pk_demo_v1",
+  "crops": [
+    {
+      "crop_id": "wheat",
+      "crop_name": "Wheat",
+      "family": "Poaceae",
+      "legume": false,
+      "temperature_min_c": 15,
+      "temperature_max_c": 23,
+      "ph_min": 6,
+      "ph_max": 7,
+      "region_ids": [
+        "punjab_pk_demo_v1"
+      ],
+      "planting_windows": [
+        {
+          "start_mmdd": "1101",
+          "end_mmdd": "1215"
+        }
+      ],
+      "irrigation_required": true,
+      "maturity_min_days": 120,
+      "maturity_max_days": 150,
+      "rainfall_min_mm": 450,
+      "rainfall_max_mm": 650,
+      "root_class": "deep",
+      "family_break_crops": 0,
+      "nitrogen_demand": "high",
+      "waterlogging_tolerant": false,
+      "drought_tolerant": false,
+      "references": [
+        "https://api.gov.pk/SiteImage/Policy/WheatPolicyAnalysis%20For2017-18Crop.pdf",
+        "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=2114",
+        "https://www.fao.org/4/s2022e/s2022e02.htm",
+        "https://www.fao.org/4/v9926e/v9926e06.htm",
+        "https://www.fao.org/4/x0490e/x0490e0e.htm"
+      ]
+    },
+    {
+      "crop_id": "chickpea",
+      "crop_name": "Chickpea",
+      "family": "Fabaceae",
+      "legume": true,
+      "temperature_min_c": 15,
+      "temperature_max_c": 29,
+      "ph_min": 6,
+      "ph_max": 8.5,
+      "region_ids": [
+        "punjab_pk_demo_v1"
+      ],
+      "planting_windows": [
+        {
+          "start_mmdd": "1025",
+          "end_mmdd": "1025"
+        }
+      ],
+      "maturity_min_days": 90,
+      "maturity_max_days": 180,
+      "rainfall_min_mm": 100,
+      "rainfall_max_mm": 450,
+      "nitrogen_demand": "low",
+      "root_class": "deep",
+      "drought_tolerant": true,
+      "irrigation_required": false,
+      "waterlogging_tolerant": false,
+      "family_break_crops": 6,
+      "references": [
+        "https://bcsrj.com/ojs/index.php/bcsrj/article/download/986/1230/3302",
+        "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=2479",
+        "https://oar.icrisat.org/10276/1/ChickpeaManual_full.pdf",
+        "https://oar.icrisat.org/535/1/RA_00152.pdf",
+        "https://oar.icrisat.org/881/1/RA_000114.pdf"
+      ]
+    },
+    {
+      "crop_id": "maize",
+      "crop_name": "Maize",
+      "family": "Poaceae",
+      "legume": false,
+      "temperature_min_c": 18,
+      "temperature_max_c": 33,
+      "ph_min": 5,
+      "ph_max": 7,
+      "region_ids": [
+        "punjab_pk_demo_v1"
+      ],
+      "planting_windows": [
+        {
+          "start_mmdd": "0115",
+          "end_mmdd": "0215"
+        },
+        {
+          "start_mmdd": "0715",
+          "end_mmdd": "0810"
+        }
+      ],
+      "irrigation_required": true,
+      "nitrogen_demand": "high",
+      "maturity_min_days": 125,
+      "maturity_max_days": 180,
+      "rainfall_min_mm": 500,
+      "rainfall_max_mm": 800,
+      "root_class": "deep",
+      "family_break_crops": 0,
+      "drought_tolerant": false,
+      "waterlogging_tolerant": false,
+      "references": [
+        "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=238663",
+        "https://pdf.usaid.gov/pdf_docs/PNABW084.pdf",
+        "https://www.fao.org/4/s2022e/s2022e02.htm",
+        "https://www.fao.org/4/v9926e/v9926e06.htm",
+        "https://www.fao.org/4/x0490e/x0490e0e.htm",
+        "https://www.fao.org/4/x7660e/x7660e09.htm",
+        "https://www.mdpi.com/2071-1050/13/5/2757"
+      ]
+    }
+  ]
+}

@@ -34,6 +34,7 @@ pnpm-debug.log*
 # Local Caches & Temporary Files
 .cache/
 tmp/
+backend/.provider_cache/
 
 # OS & Editor
 .DS_Store

@@ -1,0 +1,19 @@
+{
+  "schema_version": "fixture-1",
+  "provider": "smap",
+  "farm_id": "faisalabad_2025",
+  "location": {
+    "latitude": 31.4504,
+    "longitude": 73.135
+  },
+  "product": "SPL3SMP_E",
+  "version": "6",
+  "cell_id": null,
+  "grid_posting_km": 9,
+  "retrieved_at": "2026-09-26T15:25:09.308843+00:00",
+  "granule_ids": [],
+  "available": false,
+  "unavailable_reason": "No authorized SPL3SMP_E Version 6 granules supplied; previous observations lacked verifiable provenance.",
+  "rows": [],
+  "reference_rows": []
+}

@@ -1,0 +1,1536 @@
+{
+  "$defs": {
+    "Climate": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_end_year": {
+          "const": 2020,
+          "type": "integer"
+        },
+        "baseline_start_year": {
+          "const": 1991,
+          "type": "integer"
+        },
+        "heat_band": {
+          "enum": [
+            "normal",
+            "elevated",
+            "high",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "rainfall_anomaly_pct": {
+          "anyOf": [
+            {
+              "minimum": -100,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rainfall_band": {
+          "enum": [
+            "severe_dry",
+            "dry",
+            "normal",
+            "wet",
+            "severe_wet",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "rainfall_baseline_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rainfall_baseline_years": {
+          "maximum": 30,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "rainfall_coverage": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "rainfall_observed_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "temperature_anomaly_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "temperature_baseline_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "temperature_baseline_years": {
+          "maximum": 30,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "temperature_coverage": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "temperature_observed_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "window_end": {
+          "format": "date",
+          "type": "string"
+        },
+        "window_start": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "window_start",
+        "window_end",
+        "baseline_start_year",
+        "baseline_end_year",
+        "rainfall_observed_mm",
+        "rainfall_baseline_mm",
+        "rainfall_anomaly_pct",
+        "temperature_observed_c",
+        "temperature_baseline_c",
+        "temperature_anomaly_c",
+        "rainfall_band",
+        "heat_band",
+        "rainfall_coverage",
+        "temperature_coverage",
+        "rainfall_baseline_years",
+        "temperature_baseline_years"
+      ],
+      "title": "Climate",
+      "type": "object"
+    },
+    "Components": {
+      "additionalProperties": false,
+      "properties": {
+        "nitrogen": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "roots": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "soil": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "temperature": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "water": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "nitrogen",
+        "roots",
+        "water",
+        "temperature",
+        "soil"
+      ],
+      "title": "Components",
+      "type": "object"
+    },
+    "Crop": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "crop_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "drought_tolerant": {
+          "type": "boolean"
+        },
+        "family": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "family_break_crops": {
+          "maximum": 8,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "irrigation_required": {
+          "type": "boolean"
+        },
+        "legume": {
+          "type": "boolean"
+        },
+        "maturity_max_days": {
+          "maximum": 366,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "maturity_min_days": {
+          "maximum": 366,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "nitrogen_demand": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "type": "string"
+        },
+        "ph_max": {
+          "maximum": 14,
+          "minimum": 0,
+          "type": "number"
+        },
+        "ph_min": {
+          "maximum": 14,
+          "minimum": 0,
+          "type": "number"
+        },
+        "planting_windows": {
+          "items": {
+            "$ref": "#/$defs/PlantingWindow"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "rainfall_max_mm": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "rainfall_min_mm": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "references": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "region_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "root_class": {
+          "enum": [
+            "shallow",
+            "medium",
+            "deep"
+          ],
+          "type": "string"
+        },
+        "temperature_max_c": {
+          "type": "number"
+        },
+        "temperature_min_c": {
+          "type": "number"
+        },
+        "waterlogging_tolerant": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "crop_id",
+        "crop_name",
+        "family",
+        "region_ids",
+        "planting_windows",
+        "maturity_min_days",
+        "maturity_max_days",
+        "nitrogen_demand",
+        "legume",
+        "root_class",
+        "rainfall_min_mm",
+        "rainfall_max_mm",
+        "temperature_min_c",
+        "temperature_max_c",
+        "ph_min",
+        "ph_max",
+        "drought_tolerant",
+        "waterlogging_tolerant",
+        "irrigation_required",
+        "family_break_crops",
+        "references"
+      ],
+      "title": "Crop",
+      "type": "object"
+    },
+    "CropCatalogResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "crops": {
+          "items": {
+            "$ref": "#/$defs/Crop"
+          },
+          "maxItems": 12,
+          "minItems": 1,
+          "type": "array"
+        },
+        "region_id": {
+          "enum": [
+            "punjab_pk_demo_v1",
+            "maryland_usa_demo_v1",
+            "uk_england_demo_v1"
+          ],
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0.0",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "catalog_version",
+        "region_id",
+        "crops"
+      ],
+      "title": "CropCatalogResponse",
+      "type": "object"
+    },
+    "Error": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "PAYLOAD_TOO_LARGE",
+            "UNSUPPORTED_MEDIA_TYPE",
+            "VALIDATION_ERROR",
+            "RATE_LIMITED",
+            "REQUIRED_DATA_UNAVAILABLE",
+            "INTERNAL_ERROR"
+          ],
+          "type": "string"
+        },
+        "details": {
+          "items": {
+            "$ref": "#/$defs/ErrorDetail"
+          },
+          "type": "array"
+        },
+        "message": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable",
+        "details"
+      ],
+      "title": "Error",
+      "type": "object"
+    },
+    "ErrorDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "message"
+      ],
+      "title": "ErrorDetail",
+      "type": "object"
+    },
+    "ErrorEnvelope": {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/Error"
+        },
+        "request_id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0.0",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "request_id",
+        "error"
+      ],
+      "title": "ErrorEnvelope",
+      "type": "object"
+    },
+    "Exclusion": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "CROP_EXCLUDED",
+            "CROP_NOT_ALLOWED",
+            "CALENDAR_INCOMPATIBLE",
+            "MATURITY_WINDOW_TOO_SHORT",
+            "IRRIGATION_REQUIRED",
+            "FAMILY_BREAK_REQUIRED",
+            "SOIL_PH_OUT_OF_RANGE"
+          ],
+          "type": "string"
+        },
+        "crop_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
+        "slot_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_id",
+        "crop_id",
+        "code",
+        "message"
+      ],
+      "title": "Exclusion",
+      "type": "object"
+    },
+    "Features": {
+      "additionalProperties": false,
+      "properties": {
+        "climate": {
+          "$ref": "#/$defs/Climate"
+        },
+        "moisture": {
+          "$ref": "#/$defs/Moisture"
+        },
+        "slot_scenarios": {
+          "items": {
+            "$ref": "#/$defs/SlotScenario"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "type": "array"
+        },
+        "soil": {
+          "$ref": "#/$defs/Soil"
+        }
+      },
+      "required": [
+        "climate",
+        "soil",
+        "moisture",
+        "slot_scenarios"
+      ],
+      "title": "Features",
+      "type": "object"
+    },
+    "History": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "residue_management": {
+          "enum": [
+            "retained",
+            "removed",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "start_date": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "crop_id",
+        "start_date",
+        "end_date",
+        "residue_management"
+      ],
+      "title": "History",
+      "type": "object"
+    },
+    "Location": {
+      "additionalProperties": false,
+      "properties": {
+        "latitude": {
+          "maximum": 90,
+          "minimum": -90,
+          "type": "number"
+        },
+        "longitude": {
+          "maximum": 180,
+          "minimum": -180,
+          "type": "number"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "title": "Location",
+      "type": "object"
+    },
+    "Message": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "enum": [
+                "LEGUME_AFTER_HIGH_DEMAND",
+                "LEGUME_BEFORE_HIGH_DEMAND",
+                "ROOT_DEPTH_ALTERNATION",
+                "WATER_STRESS_TOLERANCE",
+                "SEASONAL_CLIMATE_FIT",
+                "SOIL_PH_FIT",
+                "LIMITED_RESIDUE_BENEFIT",
+                "ROTATION_DIVERSITY",
+                "FARMER_OBJECTIVE",
+                "SOIL_ORGANIC_CONTEXT",
+                "EXTREME_CLIMATE_ANOMALY",
+                "SOIL_HEALTH_TRANSITION"
+              ],
+              "type": "string"
+            },
+            {
+              "enum": [
+                "DEMO_FIXTURE",
+                "SOURCE_STALE",
+                "SOILGRIDS_UNAVAILABLE",
+                "SMAP_UNAVAILABLE",
+                "SMAP_PERCENTILE_UNAVAILABLE",
+                "CLIMATE_COVERAGE_LOW",
+                "BASELINE_TOO_DRY",
+                "HISTORY_UNKNOWN",
+                "SOIL_SCREEN_INCOMPLETE",
+                "PARTIAL_COMPONENT_COVERAGE",
+                "SOIL_TEXTURE_INCONSISTENT",
+                "NO_FEASIBLE_ROTATION"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "message": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "Moisture": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_overpasses": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "depth_cm": {
+          "const": 5,
+          "type": "integer"
+        },
+        "latest_observation": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "percentile": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "surface_m3_m3": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "surface_m3_m3",
+        "percentile",
+        "accepted_overpasses",
+        "latest_observation",
+        "depth_cm"
+      ],
+      "title": "Moisture",
+      "type": "object"
+    },
+    "PlannedCrop": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "crop_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "slot_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "start_date": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_id",
+        "crop_id",
+        "crop_name",
+        "start_date",
+        "end_date"
+      ],
+      "title": "PlannedCrop",
+      "type": "object"
+    },
+    "PlantingWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "end_mmdd": {
+          "pattern": "^\\d{4}$",
+          "type": "string"
+        },
+        "start_mmdd": {
+          "pattern": "^\\d{4}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start_mmdd",
+        "end_mmdd"
+      ],
+      "title": "PlantingWindow",
+      "type": "object"
+    },
+    "Recommendation": {
+      "additionalProperties": false,
+      "properties": {
+        "components": {
+          "$ref": "#/$defs/Components"
+        },
+        "effective_weights": {
+          "$ref": "#/$defs/Weights"
+        },
+        "rank": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Message"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "rotation_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "slots": {
+          "items": {
+            "$ref": "#/$defs/PlannedCrop"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rank",
+        "rotation_id",
+        "score",
+        "components",
+        "effective_weights",
+        "slots",
+        "reasons"
+      ],
+      "title": "Recommendation",
+      "type": "object"
+    },
+    "RecommendationRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_crop_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 12,
+          "type": "array"
+        },
+        "assessment_end": {
+          "format": "date",
+          "type": "string"
+        },
+        "crop_history": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/History"
+          },
+          "maxItems": 8,
+          "type": "array"
+        },
+        "data_mode": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "fixture"
+          ],
+          "type": "string"
+        },
+        "excluded_crop_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 12,
+          "type": "array"
+        },
+        "irrigation": {
+          "enum": [
+            "rainfed",
+            "available"
+          ],
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/$defs/Location"
+        },
+        "region_id": {
+          "enum": [
+            "punjab_pk_demo_v1",
+            "maryland_usa_demo_v1",
+            "uk_england_demo_v1"
+          ],
+          "type": "string"
+        },
+        "slots": {
+          "items": {
+            "$ref": "#/$defs/Slot"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "type": "array"
+        },
+        "soil_override": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SoilOverride"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "farmer_objective": {
+          "default": "balanced",
+          "enum": [
+            "balanced",
+            "water_conservation",
+            "soil_health",
+            "climate_adaptation"
+          ],
+          "type": "string"
+        },
+        "top_k": {
+          "default": 3,
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "location",
+        "region_id",
+        "assessment_end",
+        "slots",
+        "irrigation"
+      ],
+      "title": "RecommendationRequest",
+      "type": "object"
+    },
+    "RecommendationResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "data_quality": {
+          "enum": [
+            "complete",
+            "limited"
+          ],
+          "type": "string"
+        },
+        "exclusions": {
+          "items": {
+            "$ref": "#/$defs/Exclusion"
+          },
+          "type": "array"
+        },
+        "feasible_rotation_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "features": {
+          "$ref": "#/$defs/Features"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/$defs/Location"
+        },
+        "recommendations": {
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          },
+          "maxItems": 3,
+          "type": "array"
+        },
+        "request_id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "rules_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0.0",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "degraded",
+            "no_feasible_rotation"
+          ],
+          "type": "string"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/Message"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "request_id",
+        "generated_at",
+        "status",
+        "rules_version",
+        "catalog_version",
+        "location",
+        "data_quality",
+        "features",
+        "sources",
+        "recommendations",
+        "feasible_rotation_count",
+        "exclusions",
+        "warnings"
+      ],
+      "title": "RecommendationResponse",
+      "type": "object"
+    },
+    "Slot": {
+      "additionalProperties": false,
+      "properties": {
+        "end_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "slot_id": {
+          "pattern": "^[a-z0-9_-]{1,32}$",
+          "type": "string"
+        },
+        "start_date": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_id",
+        "start_date",
+        "end_date"
+      ],
+      "title": "Slot",
+      "type": "object"
+    },
+    "SlotScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "historical_stress_scenario",
+          "type": "string"
+        },
+        "rainfall_baseline_years": {
+          "maximum": 30,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "rainfall_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "slot_id": {
+          "pattern": "^[a-z0-9_-]{1,32}$",
+          "type": "string"
+        },
+        "smap_adjustment_applied": {
+          "type": "boolean"
+        },
+        "temperature_baseline_years": {
+          "maximum": 30,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "temperature_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "slot_id",
+        "kind",
+        "rainfall_mm",
+        "temperature_c",
+        "rainfall_baseline_years",
+        "temperature_baseline_years",
+        "smap_adjustment_applied"
+      ],
+      "title": "SlotScenario",
+      "type": "object"
+    },
+    "Soil": {
+      "additionalProperties": false,
+      "properties": {
+        "clay_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "depth_bottom_cm": {
+          "const": 30,
+          "type": "integer"
+        },
+        "depth_top_cm": {
+          "const": 0,
+          "type": "integer"
+        },
+        "field_sources": {
+          "$ref": "#/$defs/SoilFieldSources"
+        },
+        "ph": {
+          "anyOf": [
+            {
+              "maximum": 14,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sand_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "silt_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "soc_g_kg": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "total_n_g_kg": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "depth_top_cm",
+        "depth_bottom_cm",
+        "ph",
+        "soc_g_kg",
+        "total_n_g_kg",
+        "sand_pct",
+        "silt_pct",
+        "clay_pct",
+        "field_sources"
+      ],
+      "title": "Soil",
+      "type": "object"
+    },
+    "SoilFieldSources": {
+      "additionalProperties": false,
+      "properties": {
+        "clay_pct": {
+          "enum": [
+            "soilgrids",
+            "farmer_input",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "ph": {
+          "enum": [
+            "soilgrids",
+            "farmer_input",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "sand_pct": {
+          "enum": [
+            "soilgrids",
+            "farmer_input",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "silt_pct": {
+          "enum": [
+            "soilgrids",
+            "farmer_input",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "soc_g_kg": {
+          "enum": [
+            "soilgrids",
+            "farmer_input",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "total_n_g_kg": {
+          "enum": [
+            "soilgrids",
+            "farmer_input",
+            "unavailable"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "ph",
+        "soc_g_kg",
+        "total_n_g_kg",
+        "sand_pct",
+        "silt_pct",
+        "clay_pct"
+      ],
+      "title": "SoilFieldSources",
+      "type": "object"
+    },
+    "SoilOverride": {
+      "additionalProperties": false,
+      "properties": {
+        "clay_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "depth_bottom_cm": {
+          "const": 30,
+          "type": "integer"
+        },
+        "depth_top_cm": {
+          "const": 0,
+          "type": "integer"
+        },
+        "ph": {
+          "anyOf": [
+            {
+              "maximum": 14,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sampled_on": {
+          "format": "date",
+          "type": "string"
+        },
+        "sand_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "silt_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "soc_g_kg": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "total_n_g_kg": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "sampled_on",
+        "depth_top_cm",
+        "depth_bottom_cm"
+      ],
+      "title": "SoilOverride",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "fixture_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "grid_resolution_km": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "cache",
+            "stale_cache",
+            "snapshot",
+            "fixture",
+            "farmer_input",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "observed_end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observed_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "product": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "provider": {
+          "enum": [
+            "power",
+            "soilgrids",
+            "smap",
+            "farmer_input"
+          ],
+          "type": "string"
+        },
+        "retrieved_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "spatial_support": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "used_for": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "provider",
+        "mode",
+        "product",
+        "observed_start",
+        "observed_end",
+        "retrieved_at",
+        "grid_resolution_km",
+        "spatial_support",
+        "fixture_id",
+        "used_for"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Weights": {
+      "additionalProperties": false,
+      "properties": {
+        "nitrogen": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "roots": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "soil": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "temperature": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "water": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "nitrogen",
+        "roots",
+        "water",
+        "temperature",
+        "soil"
+      ],
+      "title": "Weights",
+      "type": "object"
+    }
+  },
+  "$id": "https://field-shift.local/contracts/1.0.0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "crop_catalog_response": {
+      "$ref": "#/$defs/CropCatalogResponse"
+    },
+    "error_response": {
+      "$ref": "#/$defs/ErrorEnvelope"
+    },
+    "recommendation_request": {
+      "$ref": "#/$defs/RecommendationRequest"
+    },
+    "recommendation_response": {
+      "$ref": "#/$defs/RecommendationResponse"
+    }
+  },
+  "required": [
+    "recommendation_request",
+    "recommendation_response",
+    "error_response",
+    "crop_catalog_response"
+  ],
+  "title": "ContractDocument",
+  "type": "object"
+}
