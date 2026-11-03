@@ -1,4 +1,6 @@
-# Field Shift: 180-second judge demonstration
+# Archived regional planner: 180-second judge demonstration
+
+> Historical record: the planner and weather UI described here has been removed. Use the [Rotation Atlas judge demonstration](ROTATION_ATLAS.md#judge-demonstration) for the current product. Pinned backend fixtures and their contract checks remain available.
 
 This is a decision-support demonstration for one authorized Faisalabad farm. Use the production backend `app.main:app` with `ENABLE_DEMO_FIXTURES=true` and `BACKEND_DATA_DIR` pointed at this repository root, then the frontend same-origin route `/api/recommend-rotation`. The release manifest is `backend/tests/fixtures/manifest.json`, fixture ID `faisalabad_2025`, catalog version `1.0.1`, transform version `features-v1`, and `synthetic=false`. The POWER archive is genuinely captured; the pinned SoilGrids and SMAP archives honestly record unavailability. Do not substitute the synthetic mock API for this journey.
 

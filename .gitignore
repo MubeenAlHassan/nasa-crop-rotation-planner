@@ -41,3 +41,11 @@ backend/.provider_cache/
 Thumbs.db
 .vscode/
 .idea/
+
+# Rotation Atlas build and browser QA outputs
+dist-atlas/
+artifacts/
+frontend/public/atlas/app.js
+frontend/public/atlas/app.css
+frontend/public/atlas/offline.html
+frontend/.atlas-decisions/
