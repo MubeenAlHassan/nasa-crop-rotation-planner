@@ -1,0 +1,14 @@
+import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {randomUUID} from 'node:crypto';
+import {GET,POST} from './route';
+import {DEFAULT_REQUEST} from '../../../../lib/atlas/catalog';
+let directory:string;
+beforeEach(async()=>{directory=await mkdtemp(path.join(tmpdir(),'atlas-decisions-test-'));vi.stubEnv('ATLAS_DECISIONS_DIR',directory);});
+afterEach(async()=>{vi.unstubAllEnvs();await rm(directory,{recursive:true,force:true});});
+describe('Per-device decision synchronization',()=>{
+ it('persists a saved decision and isolates other device keys',async()=>{const key=randomUUID(),value={schema:1,updatedAt:'2026-11-03T00:00:00.000Z',request:DEFAULT_REQUEST};const response=await POST(new Request('http://localhost/api/atlas/decisions',{method:'POST',headers:{'x-atlas-device':key},body:JSON.stringify(value)}));expect(response.status).toBe(200);const read=await GET(new Request('http://localhost/api/atlas/decisions',{headers:{'x-atlas-device':key}}));expect((await read.json()).request).toEqual(DEFAULT_REQUEST);expect((await GET(new Request('http://localhost/api/atlas/decisions',{headers:{'x-atlas-device':randomUUID()}}))).status).toBe(404);});
+ it('rejects missing and path-like capability keys',async()=>{for(const key of ['', '../../etc/passwd'])expect((await GET(new Request('http://localhost/api/atlas/decisions',{headers:{'x-atlas-device':key}}))).status).toBe(401);});
+});
