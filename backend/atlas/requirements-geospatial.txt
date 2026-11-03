@@ -1,0 +1,7 @@
+# Optional tools for authenticated granule capture and native-grid processing.
+# The included POWER pipeline and the offline demo do not need these packages.
+earthaccess>=0.14,<1
+rasterio>=1.4,<2
+shapely>=2.0,<3
+pyarrow>=18,<30
+h5py>=3.12,<4
