@@ -13,6 +13,4 @@ npm run start
 
 Both dev and build regenerate the cached offline bundle. Build also runs the remaining tests and TypeScript checks. Open http://localhost:3000.
 
-The reusable `src/lib/weather` utilities, validated `src/lib/api/client.ts`, generated v1 contracts and `/api/recommend-rotation` proxy are retained for backend compatibility. They are independent of the Atlas UI.
-
-See the [project README](../README.md) and [Atlas implementation guide](../agent_docs/ROTATION_ATLAS.md) for evidence capture, static packaging, persistent storage and verification.
+See the [project README](../README.md) and [Atlas implementation guide](../agent_docs/ROTATION_ATLAS.md) for evidence capture, static packaging, storage and verification.
