@@ -53,7 +53,7 @@ export default function Landing() {
     <div className="ra-app ra-landing">
       <header className="ra-landing-header">
         <a href="/" className="ra-brand">
-          <BrandMark size={46} />
+          <BrandMark size={28} />
           <span>
             rotation<span className="ra-brand-light">atlas</span>
             <small>ROOTED IN EARTH. INFORMED BY SPACE.</small>

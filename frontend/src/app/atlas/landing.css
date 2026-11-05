@@ -10,7 +10,7 @@
 .ra-landing .ra-brand-light{color:#6d8558;font-weight:500}
 .ra-landing .ra-brand small{color:#8a9480;font-size:7.5px;letter-spacing:.16em;font-family:var(--ra-sans);font-weight:600}
 .ra-landing .ra-brand-icon{
-  width:46px;height:46px;border-radius:13px;border:1.5px solid #d5d8c8;color:#6a8454;background:transparent;
+  width:46px;height:46px;border-radius:13px;border:1px solid #c9d4ba;color:#5d794b;background:transparent;
   display:grid;place-items:center;overflow:hidden;
 }
 .ra-landing .ra-brand-icon svg{display:block}
