@@ -18,4 +18,14 @@
 @keyframes ra-slide-in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
 @media(max-width:700px){.ra-strategy-metrics>span{font-size:10px}.ra-strategy-sequence{font-size:10px;min-height:34px}.ra-map-caption{font-size:9px}.ra-map-note{font-size:9px!important}.ra-demo-note{font-size:10px}.ra-match>span{font-size:9px}.ra-intro{font-size:12px}.ra-threshold-grid p{font-size:10px}.ra-legend{font-size:9px}.ra-stat>div>span{font-size:8px}.ra-stat p{font-size:9px}.ra-stat:hover,.ra-strategy:hover,.ra-sidebar nav button:hover{transform:none}}
 
+
+.ra-export{position:relative}
+.ra-export>.ra-button{gap:8px}
+.ra-export-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:198px;background:#fffcf4;border:1px solid #d7decc;border-radius:12px;box-shadow:0 16px 36px #243b3022;padding:6px;z-index:40;display:grid;gap:2px}
+.ra-export-menu>button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border-radius:9px;color:#2b4734;font-size:13px;font-weight:600;text-align:left}
+.ra-export-menu>button:hover{background:#edf0e5}
+.ra-export-menu>button>small{margin-left:auto;color:#7d8a76;font-weight:500;font-size:11px}
+.ra-export.open>.ra-button svg:last-child{transform:rotate(180deg)}
+.ra-export>.ra-button svg:last-child{transition:transform .2s ease}
+
 @media(prefers-reduced-motion:reduce){.ra-logo-sat animateMotion{display:none}}

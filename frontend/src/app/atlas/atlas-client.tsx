@@ -1,11 +1,11 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Check, ChevronRight, CircleHelp, CloudRain, Download, Droplets, ExternalLink, FileText, Layers, Leaf, MapPin, Menu, RotateCcw, Satellite, Settings2, ShieldCheck, SlidersHorizontal, Sprout, TrendingUp, Wheat, Wifi, WifiOff, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, ChevronRight, CircleHelp, CloudRain, Download, Droplets, ExternalLink, FileJson, FileSpreadsheet, FileText, Layers, Leaf, MapPin, Menu, RotateCcw, Satellite, Settings2, ShieldCheck, SlidersHorizontal, Sprout, TrendingUp, Wheat, Wifi, WifiOff, X } from 'lucide-react';
 import BrandMark, { OrbitPerspective } from './brand-mark';
 import { ASSUMPTIONS, CROPS, DEFAULT_REQUEST, MODEL_VERSION, SOURCES, STRATEGIES } from '@/lib/atlas/catalog';
 import { compare, sensitivity, validateRequest } from '@/lib/atlas/engine';
 import type { EvidenceSeries, ScenarioRequest, SensitivityResult, StrategyId, StrategyResult } from '@/lib/atlas/types';
-import { downloadReport, loadDecision, saveDecision, syncDecision } from '@/lib/atlas/storage';
+import { downloadReport, loadDecision, saveDecision, syncDecision, type ReportFormat } from '@/lib/atlas/storage';
 import { FieldMap } from './field-map';
 const number=(n:number,digits=0)=>n.toLocaleString('en-US',{maximumFractionDigits:digits});
 const money=(n:number)=>`${n<0?'−':''}$${number(Math.abs(n))}`;
@@ -27,6 +27,8 @@ export default function Atlas() {
   const [tab,setTab]=useState<'overview'|'compare'|'evidence'>('overview'),[selected,setSelected]=useState<StrategyId>('cover');
   const [settings,setSettings]=useState(false),[menu,setMenu]=useState(false),[online,setOnline]=useState(true),[saved,setSaved]=useState(''),[notice,setNotice]=useState('');
   const [offlineReady,setOfflineReady]=useState(false),[sensitivityResult,setSensitivity]=useState<SensitivityResult|null>(null),[analyzing,setAnalyzing]=useState(false),[retry,setRetry]=useState(0);
+  const [exportOpen,setExportOpen]=useState(false);
+  const exportRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{
     let disposed=false;
     fetch('/atlas/iowa.json').then(r=>{if(!r.ok)throw new Error('Weather package could not be loaded.');return r.json();}).then(d=>{if(!disposed)setData(d);}).catch(e=>{if(!disposed)setError(e.message);});
@@ -37,6 +39,14 @@ export default function Atlas() {
   },[retry]);
   useEffect(()=>{if(!settings)return;const previous=document.activeElement as HTMLElement|null;const modal=document.querySelector<HTMLElement>('.ra-modal');const handler=(event:KeyboardEvent)=>{if(event.key==='Escape'){setSettings(false);return;}if(event.key!=='Tab'||!modal)return;const items=Array.from(modal.querySelectorAll<HTMLElement>('button:not([disabled]),input,select,a[href]'));const first=items[0],last=items[items.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}};document.addEventListener('keydown',handler);return()=>{document.removeEventListener('keydown',handler);previous?.focus();};},[settings]);
   useEffect(()=>{if(!online)return;const prior=loadDecision();if(prior?.pending)void syncDecision(prior);},[online]);
+  useEffect(()=>{
+    if(!exportOpen)return;
+    const onPointer=(event:MouseEvent)=>{if(!exportRef.current?.contains(event.target as Node))setExportOpen(false);};
+    const onKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setExportOpen(false);};
+    document.addEventListener('mousedown',onPointer);
+    document.addEventListener('keydown',onKey);
+    return()=>{document.removeEventListener('mousedown',onPointer);document.removeEventListener('keydown',onKey);};
+  },[exportOpen]);
   const update=useCallback((patch:Partial<ScenarioRequest>)=>{setRequest(r=>({...r,...patch}));setSensitivity(null);setSaved('Unsaved changes');},[]);
   const updateField=(patch:Partial<ScenarioRequest['field']>)=>update({field:{...request.field,...patch}});
   const result=useMemo(()=>{if(!data)return null;try{return compare(data,request);}catch(e){return {version:MODEL_VERSION,status:'insufficient-information' as const,reason:e instanceof Error?e.message:'Invalid scenario',strategies:[],preferred:null,evidenceId:data.id,assumptions:ASSUMPTIONS};}},[data,request]);
@@ -45,7 +55,12 @@ export default function Atlas() {
   const yearlyRain=data?data.weather.reduce((a,d)=>a+(d.rain??0),0)/12:0;
   const analyze=()=>{if(!data)return;setAnalyzing(true);setTimeout(()=>{try {setSensitivity(sensitivity(data,request));}catch(e){setNotice(e instanceof Error?e.message:'Sensitivity failed.');}finally{setAnalyzing(false);}},40);};
   const save=async()=>{try {const value=saveDecision(request);setSaved('Saved on this device');setNotice('Decision saved on this device. Edits will sync to this app’s server when it is available.');if(online&&await syncDecision(value)){setSaved('Saved on device and server');setNotice('Decision saved on this device and synced to this app’s server.');}}catch{setNotice('Device storage is unavailable. Download a decision report instead.');}};
-  const exportReport=()=>{if(data&&result)downloadReport(request,{...result,strategies:result.strategies.map(s=>({...s,daily:undefined})),sensitivity:sensitivityResult},data);};
+  const exportReport=(format:ReportFormat)=>{
+    if(!data||!result)return;
+    downloadReport(request,{...result,strategies:result.strategies.map(s=>({...s,daily:undefined})),sensitivity:sensitivityResult},data,format);
+    setExportOpen(false);
+    setNotice(format==='json'?'JSON report downloaded.':format==='excel'?'Excel report downloaded.':'Word report downloaded.');
+  };
   const chooseTab=(t:typeof tab)=>{setTab(t);setMenu(false);};
   return <div className="ra-app">
     <a href="#atlas-main" className="ra-skip">Skip to workspace</a>
@@ -54,7 +69,18 @@ export default function Atlas() {
       <div className="ra-sidebar-field"><MapPin size={17}/><span>Prairie Creek<small>Iowa, United States · illustrative</small></span></div><button className="ra-sidebar-settings" onClick={()=>setSettings(true)}><Settings2 size={16}/>Farm assumptions<ArrowUpRight size={14}/></button>
       <div className="ra-sidebar-bottom"><OrbitPerspective size={92}/><h3>A global perspective.<br/>A local decision.</h3><p>Historical NASA weather, interpreted with your priorities.</p><div className="ra-sidebar-status"><span className="ra-dot"/>{data?'2013–2024 evidence loaded':'Loading evidence package'}</div><small>Research prototype · {MODEL_VERSION}</small></div>
     </aside>
-    <div className="ra-workspace"><header className="ra-topbar"><button className="ra-mobile-menu" aria-label="Open navigation" onClick={()=>setMenu(true)}><Menu/></button><div className="ra-breadcrumb">MY WORKSPACE <ChevronRight size={12}/> <span>IOWA DEMO</span></div><div className="ra-top-actions"><span className="ra-connection">{online?<Wifi size={14}/>:<WifiOff size={14}/>} {online?(offlineReady?'Offline pack ready':'Online'):'Offline mode'}</span><button className="ra-button ra-button-outline" onClick={exportReport} disabled={!result}><Download size={15}/><span>Export report</span></button><button className="ra-button ra-button-primary" onClick={save}><Check size={15}/>Save decision</button></div></header>
+    <div className="ra-workspace"><header className="ra-topbar"><button className="ra-mobile-menu" aria-label="Open navigation" onClick={()=>setMenu(true)}><Menu/></button><div className="ra-breadcrumb">MY WORKSPACE <ChevronRight size={12}/> <span>IOWA DEMO</span></div><div className="ra-top-actions"><span className="ra-connection">{online?<Wifi size={14}/>:<WifiOff size={14}/>} {online?(offlineReady?'Offline pack ready':'Online'):'Offline mode'}</span>
+        <div className={`ra-export${exportOpen?' open':''}`} ref={exportRef}>
+          <button className="ra-button ra-button-outline" type="button" aria-haspopup="menu" aria-expanded={exportOpen} disabled={!result} onClick={()=>setExportOpen(o=>!o)}><Download size={15}/><span>Export report</span><ChevronDown size={14}/></button>
+          {exportOpen&&result&&(
+            <div className="ra-export-menu" role="menu" aria-label="Export formats">
+              <button type="button" role="menuitem" onClick={()=>exportReport('excel')}><FileSpreadsheet size={15}/><span>Excel</span><small>.xls</small></button>
+              <button type="button" role="menuitem" onClick={()=>exportReport('json')}><FileJson size={15}/><span>JSON</span><small>.json</small></button>
+              <button type="button" role="menuitem" onClick={()=>exportReport('word')}><FileText size={15}/><span>Word</span><small>.doc</small></button>
+            </div>
+          )}
+        </div>
+        <button className="ra-button ra-button-primary" onClick={save}><Check size={15}/>Save decision</button></div></header>
       <main id="atlas-main" className="ra-main"><div className="ra-heading ra-panel-in"><div><p className="ra-eyebrow"><span/> YOUR NEXT SEASON, IN PERSPECTIVE</p><h1>{tab==='overview'?<>Good rotations start<br/>with a clearer picture.</>:tab==='compare'?<>Four paths.<br/>One informed decision.</>:<>Every insight has<br/>a place to start.</>}</h1><p className="ra-intro">{tab==='overview'?'Understand your field. Explore the tradeoffs. Find a rotation that fits.':tab==='compare'?'Same field. Same historical weather. Different possibilities for your farm.':'See what was observed, what was modeled, and what still needs a local answer.'}</p></div><div className="ra-field-pill"><MapPin size={16}/><div>{request.field.name}<small>Maize–soybean baseline · rain{request.field.irrigation?'-supplemented':'fed'}</small></div><button aria-label="Edit farm assumptions" onClick={()=>setSettings(true)}><Settings2 size={17}/></button></div></div>
       <div className="ra-demo-note ra-panel-in"><ShieldCheck size={15}/><span>Real NASA POWER weather. Illustrative farm, soil and economic assumptions. Historical scenarios, not forecasts.</span><button onClick={()=>setTab('evidence')}>View evidence <ArrowUpRight size={13}/></button></div>
       {notice&&<div className="ra-notice" role="status">{notice}<button aria-label="Dismiss notification" onClick={()=>setNotice('')}><X size={15}/></button></div>}
