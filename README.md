@@ -30,27 +30,12 @@ node scripts/build-atlas.mjs
 
 This produces `dist-atlas/`, a static demonstration that calculates locally. The full Next.js app additionally provides `/api/atlas/compare` and `/api/atlas/decisions`; decision sync requires persistent writable storage. See the implementation guide for storage and offline limits.
 
-## Retained backend and utilities
+## Data tooling
 
-The FastAPI service, v1 recommendation contracts, validated TypeScript API client and weather utilities are retained independently of the retired UI. Contract schema identifiers remain unchanged for compatibility. Atlas does not call the regional recommendation API.
-
-Use Python 3.11.13 for the backend:
-
-```sh
-uv sync --frozen --extra dev
-.venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
-```
-
-The retained Next.js `/api/recommend-rotation` proxy forwards to `/api/v1/recommend-rotation`. Its default backend is `http://127.0.0.1:8000`; deployments use server-only `BACKEND_BASE_URL` and `BACKEND_ALLOWED_UPSTREAM_ORIGINS`.
-
-The historical Faisalabad fixtures and backend checks remain available. [The archived regional demo script](agent_docs/JUDGE_DEMO.md) documents that earlier work; its UI instructions no longer describe the app. Other regional planning documents are retained as technical history.
+The shipped Atlas experience does not require a Python server. Optional NASA capture and geospatial QA tools remain in `backend/atlas/`; they run independently of the hosted Next.js app. The captured Iowa evidence package is already included, so the normal demo does not download data at runtime.
 
 ## Verification
 
 ```sh
-PYTHONPATH=backend .venv/bin/python -m pytest -q
-.venv/bin/python backend/scripts/verify_phase0.py
 npm run build --prefix frontend
-# With the production app running on port 4173 and Chrome installed:
-node scripts/atlas-browser-smoke.mjs http://127.0.0.1:4173 --server
 ```
