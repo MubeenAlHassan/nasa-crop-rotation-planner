@@ -1,7 +1,7 @@
 # Rotation Atlas
 
 The Midwest rotation workspace is at `/atlas`, with its presentation page at `/`.
-Rotation Atlas is the sole frontend experience. The legacy `/planner` and `/weather` pages, their UI components and navigation have been removed; those URLs return 404. The FastAPI application, v1 recommendation contract, validated API client and reusable weather utilities remain available.
+Rotation Atlas is the sole application experience. The legacy `/planner`, `/weather`, FastAPI recommendation service, v1 contracts, and their UI dependencies have been removed; those URLs and APIs are no longer part of the product. NASA capture and harmonization tooling remains under `backend/atlas/`.
 
 ## Run and build
 
@@ -14,7 +14,7 @@ npm run dev --prefix frontend
 # Open http://localhost:3000/atlas
 ```
 
-The comparison service is `POST /api/atlas/compare` in Next.js. It runs the same pure TypeScript engine as the browser; the Iowa experience does not require FastAPI. This avoids divergent Python/JavaScript model implementations. Python is used for capture, QA and harmonization. The retained regional recommendation API requires FastAPI.
+The comparison service is `POST /api/atlas/compare` in Next.js. It runs the same pure TypeScript engine as the browser; the Iowa experience does not require a Python server. Python is used only for optional capture, QA and harmonization.
 
 `node scripts/build-atlas.mjs` also produces `dist-atlas/`, a portable static demonstration, and the self-contained offline shell in `frontend/public/atlas/`. Serve the static demonstration at `/atlas/` for service-worker coverage. The static artifact calculates locally; it has no server comparison endpoint. Saved edits remain on the device and can be exported. On the full Next.js application, pending saved scenarios are synced to the decision storage service when connectivity returns. The `POST/GET /api/atlas/decisions` service stores the latest decision behind a per-device UUID capability key (no public listing). It uses `.atlas-decisions/` or `ATLAS_DECISIONS_DIR`; production hosting needs a persistent writable volume. This demo mechanism is not account-based cross-device storage or a multi-user authentication system. Keep the device key private. Static hosting has no sync endpoint and retains the pending device copy.
 
@@ -84,7 +84,6 @@ Numeric prices, wheat budgets, management dates and nitrogen-credit scenarios ar
 ## Verification
 
 ```sh
-PYTHONPATH=backend python3 -m unittest discover -s backend/tests -p 'test_atlas_*.py'
 npm run test --prefix frontend -- --run --cache=false
 node scripts/build-atlas.mjs
 npm run build --prefix frontend
