@@ -26,9 +26,13 @@ const steps = [
 
 export default function Landing() {
   useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      document.querySelectorAll('.ra-sat-flight animateMotion').forEach((node) => node.remove());
+    }
     const nodes = Array.from(document.querySelectorAll<HTMLElement>('.ra-reveal'));
     if (!nodes.length) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduce) {
       nodes.forEach((node) => node.classList.add('ra-revealed'));
       return;
     }
@@ -74,11 +78,11 @@ export default function Landing() {
               <Satellite size={16} className="ra-eyebrow-sat" /> EARTH OBSERVATIONS. EVERYDAY DECISIONS.
             </p>
             <h1 className="ra-anim ra-anim-2">
-              The next chapter
-              <br />
-              of your field
-              <br />
-              starts <em>here.</em>
+              <span>The next chapter</span>
+              <span>of your field</span>
+              <span>
+                starts <em>here.</em>
+              </span>
             </h1>
             <p className="ra-anim ra-anim-3">
               Every rotation is a tradeoff. Explore what a different crop could mean for your water, your soil and
@@ -126,24 +130,20 @@ export default function Landing() {
               <path d="M225 310L430 437L600 520M430 437L170 640" stroke="#efebcf" strokeWidth="12" fill="none" />
               <path d="M0 400Q100 395 125 450T110 640" fill="none" stroke="#809f95" strokeWidth="17" />
 
-              <g className="ra-orbit-track" aria-hidden>
-                <path d="M80 120C180 40 420 40 540 130" fill="none" stroke="#56745c33" strokeWidth="1.5" strokeDasharray="4 8" />
-              </g>
-
+              <path className="ra-orbit-track" d="M70 145C175 48 425 42 545 140" fill="none" stroke="#5f7a5633" strokeWidth="1.5" strokeDasharray="3 7" />
               <g className="ra-sat-flight">
-                <path className="ra-sat-beam" d="M0 18L-28 170L28 170Z" fill="url(#beam)" />
+                <animateMotion dur="11s" repeatCount="indefinite" rotate="auto" path="M70 145C175 48 425 42 545 140" />
+                <path className="ra-sat-beam" d="M0 10 L-36 155 L36 155 Z" fill="url(#beam)" />
                 <g className="ra-sat-body">
-                  <rect x="-18" y="-8" width="14" height="16" rx="2" fill="#5f7d58" />
-                  <rect x="4" y="-8" width="14" height="16" rx="2" fill="#5f7d58" />
-                  <rect x="-6" y="-10" width="12" height="20" rx="3" fill="#49694d" />
-                  <circle cx="0" cy="0" r="3" fill="#dce8c8" />
-                  <path d="M-22 -2H-18M18 -2H22" stroke="#76906a" strokeWidth="2" />
+                  <rect x="-26" y="-7" width="18" height="14" rx="2" fill="#6d8a5f" />
+                  <rect x="8" y="-7" width="18" height="14" rx="2" fill="#6d8a5f" />
+                  <rect x="-9" y="-12" width="18" height="24" rx="4" fill="#3f5f44" />
+                  <rect x="-5" y="-7" width="10" height="8" rx="1.5" fill="#c9d9b4" />
+                  <circle cx="0" cy="8" r="2.5" fill="#e8f0d8" />
+                  <path d="M-30 -1 h4 M26 -1 h4" stroke="#8aa576" strokeWidth="2.5" strokeLinecap="round" />
                 </g>
               </g>
-
-              <path className="ra-signal-pulse" d="M442 151L340 330" stroke="#76906a" strokeDasharray="5 7" opacity=".45" />
-              <path className="ra-signal-pulse ra-signal-delay" d="M451 155L500 350" stroke="#76906a" strokeDasharray="5 7" opacity=".45" />
-              <text x="30" y="608" fontSize="11" fill="#eff3dc" letterSpacing="2">
+              <text x="30" y="608" fontSize="11" fill="#eff3dc" letterSpacing="2.2" className="ra-landscape-caption">
                 A GLOBAL PERSPECTIVE. A LOCAL DECISION.
               </text>
             </svg>
