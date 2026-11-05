@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { ArrowRight, ArrowUpRight, Globe2, Leaf, Satellite, Sprout, Wheat } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Globe2, Leaf, Satellite, Wheat } from 'lucide-react';
+import BrandMark from './brand-mark';
 
 const ORBIT_PATH = 'M70 145C175 48 425 42 545 140';
 
@@ -52,9 +53,7 @@ export default function Landing() {
     <div className="ra-app ra-landing">
       <header className="ra-landing-header">
         <a href="/" className="ra-brand">
-          <span className="ra-brand-icon">
-            <Sprout size={28} />
-          </span>
+          <BrandMark size={46} />
           <span>
             rotation<span className="ra-brand-light">atlas</span>
             <small>ROOTED IN EARTH. INFORMED BY SPACE.</small>

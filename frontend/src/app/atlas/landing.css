@@ -6,10 +6,14 @@
   font-family:var(--ra-sans);
 }
 .ra-landing>header,.ra-landing-header{height:108px;max-width:1400px;margin:auto;padding:0 55px;display:flex;align-items:center;justify-content:space-between;gap:30px}
-.ra-landing .ra-brand{color:#2b4734;font-size:27px;font-family:var(--ra-display);font-weight:620;letter-spacing:-.04em}
-.ra-landing .ra-brand-light{color:#6f8555;font-weight:450}
-.ra-landing .ra-brand small{color:#7b896a;font-size:7.5px;letter-spacing:.18em;font-family:var(--ra-sans);font-weight:600}
-.ra-landing .ra-brand-icon{color:#5d794b;border-color:#c9d4ba;width:46px;height:46px;border-radius:13px}
+.ra-landing .ra-brand{color:#2a3d30;font-size:27px;font-family:var(--ra-display);font-weight:650;letter-spacing:-.035em}
+.ra-landing .ra-brand-light{color:#6d8558;font-weight:500}
+.ra-landing .ra-brand small{color:#8a9480;font-size:7.5px;letter-spacing:.16em;font-family:var(--ra-sans);font-weight:600}
+.ra-landing .ra-brand-icon{
+  width:46px;height:46px;border-radius:13px;border:1.5px solid #d5d8c8;color:#6a8454;background:transparent;
+  display:grid;place-items:center;overflow:hidden;
+}
+.ra-landing .ra-brand-icon svg{display:block}
 .ra-landing nav{display:flex;gap:32px;font-size:14px;color:#6e7e60;font-weight:550}
 .ra-landing nav a{position:relative;transition:color .25s ease}
 .ra-landing nav a:hover{color:#314f38}
@@ -151,7 +155,7 @@
 
 @media(prefers-reduced-motion:reduce){
   .ra-landing .ra-anim,.ra-landing .ra-reveal,.ra-landing .ra-sun,.ra-landing .ra-field-rise,.ra-landing .ra-sat-beam,.ra-landing .ra-landscape-card,.ra-landing .ra-eyebrow-sat,.ra-landing .ra-proof-sat,.ra-landing-bottom:before,.ra-landing-bottom:after{animation:none!important;transition:none!important;opacity:1!important}
-  .ra-landing .ra-sat-flight animateMotion{display:none}
+  .ra-landing .ra-sat-flight animateMotion,.ra-landing .ra-logo-sat animateMotion{display:none}
   .ra-landing .ra-sat-flight{transform:translate(70px,145px)}
   .ra-button-motion:hover,.ra-step-card:hover,.ra-step-card:hover>span>svg{transform:none}
 }
