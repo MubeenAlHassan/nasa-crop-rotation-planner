@@ -27,9 +27,6 @@ const steps = [
 export default function Landing() {
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      document.querySelectorAll('.ra-sat-flight animateMotion').forEach((node) => node.remove());
-    }
     const nodes = Array.from(document.querySelectorAll<HTMLElement>('.ra-reveal'));
     if (!nodes.length) return;
     if (reduce) {
@@ -132,8 +129,7 @@ export default function Landing() {
 
               <path className="ra-orbit-track" d="M70 145C175 48 425 42 545 140" fill="none" stroke="#5f7a5633" strokeWidth="1.5" strokeDasharray="3 7" />
               <g className="ra-sat-flight">
-                <animateMotion dur="11s" repeatCount="indefinite" rotate="auto" path="M70 145C175 48 425 42 545 140" />
-                <path className="ra-sat-beam" d="M0 10 L-36 155 L36 155 Z" fill="url(#beam)" />
+                <path className="ra-sat-beam" d="M0 12 L-34 150 L34 150 Z" fill="url(#beam)" />
                 <g className="ra-sat-body">
                   <rect x="-26" y="-7" width="18" height="14" rx="2" fill="#6d8a5f" />
                   <rect x="8" y="-7" width="18" height="14" rx="2" fill="#6d8a5f" />
