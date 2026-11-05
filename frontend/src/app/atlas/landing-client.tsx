@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { ArrowRight, ArrowUpRight, Globe2, Leaf, Satellite, Sprout, Wheat } from 'lucide-react';
 
+const ORBIT_PATH = 'M70 145C175 48 425 42 545 140';
+
 const steps = [
   {
     icon: Globe2,
@@ -28,7 +30,6 @@ export default function Landing() {
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const nodes = Array.from(document.querySelectorAll<HTMLElement>('.ra-reveal'));
-    if (!nodes.length) return;
     if (reduce) {
       nodes.forEach((node) => node.classList.add('ra-revealed'));
       return;
@@ -127,8 +128,26 @@ export default function Landing() {
               <path d="M225 310L430 437L600 520M430 437L170 640" stroke="#efebcf" strokeWidth="12" fill="none" />
               <path d="M0 400Q100 395 125 450T110 640" fill="none" stroke="#809f95" strokeWidth="17" />
 
-              <path className="ra-orbit-track" d="M70 145C175 48 425 42 545 140" fill="none" stroke="#5f7a5633" strokeWidth="1.5" strokeDasharray="3 7" />
+              <path
+                id="ra-orbit-path"
+                className="ra-orbit-track"
+                d={ORBIT_PATH}
+                fill="none"
+                stroke="#5f7a5633"
+                strokeWidth="1.5"
+                strokeDasharray="3 7"
+              />
               <g className="ra-sat-flight">
+                <animateMotion
+                  dur="16s"
+                  repeatCount="indefinite"
+                  rotate="0"
+                  path={ORBIT_PATH}
+                  keyPoints="0;1;0"
+                  keyTimes="0;0.5;1"
+                  calcMode="spline"
+                  keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
+                />
                 <path className="ra-sat-beam" d="M0 12 L-34 150 L34 150 Z" fill="url(#beam)" />
                 <g className="ra-sat-body">
                   <rect x="-26" y="-7" width="18" height="14" rx="2" fill="#6d8a5f" />
