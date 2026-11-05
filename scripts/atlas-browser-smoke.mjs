@@ -34,7 +34,7 @@ try{
  await click('Find the turning points');await until(`document.querySelectorAll('.ra-sweep-track > div').length===11`);
  await click('Save decision');await until(`localStorage.getItem('rotation-atlas-decision-v1')!==null`);
  if(serverMode){await until(`JSON.parse(localStorage.getItem('rotation-atlas-decision-v1')).pending===false`);const saved=await evaluate(`fetch('/api/atlas/decisions',{headers:{'X-Atlas-Device':localStorage.getItem('rotation-atlas-device')}}).then(r=>r.json())`);if(saved.request.field.baseline!=='maize-soybean')throw Error('Server did not persist decision');}
- await call('Page.setDownloadBehavior',{behavior:'allow',downloadPath:artifacts});await click('Export report');
+ await call('Page.setDownloadBehavior',{behavior:'allow',downloadPath:artifacts});await click('Export report');await until(`document.querySelector('.ra-export-menu')!==null`);await click('JSON');
  await pause(300);const report=JSON.parse(await readFile(path.join(artifacts,'rotation-atlas-decision.json'),'utf8'));if(report.result.strategies.length!==4||report.result.sensitivity.tested!==34)throw Error('Incomplete report export');
  shot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(artifacts,'atlas-comparison.png'),Buffer.from(shot.data,'base64'));
  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await pause(200);
