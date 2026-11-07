@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Check, ChevronRight, CircleHelp, CloudRain, Download, Droplets, ExternalLink, FileText, Globe2, Layers, Leaf, MapPin, Menu, RotateCcw, Satellite, Settings2, ShieldCheck, SlidersHorizontal, Sprout, TrendingUp, Wheat, Wifi, WifiOff, X } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, ChevronRight, CircleHelp, CloudRain, Download, Droplets, ExternalLink, FileText, Layers, Leaf, MapPin, Menu, RotateCcw, Satellite, Settings2, ShieldCheck, SlidersHorizontal, Sprout, TrendingUp, Wheat, Wifi, WifiOff, X } from 'lucide-react';
 import { ASSUMPTIONS, CROPS, DEFAULT_REQUEST, MODEL_VERSION, SOURCES, STRATEGIES } from '@/lib/atlas/catalog';
 import { compare, sensitivity, validateRequest } from '@/lib/atlas/engine';
 import type { EvidenceSeries, ScenarioRequest, SensitivityResult, StrategyId, StrategyResult } from '@/lib/atlas/types';
@@ -48,10 +48,31 @@ export default function Atlas() {
   const chooseTab=(t:typeof tab)=>{setTab(t);setMenu(false);};
   return <div className="ra-app">
     <a href="#atlas-main" className="ra-skip">Skip to workspace</a>
-    <aside className={`ra-sidebar ${menu?'ra-sidebar-open':''}`}><a className="ra-brand" href="/"><span className="ra-brand-icon"><Sprout size={25}/></span><span>rotation<span className="ra-brand-light">atlas</span><small>ROOTED IN EARTH. INFORMED BY SPACE.</small></span></a><button className="ra-mobile-close" aria-label="Close navigation" onClick={()=>setMenu(false)}><X/></button>
+    <aside className={`ra-sidebar ${menu?'ra-sidebar-open':''}`}><a className="ra-brand" href="/"><span className="ra-brand-icon"><Sprout size={25}/></span><span className="ra-brand-copy"><span className="ra-brand-name">rotation<span className="ra-brand-light">atlas</span></span><small><span>ROOTED IN EARTH.</span> <span>INFORMED BY SPACE.</span></small></span></a><button className="ra-mobile-close" aria-label="Close navigation" onClick={()=>setMenu(false)}><X/></button>
       <div className="ra-workspace-label">YOUR WORKSPACE</div><nav aria-label="Workspace"><button className={tab==='overview'?'active':''} onClick={()=>chooseTab('overview')}><Layers size={18}/>Field overview<ChevronRight size={15}/></button><button className={tab==='compare'?'active':''} onClick={()=>chooseTab('compare')}><Wheat size={18}/>Compare rotations<small>4</small></button><button className={tab==='evidence'?'active':''} onClick={()=>chooseTab('evidence')}><Satellite size={18}/>Evidence & method</button></nav>
       <div className="ra-sidebar-field"><MapPin size={17}/><span>Prairie Creek<small>Iowa, United States · illustrative</small></span></div><button className="ra-sidebar-settings" onClick={()=>setSettings(true)}><Settings2 size={16}/>Farm assumptions<ArrowUpRight size={14}/></button>
-      <div className="ra-sidebar-bottom"><div className="ra-orbit"><Globe2 size={28}/><span/></div><h3>A global perspective.<br/>A local decision.</h3><p>Historical NASA weather, interpreted with your priorities.</p><div className="ra-sidebar-status"><span className="ra-dot"/>{data?'2013–2024 evidence loaded':'Loading evidence package'}</div><small>Research prototype · {MODEL_VERSION}</small></div>
+      <div className="ra-sidebar-bottom"><div className="ra-orbit" aria-hidden="true">
+        <svg viewBox="0 0 88 76" fill="none" focusable="false">
+          <defs>
+            <radialGradient id="ra-earth-light" cx="30%" cy="25%" r="85%"><stop stopColor="#41694d"/><stop offset="1" stopColor="#203d31"/></radialGradient>
+            <clipPath id="ra-orbit-near-side" clipPathUnits="userSpaceOnUse"><rect x="0" y="38" width="88" height="38"/></clipPath>
+            <g id="ra-satellite-mark"><circle r="5" fill="#203d31" stroke="currentColor" strokeOpacity=".3"/><circle r="2.25" fill="#e0eac7"/></g>
+          </defs>
+          <circle className="ra-orbit-halo" cx="44" cy="38" r="28" stroke="currentColor" strokeOpacity=".12"/>
+          <ellipse cx="44" cy="38" rx="39" ry="12" transform="rotate(-25 44 38)" stroke="currentColor" strokeOpacity=".3"/>
+          {/* The globe occludes the satellite on the far half of its orbit. */}
+          <g transform="rotate(-25 44 38)"><g className="ra-orbit-satellite"><use href="#ra-satellite-mark"/></g></g>
+          <circle cx="44" cy="38" r="21" fill="url(#ra-earth-light)" stroke="currentColor" strokeOpacity=".8"/>
+          <path d="m30 24 7-3 5 2 1 5-4 3-1 5-5 1-4-5-3-1M36 39l6 1 4 5-2 7-4 5-3-6 1-5-4-3Zm15-19-3 5 3 5 6 1 3 5-3 3-5-2-3 4 2 7 6 2 5-7 2-7-3-9" fill="currentColor" fillOpacity=".7"/>
+          <path d="M28 49c7 6 20 7 31-2" stroke="currentColor" strokeOpacity=".15" strokeLinecap="round"/>
+          <path d="M5 38a39 12 0 0 0 78 0" transform="rotate(-25 44 38)" stroke="currentColor" strokeOpacity=".75" strokeLinecap="round"/>
+          {/* Only the near half is painted over the globe, in sync with the rear copy. */}
+          <g transform="rotate(-25 44 38)">
+            <g clipPath="url(#ra-orbit-near-side)"><g className="ra-orbit-satellite"><use href="#ra-satellite-mark"/></g></g>
+          </g>
+          <path d="M13 16v6m-3-3h6" stroke="currentColor" strokeOpacity=".45" strokeLinecap="round"/>
+        </svg>
+      </div><h3>A global perspective.<br/>A local decision.</h3><p>Historical NASA weather, interpreted with your priorities.</p><div className="ra-sidebar-status"><span className="ra-dot"/>{data?'2013–2024 evidence loaded':'Loading evidence package'}</div><small>Research prototype · {MODEL_VERSION}</small></div>
     </aside>
     <div className="ra-workspace"><header className="ra-topbar"><button className="ra-mobile-menu" aria-label="Open navigation" onClick={()=>setMenu(true)}><Menu/></button><div className="ra-breadcrumb">MY WORKSPACE <ChevronRight size={12}/> <span>IOWA DEMO</span></div><div className="ra-top-actions"><span className="ra-connection">{online?<Wifi size={14}/>:<WifiOff size={14}/>} {online?(offlineReady?'Offline pack ready':'Online'):'Offline mode'}</span><button className="ra-button ra-button-outline" onClick={exportReport} disabled={!result}><Download size={15}/><span>Export report</span></button><button className="ra-button ra-button-primary" onClick={save}><Check size={15}/>Save decision</button></div></header>
       <main id="atlas-main" className="ra-main"><div className="ra-heading ra-panel-in"><div><p className="ra-eyebrow"><span/> YOUR NEXT SEASON, IN PERSPECTIVE</p><h1>{tab==='overview'?<>Good rotations start<br/>with a clearer picture.</>:tab==='compare'?<>Four paths.<br/>One informed decision.</>:<>Every insight has<br/>a place to start.</>}</h1><p className="ra-intro">{tab==='overview'?'Understand your field. Explore the tradeoffs. Find a rotation that fits.':tab==='compare'?'Same field. Same historical weather. Different possibilities for your farm.':'See what was observed, what was modeled, and what still needs a local answer.'}</p></div><div className="ra-field-pill"><MapPin size={16}/><div>{request.field.name}<small>Maize–soybean baseline · rain{request.field.irrigation?'-supplemented':'fed'}</small></div><button aria-label="Edit farm assumptions" onClick={()=>setSettings(true)}><Settings2 size={17}/></button></div></div>
