@@ -1759,3 +1759,54 @@ to {
 .ra-card, .ra-evidence, .ra-evidence > *, .ra-overview-grid > *,
 .ra-bottom-grid > *, .ra-active-detail > *, .ra-explorer > * { min-width: 0; }
 .ra-evidence-feature { flex-wrap: wrap; }
+
+/* Redundant labels and patterns keep chart meaning available without color. */
+.ra-chart-data { margin-top: var(--ra-space-4); font-size: var(--ra-text-label); }
+.ra-chart-data summary { cursor: pointer; padding: var(--ra-space-2) 0; min-height: 44px; }
+.ra-chart-data table { border-collapse: collapse; width: 100%; }
+.ra-chart-data caption { text-align: left; padding: var(--ra-space-2) 0; color: var(--ra-muted); }
+.ra-chart-data th, .ra-chart-data td { text-align: left; vertical-align: top; padding: var(--ra-space-2); border-bottom: 1px solid var(--ra-line); }
+.ra-chart-data th { font-weight: 600; }
+.ra-chart-bar-pair .ra-pattern-hatch, .ra-scenario-key {
+  background-image: repeating-linear-gradient(135deg, transparent 0 3px, rgb(255 255 255 / 80%) 3px 4px);
+}
+.ra-legend .ra-historical-key { background-color: #6b7c62; width: 12px; height: 12px; }
+.ra-legend .ra-scenario-key { background-color: #56755a; width: 12px; height: 12px; }
+.ra-sweep-track > div { min-width: 88px; flex-basis: 88px; height: auto; min-height: 80px; padding: var(--ra-space-2); }
+.ra-sweep-track > div > span { display: grid; gap: var(--ra-space-1); }
+.ra-sweep-track > div > span > span { font-size: var(--ra-text-label); line-height: 1.3; }
+.ra-season-body { flex: 1; min-width: 0; }
+.ra-season-labels { display: flex; flex-wrap: wrap; gap: var(--ra-space-2); margin-top: var(--ra-space-2); font-size: var(--ra-text-label); }
+.ra-season-labels > span { border-left: 2px solid var(--ra-outline); padding-left: var(--ra-space-2); }
+.ra-season-track > span[class*="ra-crop-pattern-"] { background-image: repeating-linear-gradient(var(--ra-pattern-angle, 45deg), transparent 0 var(--ra-pattern-gap, 4px), rgb(255 255 255 / 75%) var(--ra-pattern-gap, 4px) calc(var(--ra-pattern-gap, 4px) + 1px)); }
+.ra-crop-pattern-maize { --ra-pattern-angle: 0deg; }
+.ra-crop-pattern-soybean { --ra-pattern-angle: 90deg; }
+.ra-crop-pattern-wheat { --ra-pattern-angle: 45deg; }
+.ra-crop-pattern-oats { --ra-pattern-angle: 135deg; }
+.ra-crop-pattern-alfalfa { --ra-pattern-angle: 0deg; --ra-pattern-gap: 2px; }
+.ra-crop-pattern-rye { --ra-pattern-angle: 90deg; --ra-pattern-gap: 2px; }
+.ra-crop-pattern-clover { --ra-pattern-angle: 45deg; --ra-pattern-gap: 2px; }
+.ra-selection-label { display: inline-flex; align-items: center; gap: var(--ra-space-1); font-size: var(--ra-text-label); margin-bottom: var(--ra-space-2); }
+@media (max-width: 480px) { .ra-season-body { flex-basis: 100%; } }
+
+@media (forced-colors: active) {
+  /* Keep the user's palette. Shadows and CSS pattern fills may be suppressed. */
+  .ra-app .ra-button, .ra-app .ra-strategy, .ra-app .ra-sidebar nav button,
+  .ra-app .ra-map-tools button, .ra-app input, .ra-app select {
+    border: 1px solid ButtonText !important;
+  }
+  .ra-app .ra-strategy.ra-selected, .ra-app .ra-sidebar nav button.active {
+    border: 3px double Highlight !important;
+    outline: none;
+  }
+  .ra-app :focus-visible, .ra-app .ra-strategy:focus-visible {
+    outline: 2px dashed Highlight !important;
+    outline-offset: 4px;
+    box-shadow: none !important;
+  }
+  .ra-chart-bar-pair span { border: 1px solid CanvasText; background: Canvas !important; }
+  .ra-chart-bar-pair span + span { border: 2px dashed CanvasText; }
+  .ra-sweep-track > div, .ra-season-track { border: 1px solid CanvasText; }
+  .ra-sweep-track > div::before { display: none; }
+  .ra-season-labels > span { border-color: CanvasText; }
+}
