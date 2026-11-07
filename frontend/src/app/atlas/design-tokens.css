@@ -1,0 +1,42 @@
+/* Shared by Next and the standalone/offline bundle; no Tailwind runtime required. */
+:root {
+  --ra-sans: var(--font-sans, "Source Sans 3"), Arial, sans-serif;
+  /* 16px base × 1.25ⁿ. Rem values respect the browser's preferred font size. */
+  --ra-text-label: .8rem;
+  --ra-text-body: 1rem;
+  --ra-text-title: 1.25rem;
+  --ra-text-heading: 1.5625rem;
+  --ra-text-section: 1.953125rem;
+  --ra-text-display: 2.44140625rem;
+  --ra-text-hero: 3.0517578125rem;
+  --ra-text-hero-lg: 3.8146972656rem;
+  --ra-text-hero-xl: 4.768371582rem;
+  --ra-space-1: 4px;
+  --ra-space-2: 8px;
+  --ra-space-3: 12px;
+  --ra-space-4: 16px;
+  --ra-space-5: 20px;
+  --ra-space-6: 24px;
+  --ra-space-7: 28px;
+  --ra-space-8: 32px;
+  --ra-space-10: 40px;
+  --ra-space-12: 48px;
+  --ra-space-14: 56px;
+  --ra-space-16: 64px;
+  --ra-space-18: 72px;
+  --ra-space-20: 80px;
+  --ra-paper: #f6f5ef;
+  --ra-ink: #243b30;
+  --ra-muted: #56664f;
+  --ra-green: #365b40;
+  /* Alpha dividers adapt to their surface; controls use the stronger outline. */
+  --ra-line: rgb(36 59 48 / 14%);
+  --ra-outline: rgb(36 59 48 / 62%);
+  --ra-radius-sm: 4px;
+  --ra-radius-md: 8px;
+  --ra-radius-lg: 16px;
+  --ra-radius-xl: 24px;
+  /* Green-tinted contact + ambient layers avoid a hard floating edge. */
+  --ra-shadow-raised: 0 2px 4px rgb(36 59 48 / 5%), 0 12px 32px rgb(36 59 48 / 9%);
+  --ra-shadow-floating: 0 4px 8px rgb(36 59 48 / 7%), 0 24px 56px rgb(36 59 48 / 13%);
+}

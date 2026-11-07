@@ -143,7 +143,8 @@ export default function Landing() {
                   <path d="M-30 -1 h4 M26 -1 h4" stroke="#8aa576" strokeWidth="2.5" strokeLinecap="round" />
                 </g>
               </g>
-              <text x="30" y="608" fontSize="11" fill="#eff3dc" letterSpacing="2.2" className="ra-landscape-caption">
+              <rect x="16" y="584" width="568" height="40" rx="8" fill="#f6f5ef" />
+              <text x="30" y="608" fontSize="12.8" fill="#243b30" letterSpacing=".8" className="ra-landscape-caption">
                 A GLOBAL PERSPECTIVE. A LOCAL DECISION.
               </text>
             </svg>
