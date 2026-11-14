@@ -33,6 +33,6 @@ Use one clearly labeled demonstration before a real field: select and verify bou
 
 ## Implementable now versus external dependencies
 
-Code work: evidence-linked per-strategy rationale with explicit provenance and uncertainty; editable reviewed local enterprise inputs; evaluation dataset/version contracts and abstention reporting; production security/recovery controls. These are remaining tasks, not authorized architectural expansion in this audit.
+Code work: evidence-linked per-strategy rationale (**delivered** — `strategy-rationale-v1`); editable reviewed local enterprise inputs (**delivered** — `enterprise-inputs-v1`); evaluation dataset/version contracts and abstention reporting; production security/recovery controls. Remaining code items are not authorized architectural expansion beyond the handoff priority list. G0–G5 still require people, instruments and seasons.
 
 External work: participating farms and consent, adviser review, soil labs, instruments/maintenance, dated labels, usability participants, alternative-rotation trials and additional seasons. No software test can substitute for these. A supervised pilot may proceed for exploration with clear assumptions; quantitative farm decisions must retain local expert authority and pass the relevant gates above.

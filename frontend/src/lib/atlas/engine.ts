@@ -1,7 +1,15 @@
-import { ASSUMPTIONS, CROPS, DEFAULT_REQUEST, MODEL_VERSION, NORMALIZATION, STRATEGIES, WEATHER_BLOCKS } from './catalog';
+import { ASSUMPTIONS, CROPS, DEFAULT_ENTERPRISE, DEFAULT_REQUEST, MODEL_VERSION, NORMALIZATION, STRATEGIES, WEATHER_BLOCKS } from './catalog';
 import { average as mean, scoreStrategies } from './scoring';
 import { validateHistory } from './history';
+import { attachStrategyRationales } from './strategy-rationale';
 import type { ComparisonResult, ConstraintCheck, CropId, DailyResult, EvidenceSeries, MemberResult, ScenarioRequest, SensitivityPoint, SensitivityResult, StrategyId, StrategyResult, WeatherDay, YearResult } from './types';
+/** Resolve catalog defaults with optional farmer enterprise overrides. Null fields keep the catalog value. */
+export function resolveCropEconomics(crop:CropId,request:ScenarioRequest):{price:number;cost:number;source:'catalog-default'|'farmer-entry'} {
+  const base=CROPS[crop],over=request.enterprise?.crops?.[crop];
+  const price=over?.price??base.price,cost=over?.cost??base.cost;
+  const touched=over!=null&&(over.price!==null||over.cost!==null);
+  return {price,cost,source:touched||request.enterprise?.source==='farmer-entry'?'farmer-entry':'catalog-default'};
+}
 export { quantile } from './scoring';
 const clamp = (x:number, lo=0, hi=1) => Math.min(hi, Math.max(lo,x));
 const es = (t:number) => 0.6108*Math.exp(17.27*t/(t+237.3));
@@ -57,6 +65,13 @@ export function validateRequest(input:unknown):asserts input is ScenarioRequest 
   if(!r.weights||Object.values(r.weights).length!==3||!['soil','water','economy'].every(k=>bounded(r.weights[k as keyof typeof r.weights],0,10))||Object.values(r.weights).reduce((a,b)=>a+b,0)<=0) throw new Error('Select at least one priority.');
   if(typeof r.showScores!=='boolean'||!r.decision||![null,'defer',...STRATEGIES.map(s=>s.id)].includes(r.decision.selection)||typeof r.decision.notes!=='string'||r.decision.notes.length>3000||typeof r.decision.reviewed!=='boolean') throw new Error('Invalid saved decision.');
   validateHistory(r.history);
+  const e=r.enterprise??DEFAULT_ENTERPRISE;
+  if(e.schemaVersion!=='enterprise-inputs-v1'||!['catalog-default','farmer-entry'].includes(e.source)||typeof e.reviewed!=='boolean'||typeof e.note!=='string'||e.note.length>400||typeof e.crops!=='object'||e.crops===null||!Array.isArray(e.cloverCreditKgN)||e.cloverCreditKgN.length!==2||!bounded(e.cloverCreditKgN[0],0,200)||!bounded(e.cloverCreditKgN[1],0,200)||e.cloverCreditKgN[1]<e.cloverCreditKgN[0]||!bounded(e.nitrogenCreditUsdPerKg,0,10)) throw new Error('Invalid enterprise budget assumptions.');
+  for(const [id,over] of Object.entries(e.crops)){
+    if(!(id in CROPS)||!over||typeof over!=='object') throw new Error('Invalid enterprise crop override.');
+    if(!optional(over.price,0,2000)||!optional(over.cost,0,5000)) throw new Error(`Enterprise ${id} price/cost is outside the supported review range.`);
+  }
+  r.enterprise=e;
 }
 function evidenceProblem(data:EvidenceSeries):string|null {
   if(data.timeStandard!=='UTC'||!Number.isFinite(data.latitude)||!Number.isFinite(data.elevationM))return 'Weather time standard, latitude or elevation is unsupported.';
@@ -126,16 +141,17 @@ export function simulate(data:EvidenceSeries,request:ScenarioRequest,id:Strategy
       const crop=CROPS[y.crop];
       y.yieldT=crop.yieldT*clamp(1-crop.ky*(1-cashActual/Math.max(1,cashDemand)));
       const prior=years.length>1?years[years.length-2].crop:null;
-      if(prior==='wheat'&&id==='diverse') {y.creditLow=45;y.creditHigh=90;}
+      if(prior==='wheat'&&id==='diverse') {y.creditLow=request.enterprise.cloverCreditKgN[0];y.creditHigh=request.enterprise.cloverCreditKgN[1];}
       y.credit=Math.min(crop.fertilizerN,(y.creditLow+y.creditHigh)/2);y.fertilizer=crop.fertilizerN-y.credit;
       y.removal=y.yieldT*crop.removalN;y.fixation=crop.fixation*y.removal*1.25;
       if(id==='diverse'&&y.crop==='wheat') y.fixation+=100;
       if(id==='forage'&&y.crop==='oats') y.fixation+=40;
       const market=y.crop==='alfalfa'?f.forageBuyer:['wheat','oats'].includes(y.crop)?f.smallGrainBuyer:true;
-      y.revenue=market===false?0:y.yieldT*crop.price*request.price/100;
-      y.cost=crop.cost-y.credit*1.17+y.withdrawal*1.5;
-      if(id==='cover'&&y.crop==='maize') y.cost+=CROPS.rye.cost;
-      if(id==='diverse'&&y.crop==='wheat') y.cost+=CROPS.clover.cost;
+      const econ=resolveCropEconomics(y.crop,request);
+      y.revenue=market===false?0:y.yieldT*econ.price*request.price/100;
+      y.cost=econ.cost-y.credit*request.enterprise.nitrogenCreditUsdPerKg+y.withdrawal*1.5;
+      if(id==='cover'&&y.crop==='maize') y.cost+=resolveCropEconomics('rye',request).cost;
+      if(id==='diverse'&&y.crop==='wheat') y.cost+=resolveCropEconomics('clover',request).cost;
       y.margin=y.revenue-y.cost;
     }
     for(let i=0;i<data.weather.length;i++) {
@@ -201,7 +217,8 @@ export function compare(data:EvidenceSeries,request:ScenarioRequest,includeDaily
   for(const s of strategies) {s.delta={margin:s.margin-strategies[0].margin,deficit:s.deficit-strategies[0].deficit,coverDays:s.coverDays-strategies[0].coverDays};if(!includeDaily)s.daily=[];}
   const unknown=strategies.some(s=>s.feasibility==='unknown');
   const preferred=unknown||!request.showScores?null:[...strategies].filter(s=>s.eligible&&!s.dominated).sort((a,b)=>b.match!-a.match!||a.id.localeCompare(b.id))[0]?.id??null;
-  return {...common,status:'ready',strategies,preferred,reviewFlags:unknown?['No overall preference: resolve unknown feasibility, or explicitly mark unsuitable options as failed.']:['Preference scores express your priorities; the farmer chooses.']};
+  // Rationale cites forcing/history only here; satellite enrichment happens in UI/export and never alters scores.
+  return attachStrategyRationales({...common,status:'ready',strategies,preferred,reviewFlags:unknown?['No overall preference: resolve unknown feasibility, or explicitly mark unsuitable options as failed.']:['Preference scores express your priorities; the farmer chooses.']},request,{weather:data});
 }
 export function sensitivity(data:EvidenceSeries,request:ScenarioRequest):SensitivityResult {
   const base=compare(data,request,false),favored:Record<StrategyId,number>={baseline:0,cover:0,diverse:0,forage:0};

@@ -29,6 +29,19 @@ export interface FieldContext {
   residueRetained: boolean; budget: number | null;
   baseline: 'maize-soybean' | 'soybean-maize';
 }
+export interface EnterpriseCropOverride {
+  price: number | null;
+  cost: number | null;
+}
+export interface EnterpriseInputs {
+  schemaVersion: 'enterprise-inputs-v1';
+  source: 'catalog-default' | 'farmer-entry';
+  reviewed: boolean;
+  note: string;
+  crops: Partial<Record<CropId, EnterpriseCropOverride>>;
+  cloverCreditKgN: [number, number];
+  nitrogenCreditUsdPerKg: number;
+}
 export interface ScenarioRequest {
   field: FieldContext;
   horizon: { startYear: 2027; years: 4 };
@@ -39,6 +52,7 @@ export interface ScenarioRequest {
   showScores: boolean;
   decision: { selection: StrategyId | 'defer' | null; notes: string; reviewed: boolean };
   history:FieldHistory;
+  enterprise: EnterpriseInputs;
 }
 export interface Crop { id: CropId; name: string; color: string; family: string; root: number; kc: [number, number, number]; yieldT: number; price: number; cost: number; fertilizerN: number; removalN: number; fixation: number; ky: number; source: string; assumption: string; }
 export interface YearResult { year: number; weatherYear: number; crop: CropId; demand: number; deficit: number; irrigation: number; withdrawal: number; et: number; coverDays: number; sensitiveStressDays: number; heatDays: number; margin: number; revenue: number; cost: number; fertilizer: number; fixation: number; removal: number; credit: number; creditLow: number; creditHigh: number; yieldT: number; }
@@ -54,6 +68,26 @@ export interface MemberResult {
   delta: { deficit: number; coverDays: number; margin: number };
   years: YearResult[]; maxWaterResidual: number;
 }
+export interface StrategyRationale {
+  method: 'strategy-rationale-v1';
+  strategyId: StrategyId;
+  templateBasis: string;
+  question: string;
+  mechanisms: { id: string; title: string; description: string; claimLimit: string }[];
+  observedContext: {
+    id: string;
+    source: 'power-forcing' | 'farmer-history' | 'farmer-management' | 'landsat' | 'seasonal-regional' | 'ecostress' | 'grace' | 'template';
+    role: 'observed-context' | 'withheld' | 'management-assumption';
+    applicability: 'matching' | 'mismatched' | 'unavailable' | 'regional-only' | 'not-used';
+    period: string | null;
+    summary: string;
+    claimLimit: string;
+  }[];
+  contraryOrMissing: string[];
+  localReviewQuestions: string[];
+  projectedBenefitsNote: string;
+  scoringUnaffected: true;
+}
 export interface StrategyResult {
   id: StrategyId; name: string; sequence: string; years: YearResult[]; daily: DailyResult[];
   members: MemberResult[]; objectives: Record<ObjectiveId, DistributionSummary>;
@@ -68,6 +102,7 @@ export interface StrategyResult {
   scoreRange: [number, number] | null;
   delta: { margin: number; deficit: number; coverDays: number };
   unavailable: { soilCarbonChange: null; soilLoss: null; pestReduction: null; probabilityBetter: null };
+  rationale?: StrategyRationale;
 }
 export interface ComparisonResult {
   version: string; status: 'ready' | 'insufficient-information'; reason?: string;

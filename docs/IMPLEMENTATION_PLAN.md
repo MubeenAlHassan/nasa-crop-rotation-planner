@@ -1,6 +1,38 @@
 # Field Shift implementation — updated 14 November 2026
 
 
+## Evidence-linked per-strategy rationale — verified 14 November 2026
+
+**Software acceptance for handoff priority item 2 delivered.** Scoring, forcing and
+satellite acquisition unchanged. No farmer validation or production claim.
+
+- [x] Added `frontend/src/lib/atlas/strategy-rationale.ts` (`strategy-rationale-v1`).
+  Each strategy receives template disclosure, agronomic mechanisms with claim
+  limits, observed-context citations, contrary/missing evidence and local-review
+  questions. Projected benefits are explicitly labeled unvalidated.
+- [x] `compare()` attaches forcing/history rationale; UI and export enrich with
+  Landsat, seasonal, ECOSTRESS and GRACE packages when loaded. Mismatched
+  boundary history, Landsat and ECOSTRESS are withheld from cited context;
+  unavailable packages are listed under contrary/missing evidence.
+- [x] Inspect panel shows rationale for the active strategy; export JSON includes
+  enriched `result.strategies[].rationale` and `comparisonBasis.rationaleMethod`.
+
+## Reviewed local enterprise inputs — verified 14 November 2026
+
+**Software acceptance for handoff priority item 3 delivered.** No market quotes
+invented; catalog defaults remain labeled unvalidated.
+
+- [x] `enterprise-inputs-v1` on `ScenarioRequest`: per-crop price/cost overrides,
+  clover N-credit range, N credit USD/kg, review flag and note.
+- [x] Engine resolves overrides via `resolveCropEconomics`; water/cover objectives
+  unchanged when only economic inputs change.
+- [x] Farm assumptions UI section 4 edits and labels source; save/load migrates
+  missing enterprise without inventing `reviewed: true`.
+- [x] Verification: `enterprise.test.ts` + storage migration; full frontend suite
+  **109 tests / 21 files**; `tsc --noEmit` and eslint on touched files passed.
+
+Remaining: G0–G5 external gates (people, measurements, seasons, production ops).
+
 ## March–November 2024 seasonal milestone — verified 14 November 2026
 
 **Acquisition complete; processing/replay complete; application integration verified.**
@@ -729,9 +761,10 @@ Verification completed this audit:
 Actual scientific limitations remain: nearest-pilot L3 0/550 accepted retrieval slots; June ECOSTRESS LST usable on June 11 and June 23 (two of 17 granules), June ET/ESI withheld. These are not local calibration results. Seasonal acquisition/software integration is complete; scientific validation is not.
 
 Prioritized unfinished acceptance criteria:
-1. Evidence-linked strategy rationale: each suggested alternative must identify relevant dated support, management assumptions, counter-evidence and local-review questions. Currently templates are fixed; satellite history is exploration only. Do not claim locally feasible alternatives before hard constraints are confirmed.
-2. Supervised participating-farm pilot: consented boundary/history/soil/market inputs and farmer/adviser task completion/comprehension evidence meeting G0/G3 in the validation plan. Current UI tests are not usability research.
-3. Detection and quantitative validation: independent crop/residue labels and held-out field/season evaluation (G1/G2/G4); calibrated hydrology/yield/economic error and interval coverage with counterfactual limitations. Until then withhold automatic bare soil, stress diagnosis, protective-cover measurement, causal rotation benefits and calibrated predictive probabilities.
-4. Production controls: G5 authorization, privacy, durable storage, recovery, monitoring and operational owner. Passing build/tests does not satisfy this gate.
+1. ~~Evidence-linked strategy rationale (software)~~ — delivered 14 Nov 2026 via `strategy-rationale-v1`.
+2. ~~Usable reviewed local enterprise inputs (software)~~ — delivered 14 Nov 2026 via `enterprise-inputs-v1`. Human-validated quotes still required for G0.
+3. Supervised participating-farm pilot: consented boundary/history/soil/market inputs and farmer/adviser task completion/comprehension evidence meeting G0/G3 in the validation plan. Current UI tests are not usability research.
+4. Detection and quantitative validation: independent crop/residue labels and held-out field/season evaluation (G1/G2/G4); calibrated hydrology/yield/economic error and interval coverage with counterfactual limitations. Until then withhold automatic bare soil, stress diagnosis, protective-cover measurement, causal rotation benefits and calibrated predictive probabilities.
+5. Production controls: G5 authorization, privacy, durable storage, recovery, monitoring and operational owner. Passing build/tests does not satisfy this gate.
 
 Ready for a clearly labeled local demonstration and facilitated exploratory pilot with the above limitations. Not ready for quantitative farm reliance or production. No new external access blocker was encountered; remaining blockers are validation evidence and operational controls, not authenticated data download.
