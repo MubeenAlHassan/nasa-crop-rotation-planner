@@ -3,14 +3,30 @@
 Optional environment: pip install earthaccess rasterio shapely pyarrow h5py
 Example:
  python backend/atlas/earthdata_capture.py --product hls --start 2024-06-01 --end 2024-06-15 --out /tmp/hls
-Uses existing Earthdata netrc/environment authentication; never stores tokens here.
+Loads a repository-root .env into the process when those variables are unset.
+Never prints or stores credentials.
 """
 import argparse
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 PRODUCTS={'smap':('SPL3SMP_E','006'),'hls':('HLSL30','2.0'),'ecostress':('ECO_L2T_LSTE','003'),'imerg':('GPM_3IMERGHH','07')}
+def load_project_env() -> None:
+    env_path=Path(__file__).resolve().parents[2]/'.env'
+    if not env_path.is_file():
+        return
+    for raw in env_path.read_text(encoding='utf-8').splitlines():
+        line=raw.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key,value=line.split('=',1)
+        key,value=key.strip(),value.strip()
+        if len(value)>=2 and value[0]==value[-1] and value[0] in {'"',"'"}:
+            value=value[1:-1]
+        if key and key not in os.environ:
+            os.environ[key]=value
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--product',choices=PRODUCTS,required=True)
@@ -20,6 +36,7 @@ def main():
     parser.add_argument('--limit',type=int,default=8)
     args=parser.parse_args()
     if not 1<=args.limit<=100: parser.error('Use a limit between 1 and 100.')
+    load_project_env()
     import earthaccess
     auth=earthaccess.login(strategy='environment')
     if not auth.authenticated: auth=earthaccess.login(strategy='netrc')
