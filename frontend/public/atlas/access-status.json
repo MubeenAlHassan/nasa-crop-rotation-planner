@@ -1,0 +1,581 @@
+{
+  "checkedAt": "2026-11-08",
+  "documentation": "https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html",
+  "credentialSetup": "See backend/atlas/EARTHDATA_SETUP.md; setup remains outside the web application.",
+  "products": [
+    {
+      "id": "smap-surface",
+      "requestedShortName": "SPL3SMP_E",
+      "requestedVersion": "006",
+      "status": "catalog-verified-file-pending",
+      "collections": [
+        {
+          "id": "C2938664763-NSIDC_CPRD",
+          "title": "SMAP Enhanced L3 Radiometer Global and Polar Grid Daily 9 km EASE-Grid Soil Moisture V006",
+          "version": "006",
+          "timeStart": "2015-03-31T00:00:00.000Z",
+          "timeEnd": null,
+          "links": [
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://search.earthdata.nasa.gov/search/granules?p=C2938664763-NSIDC_CPRD"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2938664763-NSIDC_CPRD"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/data/data-access-tool/SPL3SMP_E/versions/6/"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://appeears.earthdatacloud.nasa.gov/"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://earthaccess.readthedocs.io/en/stable/"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://worldview.earthdata.nasa.gov/?v=-196,-79,132,72&l=SMAP_L3_Passive_Enhanced_Night_Soil_Moisture,SMAP_L3_Passive_Enhanced_Day_Soil_Moisture,Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor&t=2015-03-31"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://doi.org/10.5067/M20OXIZHY3RJ"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://doi.org/10.5067/M20OXIZHY3RJ"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/sites/default/files/l2_sm_p_atbd_rev_g_final_oct2021_0.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/sites/default/files/d5629220smap20l3_sm_p_e20psd_version2050_final.pdf"
+            }
+          ]
+        }
+      ],
+      "representativeFileChecked": false,
+      "numericOutputsEnabled": false
+    },
+    {
+      "id": "smap-rootzone",
+      "requestedShortName": "SPL4SMGP",
+      "requestedVersion": "008",
+      "status": "catalog-verified-file-pending",
+      "collections": [
+        {
+          "id": "C3480440870-NSIDC_CPRD",
+          "title": "SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data V008",
+          "version": "008",
+          "timeStart": "2015-03-31T00:00:00.000Z",
+          "timeEnd": null,
+          "links": [
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://search.earthdata.nasa.gov/search/granules?p=C3480440870-NSIDC_CPRD"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C3480440870-NSIDC_CPRD"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/data/data-access-tool/SPL4SMGP/versions/8/"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://appeears.earthdatacloud.nasa.gov/"
+            },
+            {
+              "length": "0.0KB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://earthaccess.readthedocs.io/en/stable/"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://worldview.earthdata.nasa.gov/?v=-203.53279034494884,2.987241956863528,1.560533905732342,102.54974195686353&l=SMAP_L4_Snow_Mass,Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor&lg=true&t=2025-09-03-T19%3A07%3A19Z"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://doi.org/10.5067/T5RUATAQREF8"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://doi.org/10.5067/T5RUATAQREF8"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/sites/default/files/documents/user-guide/multi_spl4smau-v008-userguide.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/sites/default/files/documents/technical-reference/smap_l4_sm_psd_v17_for_l4sm_version_8.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://nsidc.org/sites/default/files/272_l4_sm_reva_web_0.pdf"
+            }
+          ]
+        }
+      ],
+      "representativeFileChecked": false,
+      "numericOutputsEnabled": false
+    },
+    {
+      "id": "imerg",
+      "requestedShortName": "GPM_3IMERGHH",
+      "requestedVersion": "07",
+      "status": "catalog-verified-file-pending",
+      "collections": [
+        {
+          "id": "C2723754847-GES_DISC",
+          "title": "GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07 (GPM_3IMERGHH)",
+          "version": "07",
+          "timeStart": "1998-01-01T00:00:00.000Z",
+          "timeEnd": "2025-09-30T23:59:59.999Z",
+          "links": [
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://docserver.gesdisc.eosdis.nasa.gov/public/project/GPM/browse/GPM_3IMERGHH_07.png"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://disc.gsfc.nasa.gov/datacollection/GPM_3IMERGHH_07.html"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2723754847-GES_DISC/temporal"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://giovanni.gsfc.nasa.gov/#dataKeyword=IMERGHH"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/service#",
+              "hreflang": "en-US",
+              "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2723754847-GES_DISC/temporal"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://search.earthdata.nasa.gov/search/granules?p=C2723754847-GES_DISC"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://arthurhou.pps.eosdis.nasa.gov/Documents/IMERG_V07_ATBD_final.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://arthurhou.pps.eosdis.nasa.gov/Documents/IMERG_TechnicalDocumentation_final.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://docserver.gesdisc.eosdis.nasa.gov/public/project/GPM/IMERGV06_QI.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://docserver.gesdisc.eosdis.nasa.gov/public/project/GPM/IMERGV06_TRMMera-caveats.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://gpm1.gesdisc.eosdis.nasa.gov/data/GPM_L3/doc/README.GPM.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://gpm.nasa.gov/resources/documents/imerg-v07-release-notes"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://gpmweb2https.pps.eosdis.nasa.gov/tsdis/AB/docs/gpm_anomalous.html"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://gpm.nasa.gov"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://worldview.earthdata.nasa.gov/?z=4&ics=true&ici=5&icd=30&l=Reference_Labels_15m(hidden),Reference_Features_15m(hidden),Coastlines_15m,IMERG_Precipitation_Rate,IMERG_Precipitation_Rate_30min,OCI_PACE_True_Color(hidden),VIIRS_NOAA21_CorrectedReflectance_TrueColor(hidden),VIIRS_NOAA20_CorrectedReflectance_TrueColor(hidden),VIIRS_SNPP_CorrectedReflectance_TrueColor(hidden),MODIS_Aqua_CorrectedReflectance_TrueColor(hidden),MODIS_Terra_CorrectedReflectance_TrueColor&lg=true&t=2026-03-16-T17%3A17%3A59Z"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://journals.ametsoc.org/view/journals/apme/aop/JAMC-D-20-0253.1/JAMC-D-20-0253.1.xml"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://journals.ametsoc.org/doi/full/10.1175/JAM2173.1"
+            }
+          ]
+        }
+      ],
+      "representativeFileChecked": false,
+      "numericOutputsEnabled": false
+    },
+    {
+      "id": "ecostress-lst",
+      "requestedShortName": "ECO_L2T_LSTE",
+      "requestedVersion": "003",
+      "status": "catalog-verified-file-pending",
+      "collections": [
+        {
+          "id": "C3998139651-LPCLOUD",
+          "title": "ECOSTRESS Tiled Land Surface Temperature and Emissivity Instantaneous L2 Global 70 m V003",
+          "version": "003",
+          "timeStart": "2018-07-09T00:00:00.000Z",
+          "timeEnd": null,
+          "links": [
+            {
+              "length": "46.05MB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://search.earthdata.nasa.gov/search/granules?p=C3998139651-LPCLOUD"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://doi.org/10.5067/ECOSTRESS/ECO_L2T_LSTE.003"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://www.earthdata.nasa.gov/centers/lp-daac"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2301/ECOL2_User_Guide_V3.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2235/ECO2_LSTE_ATBD_V1.1.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-public/ECO_L2T_LSTE.003/ECOv003_L2T_LSTE_43167_017_09MZN_20260215T103205_02/ECOv003_L2T_LSTE_43167_017_09MZN_20260215T103205_02.png"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://ecostress.jpl.nasa.gov/science"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/380/ECO2_PSD_V1.pdf"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/nasa/ECOSTRESS-Data-Resources"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2249/obst_all_sort.txt"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2253/qa_20250423-present.txt"
+            }
+          ]
+        }
+      ],
+      "representativeFileChecked": false,
+      "numericOutputsEnabled": false
+    },
+    {
+      "id": "ecostress-et",
+      "requestedShortName": "ECO_L3T_JET",
+      "requestedVersion": "003",
+      "status": "catalog-verified-file-pending",
+      "collections": [
+        {
+          "id": "C4057232489-LPCLOUD",
+          "title": "ECOSTRESS Tiled Evapotranspiration PT-JPL Instantaneous and Daytime L3 Global 70 m v003",
+          "version": "003",
+          "timeStart": "2018-07-09T00:00:00.000Z",
+          "timeEnd": null,
+          "links": [
+            {
+              "length": "33MB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://search.earthdata.nasa.gov/search/granules?p=C4057232489-LPCLOUD"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://doi.org/10.5067/ECOSTRESS/ECO_L3T_JET.003"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://www.earthdata.nasa.gov/centers/lp-daac"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/ECOSTRESS-Collection-3/ECOv003-L3T-L4T-JET/blob/main/documentation/ECOv003_L3_L4_JET_User_Guide.md"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/ECOSTRESS-Collection-3/ECOv003-L3T-L4T-JET/blob/main/documentation/ECOv003_L3_L4_JET_ATBD.md"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-public/ECO_L3T_JET.003/ECOv003_L3T_JET_43165_020_55HFB_20260215T065341_02/ECOv003_L3T_JET_43165_020_55HFB_20260215T065341_02.png"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://ecostress.jpl.nasa.gov/science"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/nasa/ECOSTRESS-Data-Resources"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2249/obst_all_sort.txt"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2253/qa_20250423-present.txt"
+            }
+          ]
+        }
+      ],
+      "representativeFileChecked": false,
+      "numericOutputsEnabled": false
+    },
+    {
+      "id": "ecostress-esi",
+      "requestedShortName": "ECO_L4T_ESI",
+      "requestedVersion": "003",
+      "status": "catalog-verified-file-pending",
+      "collections": [
+        {
+          "id": "C4057232495-LPCLOUD",
+          "title": "ECOSTRESS Tiled Evaporative Stress Index PT-JPL Instantaneous L4 Global 70 m v003",
+          "version": "003",
+          "timeStart": "2018-07-09T00:00:00.000Z",
+          "timeEnd": null,
+          "links": [
+            {
+              "length": "5.89MB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://search.earthdata.nasa.gov/search/granules?p=C4057232495-LPCLOUD"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://doi.org/10.5067/ECOSTRESS/ECO_L4T_ESI.003"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://www.earthdata.nasa.gov/centers/lp-daac"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/ECOSTRESS-Collection-3/ECOv003-L3T-L4T-JET/blob/main/documentation/ECOv003_L3_L4_JET_User_Guide.md"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/ECOSTRESS-Collection-3/ECOv003-L3T-L4T-JET/blob/main/documentation/ECOv003_L3_L4_JET_ATBD.md"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-public/ECO_L4T_ESI.003/ECOv003_L4T_ESI_43158_011_13SFR_20260214T194022_02/ECOv003_L4T_ESI_43158_011_13SFR_20260214T194022_02.png"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+              "hreflang": "en-US",
+              "href": "https://ecostress.jpl.nasa.gov/science"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/nasa/ECOSTRESS-Data-Resources"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2249/obst_all_sort.txt"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://lpdaac.usgs.gov/documents/2253/qa_20250423-present.txt"
+            }
+          ]
+        }
+      ],
+      "representativeFileChecked": false,
+      "numericOutputsEnabled": false
+    },
+    {
+      "id": "grace",
+      "requestedShortName": "TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4",
+      "requestedVersion": "RL06.3Mv04",
+      "status": "catalog-verified-file-pending",
+      "collections": [
+        {
+          "id": "C3195527175-POCLOUD",
+          "title": "JPL GRACE and GRACE-FO Mascon Ocean, Ice, and Hydrology Equivalent Water Height Coastal Resolution Improvement (CRI) Filtered Release 06.3 Version 04",
+          "version": "RL06.3Mv04",
+          "timeStart": "2002-04-04T00:00:00.000Z",
+          "timeEnd": null,
+          "links": [
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://grace.jpl.nasa.gov/data/get-data/jpl_global_mascons/"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://podaac.jpl.nasa.gov/GRACE-FO"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://podaac.jpl.nasa.gov/GRACE"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://github.com/podaac/GRACE"
+            },
+            {
+              "length": "0MB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C3195527175-POCLOUD"
+            },
+            {
+              "length": "0MB",
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://search.earthdata.nasa.gov/search/granules?p=C3195527175-POCLOUD"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://podaac.jpl.nasa.gov/gravity/grace-documentation"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+              "hreflang": "en-US",
+              "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/gracefo/open/docs/GRACE_GRACE-FO_ReleaseNotes_JPL_MASCON.txt"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://podaac.jpl.nasa.gov/Podaac/thumbnails/TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4.jpg"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+              "hreflang": "en-US",
+              "href": "https://soto.podaac.earthdatacloud.nasa.gov/?l=GRACE_Tellus_Liquid_Water_Equivalent_Thickness_Mascon_CRI,BlueMarble_ShadedRelief_Bathymetry,Coastlines_15m"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/virtual_collections/TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4/TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4_virtual_https.json"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+              "hreflang": "en-US",
+              "href": "https://github.com/podaac/data-subscriber"
+            },
+            {
+              "rel": "http://esipfed.org/ns/fedsearch/1.1/service#",
+              "hreflang": "en-US",
+              "href": "https://opendap.earthdata.nasa.gov"
+            }
+          ]
+        }
+      ],
+      "representativeFileChecked": false,
+      "numericOutputsEnabled": false
+    }
+  ],
+  "pipelineSha256": "9e36fe0f2ad43a64ffa1b626d4b1eec7b66639ff2f87d10d1ad2007f8aed02d8"
+}

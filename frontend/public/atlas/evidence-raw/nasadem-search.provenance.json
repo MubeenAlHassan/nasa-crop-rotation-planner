@@ -1,0 +1,11 @@
+{
+  "url": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+  "params": {
+    "collections": "nasadem",
+    "bbox": "-93.654,42.022,-93.646,42.028",
+    "limit": 2
+  },
+  "query": null,
+  "retrievedAt": "2026-11-07T10:16:17.981113+00:00",
+  "sha256": "4dfea056ae5c05aeb8ae4ea431ae5fe1e7820157337cb1f3cd721b87a054d95e"
+}

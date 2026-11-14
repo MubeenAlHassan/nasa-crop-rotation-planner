@@ -1,0 +1,3 @@
+import {it,expect} from 'vitest';
+import {GET} from './route';
+it('serves verified acquired field evidence and conditional replay only',async()=>{const r=await GET(new Request('http://localhost/api/atlas/ecostress'));expect(r.status).toBe(200);const d=await r.json();expect(d.records).toHaveLength(24);expect(d.records[0].sources[0].sha256).toMatch(/^[a-f0-9]{64}$/);expect((await GET(new Request('http://localhost/api/atlas/ecostress',{headers:{'If-None-Match':r.headers.get('ETag')!}}))).status).toBe(304);expect((await GET(new Request('http://localhost/api/atlas/ecostress?field=other'))).status).toBe(404);});

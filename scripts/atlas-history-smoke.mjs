@@ -1,0 +1,89 @@
+// Browser fixtures are local draft entries, never captured scientific observations.
+import {spawn} from 'node:child_process';
+import {mkdtemp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+const base=process.argv[2]||'http://127.0.0.1:4173',allowLegacy=process.argv.includes('--allow-legacy');
+const artifacts=path.resolve('artifacts');await mkdir(artifacts,{recursive:true});
+const profile=await mkdtemp(path.join(tmpdir(),'history-chrome-'));
+const chrome=spawn('/usr/bin/google-chrome',['--headless=new','--disable-gpu','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const pause=ms=>new Promise(r=>setTimeout(r,ms));let ws,id=0;const pending=new Map(),errors=[];
+try {
+ let target;for(let i=0;i<60;i++){try{const port=(await readFile(path.join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];target=(await(await fetch(`http://127.0.0.1:${port}/json`)).json()).find(t=>t.type==='page');if(target)break;}catch{}await pause(100);}
+ if(!target)throw Error('Chrome unavailable');ws=new WebSocket(target.webSocketDebuggerUrl);await new Promise(r=>ws.addEventListener('open',r,{once:true}));
+ ws.addEventListener('message',event=>{const m=JSON.parse(event.data);if(m.id){const p=pending.get(m.id);pending.delete(m.id);m.error?p?.reject(Error(JSON.stringify(m.error))):p?.resolve(m.result);}else if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails);});
+ const call=(method,params={},sessionId)=>new Promise((resolve,reject)=>{pending.set(++id,{resolve,reject});ws.send(JSON.stringify({id,method,params,sessionId}));});
+ const evaluate=async expression=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+ const until=async expression=>{for(let i=0;i<150;i++){if(await evaluate(expression))return;await pause(100);}throw Error('Timed out '+expression+' '+await evaluate('document.body.innerText.slice(-5000)'));};
+ const click=async text=>evaluate(`(()=>{const b=Array.from(document.querySelectorAll('button')).find(b=>b.textContent.includes(${JSON.stringify(text)}));if(!b)throw Error('Missing button');b.click();})()`);
+ const control=async(label,value,tag='input')=>evaluate(`(()=>{const l=Array.from(document.querySelectorAll('label')).find(l=>l.textContent.trim().startsWith(${JSON.stringify(label)}));const e=l?.querySelector(${JSON.stringify(tag)});if(!e)throw Error('Missing '+${JSON.stringify(label)});const p=e.tagName==='SELECT'?HTMLSelectElement.prototype:e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(p,'value').set.call(e,${JSON.stringify(String(value))});e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}));})()`);
+ await call('Page.enable');await call('Runtime.enable');await call('Network.enable');await call('Emulation.setDeviceMetricsOverride',{width:1024,height:1366,deviceScaleFactor:1,mobile:false});await call('Page.navigate',{url:base+'/atlas/'});
+ await until(`document.querySelector('.ra-connection')?.textContent.includes('Offline pack ready')`);await click('Field history & windows');await until(`document.body.innerText.includes('Observed vegetation indicators')`);
+ await until(`document.querySelector('.ra-nasa-context')?.textContent.includes('48/48 valid half-hour intervals')`);
+ await until(`document.querySelectorAll('.ra-nasa-context svg polygon').length===27`);
+ await control('History start','2024-06-01');await control('History end','2024-06-01');await click('Apply history filters');await until(`document.querySelector('.ra-nasa-selected')?.textContent.includes('100.00%')`);
+ if(!await evaluate(`document.querySelector('.ra-nasa-selected').textContent.includes('1.33')`))throw Error('Complete IMERG day missing');
+ await control('History end','2024-06-02');await click('Apply history filters');await until(`document.querySelector('.ra-nasa-selected')?.textContent.includes('Withheld')`);
+ const nativePath=await evaluate(`fetch('/atlas/nasa-context.json').then(r=>r.json()).then(d=>d.smap.assets[0].path)`);
+ await evaluate(`fetch(${JSON.stringify(nativePath)}).then(r=>{if(!r.ok)throw Error('Native subset missing');return r.json()})`);
+ await control('Regional model layer','sm_rootzone','select');
+ await control('Regional rainfall interval','2024-06-01T23:30:00Z','select');
+ await evaluate(`document.querySelector('.ra-nasa-context').scrollIntoView({block:'start'})`);const nasaShot=await call('Page.captureScreenshot',{format:'png'});await writeFile(path.join(artifacts,'atlas-nasa-context.png'),Buffer.from(nasaShot.data,'base64'));
+ const acquired=await evaluate(`fetch('/atlas/field-evidence.json').then(r=>r.json()).then(d=>d.observations.length)`);
+ if(!allowLegacy&&acquired<=3)throw Error('Seasonal archive did not replace the three-date demonstration');
+ await until(`document.querySelector('.ra-power-history')?.textContent.includes('2005-01-01 to 2024-12-31')`);
+ await click('Explore 2023-04-01 to 2023-04-30');await until(`document.body.innerText.includes('2 usable summaries / 7 discovered acquisitions')`);
+ await click('View 2023-04-06 map');await until(`document.querySelectorAll('.ra-history-map .ra-map svg path').length>400`);
+ if(await evaluate(`document.querySelectorAll('.ra-power-history tbody tr').length`)!==20)throw Error('Twenty-year baseline missing');
+ await evaluate(`document.querySelector('.ra-power-history').scrollIntoView({block:'start'})`);const baselineShot=await call('Page.captureScreenshot',{format:'png'});await writeFile(path.join(artifacts,'atlas-twenty-year-history.png'),Buffer.from(baselineShot.data,'base64'));
+ await control('History start','2022-03-01');await control('History end','2022-09-30');await click('Apply history filters');await until(`document.body.innerText.includes('No captured Landsat observations in this period')`);
+ await control('History start','2024-03-01');await control('History end','2024-11-30');await control('Low NDVI review threshold',1);await control('Maximum review gap',32);await click('Apply history filters');
+ const composites=await evaluate(`fetch('/atlas/modis-context.json').then(r=>r.json()).then(d=>d.summary.series.length)`);
+ if(!await evaluate(`document.querySelector('.ra-regional-context')?.textContent.includes(${JSON.stringify('16 regional composites')})`))throw Error('MODIS season not connected to the history UI');
+ if(composites!==16)throw Error('Expected the complete March–November regional capture');
+ if(!allowLegacy){await until(`document.body.innerText.includes('Review this uncertain interval')`);await click('Review this uncertain interval');}
+ else {await control('Window start','2024-03-15');await control('Window end','2024-03-23');}
+ await control('Local observation / uncertainty note','Browser fixture: uncertain interval, no ground observations claimed.','textarea');await click('Save historical window');await until(`document.querySelector('.ra-history-exposure')!==null`);
+ if(!await evaluate(`document.querySelector('.ra-history-exposure').textContent.includes('POWER regional weather')`))throw Error('Weather context label missing');
+ await click('Correct window');await control('Window evidence status','farmer-confirmed','select');await click('Save historical window');await until(`document.body.innerText.includes('Confirmation needs an observed cover condition')`);
+ await control('Ground condition','bare-soil','select');await control('Local observation / uncertainty note','Browser fixture only: test the farmer confirmation control; no real scouting asserted.','textarea');await click('Save historical window');await until(`document.querySelector('.ra-history-record .ra-badge')?.textContent==='farmer-confirmed'`);
+ await control('Operation date','2024-04-20');await control('Crop / cover name','Maize (browser fixture)');await control('Management source / correction note','Browser fixture only.','textarea');await click('Add management record');await click('Correct record');await control('Operation date','2024-04-21');await click('Save management correction');
+ if(!await evaluate(`document.body.innerText.includes('2024-04-21 · Planting')`))throw Error('Management correction not reflected');
+ if(!allowLegacy){await click('View 2024-03-15 map');await until(`document.querySelectorAll('.ra-history-map .ra-map svg path').length>400`);if(!await evaluate(`document.querySelector('.ra-history-map').textContent.includes('74.4%')`))throw Error('QA coverage not retained on dated map');}
+ await evaluate(`document.querySelector('.ra-history-timeline').scrollIntoView({block:'center'})`);await pause(300);const timelineShot=await call('Page.captureScreenshot',{format:'png'});await writeFile(path.join(artifacts,'atlas-history-timeline.png'),Buffer.from(timelineShot.data,'base64'));
+ await evaluate(`document.querySelector('.ra-history-exposure').scrollIntoView({block:'center'})`);await pause(300);const exposureShot=await call('Page.captureScreenshot',{format:'png'});await writeFile(path.join(artifacts,'atlas-history-exposure.png'),Buffer.from(exposureShot.data,'base64'));
+ await evaluate(`window.scrollTo(0,0)`);if(await evaluate(`document.documentElement.scrollWidth>innerWidth`))throw Error('History tablet overflow');const shot=await call('Page.captureScreenshot',{format:'png'});await writeFile(path.join(artifacts,'atlas-history-tablet.png'),Buffer.from(shot.data,'base64'));
+ await click('Save decision');await until(`JSON.parse(localStorage.getItem('rotation-atlas-decision-v1')).request.history.windows.length===1`);
+ await call('Page.setDownloadBehavior',{behavior:'allow',downloadPath:artifacts});await rm(path.join(artifacts,'rotation-atlas-decision.json'),{force:true});await click('Export report');await pause(350);const report=JSON.parse(await readFile(path.join(artifacts,'rotation-atlas-decision.json'),'utf8'));
+ if(report.history.windows.length!==1||!report.history.windows[0].exposure||report.request.history.management.length!==1||report.request.history.management[0].date!=='2024-04-21')throw Error('History export incomplete');
+ if(report.fieldEvidence.nasaContext.imerg.sources.length!==48||report.fieldEvidence.nasaContext.rootZone.kind!=='land-model-assimilation'||report.fieldEvidence.nasaContext.smap.sources[0].sha256.length!==64)throw Error('NASA export provenance lost');
+ if(report.historicalWeather.id!=='iowa-power-history-2005-2024'||report.evidence.id!=='iowa-power-2013-2024'||report.fieldEvidence.observations.length!==73||report.fieldEvidence.capturePeriods.length!==2)throw Error('Export lost new evidence or replaced model forcing');
+ // Edit the field after recording: history must remain saved but lose attribution.
+ await click('Field overview');await evaluate(`document.querySelector('.ra-boundary-input').open=true`);await control('Closed longitude/latitude coordinate ring',JSON.stringify([[-93.653,42.023],[-93.647,42.023],[-93.647,42.027],[-93.653,42.027],[-93.653,42.023]]),'textarea');await click('Apply coordinates');await click('Field history & windows');await until(`document.body.innerText.includes('Historical records belong to your previous boundary')`);if(await evaluate(`document.querySelector('.ra-history-exposure')!==null`))throw Error('Old window assigned to edited field');
+ await click('Field overview');await click('Restore captured demo boundary');await click('Save decision');
+ // Offline state applies to page AND service worker, so this checks actual cached operation.
+ const workerSessions=[];const network={offline:true,latency:0,downloadThroughput:0,uploadThroughput:0};const {targetInfos}=await call('Target.getTargets');for(const t of targetInfos.filter(t=>t.type==='service_worker'&&t.url===base+'/atlas-sw.js')){const {sessionId}=await call('Target.attachToTarget',{targetId:t.targetId,flatten:true});workerSessions.push(sessionId);await call('Network.enable',{},sessionId);await call('Network.emulateNetworkConditions',network,sessionId);}await call('Network.emulateNetworkConditions',network);await call('Page.reload');await until(`document.querySelectorAll('.ra-stat').length===4`);await click('Field history & windows');await until(`document.querySelector('.ra-history-exposure')!==null`);await until(`document.querySelector('.ra-nasa-context')?.textContent.includes('48/48 valid half-hour intervals')`);await evaluate(`fetch(${JSON.stringify(nativePath)}).then(r=>{if(!r.ok)throw Error('Native offline replay missing');return r.json()})`);await until(`document.body.innerText.includes('2024-04-21 · Planting')`);
+ if(!allowLegacy){await click('View 2024-03-15 map');await until(`document.querySelectorAll('.ra-history-map .ra-map svg path').length>400`);}
+ await click('Explore 2023-04-01 to 2023-04-30');await until(`document.body.innerText.includes('2 usable summaries / 7 discovered acquisitions')`);await click('View 2023-04-06 map');await until(`document.querySelectorAll('.ra-history-map .ra-map svg path').length>400`);
+ await click('Explore 2024-03-01 to 2024-11-30');await until(`document.querySelector('.ra-history-exposure')!==null`);
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await evaluate('window.scrollTo(0,0)');await pause(200);if(await evaluate('document.documentElement.scrollWidth>innerWidth'))throw Error('History phone overflow');const phone=await call('Page.captureScreenshot',{format:'png'});await writeFile(path.join(artifacts,'atlas-history-mobile.png'),Buffer.from(phone.data,'base64'));
+ await click('Save decision');await until(`JSON.parse(localStorage.getItem('rotation-atlas-decision-v1')).pending===true`);
+ // Lose the weather asset while truly offline. Disable HTTP cache too: deleting
+ // CacheStorage alone leaves an independent browser copy on static hosts.
+ await evaluate(`caches.keys().then(keys=>Promise.all(keys.map(k=>caches.open(k).then(c=>Promise.all([c.delete('/atlas/iowa.json'),c.delete('/atlas/power-history.json')])))))`);
+ const blocked=[base+'/atlas/iowa.json',base+'/atlas/power-history.json',base+'/api/atlas/history'];
+ await call('Network.setCacheDisabled',{cacheDisabled:true});await call('Network.setBlockedURLs',{urls:blocked});
+ for(const sessionId of workerSessions){await call('Network.setCacheDisabled',{cacheDisabled:true},sessionId);await call('Network.setBlockedURLs',{urls:blocked},sessionId);}
+ await call('Page.reload');await until(`document.body.textContent.includes('We couldn’t load the weather record.')`);
+ await click('Field history & windows');await until(`document.querySelector('.ra-history-exposure')?.textContent.includes('0/')`);
+ if(!await evaluate(`document.querySelector('.ra-history-exposure').textContent.includes('Withheld')&&document.querySelector('.ra-regional-context').textContent.includes('16 regional composites')`))throw Error('Missing weather fabricated totals or removed independent evidence');
+ await rm(path.join(artifacts,'rotation-atlas-decision.json'),{force:true});await click('Export report');await pause(400);const missingWeather=JSON.parse(await readFile(path.join(artifacts,'rotation-atlas-decision.json'),'utf8'));
+ if(missingWeather.evidence!==null||missingWeather.history.windows[0].exposure.rainTotalMm!==null||missingWeather.request.history.management.length!==1)throw Error('Missing-weather report lost records or invented exposure');
+ // Remove the optional NASA core asset while offline: no substitute values or loss of records.
+ await evaluate(`caches.keys().then(keys=>Promise.all(keys.map(k=>caches.open(k).then(c=>c.delete('/atlas/nasa-context.json')))))`);
+ const missingNasa=[...blocked,base+'/atlas/nasa-context.json'];await call('Network.setBlockedURLs',{urls:missingNasa});for(const sessionId of workerSessions)await call('Network.setBlockedURLs',{urls:missingNasa},sessionId);
+ await call('Page.reload');await until(`document.body.textContent.includes('We couldn’t load the weather record.')`);await click('Field history & windows');await until(`document.querySelector('.ra-nasa-context')?.textContent.includes('regional context unavailable')`);
+ if(!await evaluate(`document.body.textContent.includes('2024-04-21 · Planting')`))throw Error('Missing NASA context removed farmer records');
+ if(errors.length)throw Error('Browser exceptions '+JSON.stringify(errors));
+ const result={nasaContext:'SMAP L3 and L4 distinct, 48 IMERG intervals, 27 native cells, complete/partial coverage, layer selection, provenance export, offline subset replay and missing NASA asset withholding passed',seasonAcquisitions:acquired,additionalSeason:'April 2023: 7 discoveries, 5 native windows, 2 usable summaries; dated map verified online/offline',powerBaseline:'2005–2024: 20 seasonal comparisons, export retains distinct original model forcing',regionalComposites:composites,configurablePeriod:'passed, no-data season explicit',classification:'withheld; uncertain review then local confirmation tested',weather:'unmodified UTC POWER with coverage visible; missing weather withholds totals and preserves history/export',records:'management correction and window confirmation persisted/exported',boundary:'attribution withheld after edit, restored without record loss',tablet:'1024px no overflow',mobile:'390px no overflow',offline:'timeline, records, exposure and previously viewed native map retained; device save queued',errors};await writeFile(path.join(artifacts,'atlas-history-verification.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
+}finally{if(ws?.readyState===1)ws.send(JSON.stringify({id:++id,method:'Browser.close'}));await pause(200);ws?.close();chrome.kill('SIGTERM');}

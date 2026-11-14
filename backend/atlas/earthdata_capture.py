@@ -10,7 +10,7 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-PRODUCTS={'smap':('SPL3SMP_E','006'),'hls':('HLSL30','2.0'),'ecostress':('ECO_L2T_LSTE','003'),'imerg':('GPM_3IMERGHH','07')}
+PRODUCTS={'smap':('SPL3SMP_E','006'),'smap-rootzone':('SPL4SMGP','008'),'hls':('HLSL30','2.0'),'ecostress':('ECO_L2T_LSTE','003'),'ecostress-et':('ECO_L3T_JET','003'),'ecostress-esi':('ECO_L4T_ESI','003'),'grace':('TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4','RL06.3Mv04'),'imerg':('GPM_3IMERGHH','07')}
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--product',choices=PRODUCTS,required=True)

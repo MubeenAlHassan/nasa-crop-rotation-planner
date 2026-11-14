@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "grace-index-v1",
+  "path": "/atlas/grace/iowa-region.json",
+  "sha256": "261bee2239d8744e264348535d4d3d1299acccbdda9ed49783632da7a95b9a1b",
+  "bytes": 183246,
+  "start": "2005-01",
+  "end": "2024-12",
+  "accepted": 210,
+  "missing": 30
+}

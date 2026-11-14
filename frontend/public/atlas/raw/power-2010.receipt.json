@@ -1,0 +1,6 @@
+{
+  "acquiredOn": "2026-11-12",
+  "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR%2CT2M_MIN%2CT2M_MAX%2CRH2M%2CWS2M%2CALLSKY_SFC_SW_DWN&community=AG&format=JSON&time-standard=UTC&latitude=42.025&longitude=-93.65&start=20100101&end=20101231",
+  "sha256": "4933c8e6b911fa4dd99e985d46e45b32884611b15f095b05e89dd2a341010961",
+  "note": "Acquisition day recorded; precise request time was not instrumented."
+}

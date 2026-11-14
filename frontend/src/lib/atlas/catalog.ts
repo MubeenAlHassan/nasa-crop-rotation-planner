@@ -1,10 +1,11 @@
 import type { Crop, CropId, FieldContext, ScenarioRequest, StrategyId } from './types';
-export const MODEL_VERSION = 'atlas-1.0.0';
+export const MODEL_VERSION = 'atlas-2.1.0';
 export const SOURCES = {
   power: 'https://power.larc.nasa.gov/docs/services/api/temporal/daily/',
   fao: 'https://www.fao.org/4/x0490e/x0490e00.htm',
   yield: 'https://www.fao.org/4/X5647E/x5647e0e.htm',
   budgets: 'https://www.extension.iastate.edu/agdm/crops/pdf/a1-20.pdf',
+  termination: 'https://crops.extension.iastate.edu/post/start-planning-2026-cover-crop-termination',
   rotations: 'https://www.sare.org/publications/managing-cover-crops-profitably/Crop-Rotation-with-Cover-Crops/',
   clover: 'https://crops.extension.iastate.edu/encyclopedia/red-clover-cover-crop',
   nitrogen: 'https://extension.umn.edu/agriculture/crop-production/corn/managing-the-rotation-from-alfalfa-to-corn',
@@ -27,18 +28,43 @@ export const STRATEGIES: { id: StrategyId; name: string; sequence: string; cycle
   { id:'diverse', name:'Bring a legume into the mix', sequence:'Maize → soybean → wheat + clover', cycle:['maize','soybean','wheat'], question:'Trade a cash-crop year for a grain market, more cover and a nitrogen contribution.' },
   { id:'forage', name:'Make room for forage', sequence:'Maize → soybean → oats + alfalfa → alfalfa', cycle:['maize','soybean','oats','alfalfa'], question:'A longer rotation, conditional on forage equipment and a buyer.' },
 ];
-export const DEFAULT_FIELD: FieldContext = { name:'Prairie Creek · Iowa demo', latitude:42.025, longitude:-93.65,
+export const DEFAULT_FIELD: FieldContext = {
+  name:'Prairie Creek · Iowa demo', latitude:42.025, longitude:-93.65,
   boundary:[[-93.654,42.022],[-93.646,42.022],[-93.646,42.028],[-93.654,42.028],[-93.654,42.022]],
-  soilCapacity:160, soilSource:'demo-assumption', irrigation:false, irrigationLimit:100, forageBuyer:false, forageEquipment:false,
-  smallGrainBuyer:true, smallGrainEquipment:true, residueRetained:true, budget:2000, baseline:'maize-soybean' };
-export const DEFAULT_REQUEST: ScenarioRequest = { field:DEFAULT_FIELD, rainfall:100, warming:0, price:100, terminationDay:105, weights:{soil:1,water:1,economy:1} };
+  boundaryConfirmed:null, baselineConfirmed:null,
+  soilCapacity:160, soilSource:'demo-assumption', irrigation:false, irrigationLimit:100, irrigationEfficiency:0.8,
+  forageBuyer:null, forageEquipment:null, forageSuitable:null,
+  smallGrainBuyer:null, smallGrainEquipment:null, smallGrainSuitable:null,
+  coverEquipment:null, laborAvailable:null,
+  residueRetained:true, budget:2000, baseline:'maize-soybean',
+};
+export const DEFAULT_REQUEST: ScenarioRequest = {
+  field:DEFAULT_FIELD, horizon:{startYear:2027,years:4},
+  initialState:{storageFraction:0.5,snowMm:0,residueCover:0.5,source:'assumption'},
+  calendar:{maize:[120,288],soybean:[136,277],ryeSow:295},
+  rainfall:100, warming:0, price:100, terminationDay:105,
+  weights:{soil:1,water:1,economy:1}, showScores:true,
+  decision:{selection:null,notes:'',reviewed:false},
+  history:{schemaVersion:'field-history-v1',boundary:null,start:'2024-03-01',end:'2024-11-30',lowNdvi:0.3,maxGapDays:16,rainThresholdMm:25,heatThresholdC:35,windows:[],management:[]},
+};
+export const NORMALIZATION = {
+  version:'iowa-four-year-v1',
+  // Fixed policy ranges for FOUR-YEAR totals, not observed extrema or fitted targets.
+  deficit:{unit:'mm / 4 years',direction:'min' as const,range:[0,1200] as [number,number],weight:'water' as const},
+  coverDays:{unit:'days / 4 years',direction:'max' as const,range:[0,1461] as [number,number],weight:'soil' as const},
+  margin:{unit:'2026 USD/ha / 4 years',direction:'max' as const,range:[-4000,12000] as [number,number],weight:'economy' as const},
+};
+export const WEATHER_BLOCKS = [2013,2017,2021];
 export const ASSUMPTIONS = [
-  'Historical weather replay, 2013–2024; scenarios are not forecasts.',
-  'Crop calendars, soil capacity and management describe an illustrative Iowa field.',
-  'FAO-56 ET0 with mean-relative-humidity approximation; daily crop coefficients and a one-layer soil-water bucket. No calibrated field-yield prediction.',
-  'Snow uses a simple 3 mm/°C/day melt rule; runoff is 10% of liquid input. Soil-water storage starts half-full and carries between years.',
-  'All prices and costs are constant 2026-dollar assumptions. Gross margin excludes land rent, financing and general overhead; no discounting.',
-  'Yield response is bounded FAO-style water response; nutrient, pest and heat yield effects are not modeled.',
-  'Nitrogen balance is a partial input-minus-harvest budget, excluding mineralization and environmental losses. Nitrogen credits reduce fertilizer; they are not counted as new nitrogen inputs.',
-  'Priority match is an equal-domain weighted rank by default, not a measured soil-health score. Soil domain combines living-cover duration and following-crop N credit.',
+  '2027–2030 planning horizon, replayed separately with 2013–2016, 2017–2020 and 2021–2024 weather. Three paired historical members, not forecasts or probabilities.',
+  'Each weather block starts from the same entered water, snow and residue state. States carry across all four years; terminal perennial stands are not assigned a resale or future nitrogen value.',
+  'Iowa boundary, crop calendars, soil capacity and management require farmer confirmation. Day-of-year calendars are illustrative, not cultivar phenology.',
+  'FAO-56 reference ET uses a mean-RH approximation. One 1.5 m available-water profile, simple root access and snowmelt, 10% liquid-input runoff, free overflow drainage. Frozen-soil infiltration and capillary rise are not calibrated; capillary rise is set to zero.',
+  'Residue cover decays with an illustrative 120-day half-life and reduces bare-soil evaporation only. It does not generate a carbon, infiltration or erosion-benefit claim. Alfalfa establishment with oats is a simplified sequential resource partition.',
+  'Illustrative irrigation tops available water up toward half capacity on cropped days with mean temperature >5°C and potential ET >0.5 mm/day. Irrigation allocation caps gross withdrawal at the field inlet. Applied root-zone water is withdrawal times entered efficiency; application losses are explicit. Conveyance losses upstream of the inlet are unknown.',
+  'Reference yields and water-deficit yield response are uncalibrated scenarios. Heat, fertility, disease and cultivar effects are not fitted. Unknown buyers imply hypothetical sales, not assured revenue; feasibility remains unknown.',
+  'Gross margin uses constant 2026 USD assumptions, excluding land rent, financing and general overhead. Establishment costs are charged when the operation occurs. No discounting or terminal asset valuation.',
+  'Nitrogen is a partial input-minus-harvest illustration, not a soil-N balance or fertilizer prescription. Following-crop credits reduce fertilizer once. Carbon change, soil loss, pathogen reductions and probabilities of benefit are withheld.',
+  'Preference scores use fixed four-year ranges: water shortfall 0–1200 mm (lower better), living cover 0–1461 days (higher better), gross margin −4000–12000 USD/ha (higher better). Ranges are policy assumptions, not validated targets. Out-of-range scores are clipped and flagged.',
+  'Pareto status compares mean outcomes across all three objectives, independent of preference weights. Scores average member utilities; displayed ranges are descriptive scenario spread, not predictive intervals. No overall preference while a potentially feasible option has unknown constraints.',
 ];

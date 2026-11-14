@@ -1,0 +1,534 @@
+{
+  "source": {
+    "id": "G4351834960-NSIDC_CPRD",
+    "file": "SMAP_L4_SM_gph_20240601T013000_Vv8012_001.h5",
+    "sourceUrl": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL4SMGP/008/2024/06/01/SMAP_L4_SM_gph_20240601T013000_Vv8012_001.h5",
+    "sha256": "20fd8538ffc02a2ad02dd5df4af2c8aa399c2b602d8e1d074a7bf6f00b93b25d",
+    "bytes": 149588024,
+    "start": "2024-06-01T00:00:00.000Z",
+    "end": "2024-06-01T03:00:00.000Z"
+  },
+  "schema": {
+    "cell_lat": {
+      "shape": [
+        1624,
+        3856
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DIMENSION_LABELS": [
+          "y",
+          "x"
+        ],
+        "_FillValue": -9999.0,
+        "fmissing_value": -9999.0,
+        "grid_mapping": "EASE2_global_projection",
+        "long_name": "The geodetic latitude of the center of each cell in the cylindrical 9 km Earth-fixed EASE-Grid 2.0. Zero latitude represents the Equator. Positive latitudes represent locations North of the Equator. Negative latitudes represent locations South of the Equator.",
+        "missing_value": -9999.0,
+        "units": "degrees",
+        "valid_max": 90.0,
+        "valid_min": -90.0
+      }
+    },
+    "cell_lon": {
+      "shape": [
+        1624,
+        3856
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DIMENSION_LABELS": [
+          "y",
+          "x"
+        ],
+        "_FillValue": -9999.0,
+        "fmissing_value": -9999.0,
+        "grid_mapping": "EASE2_global_projection",
+        "long_name": "The longitude of the center of each cell in the cylindrical 9 km Earth-fixed EASE-Grid 2.0. Zero longitude represents the Prime Meridian. Positive longitudes represent locations to the East of the Prime Meridian. Negative longitudes represent locations to the West of the Prime Meridian.",
+        "missing_value": -9999.0,
+        "units": "degrees",
+        "valid_max": 179.99899291992188,
+        "valid_min": -180.0
+      }
+    },
+    "time": {
+      "shape": [
+        1
+      ],
+      "dtype": "float64",
+      "attributes": {
+        "actual_range": [
+          770477400.0,
+          770477400.0
+        ],
+        "delta_t": "0000-00-00 03:00:00",
+        "long_name": "Time",
+        "units": "seconds since 2000-01-01 11:58:55.816"
+      }
+    },
+    "Geophysical_Data/sm_surface": {
+      "shape": [
+        1624,
+        3856
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DIMENSION_LABELS": [
+          "y",
+          "x"
+        ],
+        "_FillValue": -9999.0,
+        "coordinates": "/cell_lat /cell_lon",
+        "fmissing_value": -9999.0,
+        "grid_mapping": "EASE2_global_projection",
+        "long_name": "Top layer soil moisture (0-5 cm)",
+        "missing_value": -9999.0,
+        "units": "m3 m-3",
+        "valid_max": 0.8999999761581421,
+        "valid_min": 0.0
+      }
+    },
+    "Geophysical_Data/sm_rootzone": {
+      "shape": [
+        1624,
+        3856
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DIMENSION_LABELS": [
+          "y",
+          "x"
+        ],
+        "_FillValue": -9999.0,
+        "coordinates": "/cell_lat /cell_lon",
+        "fmissing_value": -9999.0,
+        "grid_mapping": "EASE2_global_projection",
+        "long_name": "Root zone soil moisture (0-100 cm)",
+        "missing_value": -9999.0,
+        "units": "m3 m-3",
+        "valid_max": 0.8999999761581421,
+        "valid_min": 0.0
+      }
+    },
+    "extent": {
+      "description": "Global land excluding inland water and permanent ice.",
+      "eastBoundLongitude": "180.0",
+      "northBoundLatitude": "85.04456",
+      "rangeBeginningDateTime": "2024-06-01T00:00:00.000Z",
+      "rangeEndingDateTime": "2024-06-01T03:00:00.000Z",
+      "southBoundLatitude": "-85.04456",
+      "westBoundLongitude": "-180.0"
+    },
+    "processingVersion": "Vv8012",
+    "sharedPrecipitationForcing": "IMGv7BFnCPCUcorrv3"
+  },
+  "cells": [
+    {
+      "id": "266:923",
+      "center": [
+        -93.78112030029297,
+        42.13795852661133
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.82780456542969,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              42.18531799316406
+            ],
+            [
+              -93.82780456542969,
+              42.18531799316406
+            ],
+            [
+              -93.82780456542969,
+              42.090667724609375
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "266:924",
+      "center": [
+        -93.68775939941406,
+        42.13795852661133
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              42.18531799316406
+            ],
+            [
+              -93.73443603515625,
+              42.18531799316406
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "266:925",
+      "center": [
+        -93.59439849853516,
+        42.13795852661133
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.54771423339844,
+              42.090667724609375
+            ],
+            [
+              -93.54771423339844,
+              42.18531799316406
+            ],
+            [
+              -93.64108276367188,
+              42.18531799316406
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "267:923",
+      "center": [
+        -93.78112030029297,
+        42.04338073730469
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.82780456542969,
+              41.996158599853516
+            ],
+            [
+              -93.73443603515625,
+              41.996158599853516
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.82780456542969,
+              42.090667724609375
+            ],
+            [
+              -93.82780456542969,
+              41.996158599853516
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "267:924",
+      "center": [
+        -93.68775939941406,
+        42.04338073730469
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.73443603515625,
+              41.996158599853516
+            ],
+            [
+              -93.64108276367188,
+              41.996158599853516
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              41.996158599853516
+            ]
+          ]
+        ]
+      },
+      "pilot": true
+    },
+    {
+      "id": "267:925",
+      "center": [
+        -93.59439849853516,
+        42.04338073730469
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.64108276367188,
+              41.996158599853516
+            ],
+            [
+              -93.54771423339844,
+              41.996158599853516
+            ],
+            [
+              -93.54771423339844,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              41.996158599853516
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "268:923",
+      "center": [
+        -93.78112030029297,
+        41.948936462402344
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.82780456542969,
+              41.90178680419922
+            ],
+            [
+              -93.73443603515625,
+              41.90178680419922
+            ],
+            [
+              -93.73443603515625,
+              41.996158599853516
+            ],
+            [
+              -93.82780456542969,
+              41.996158599853516
+            ],
+            [
+              -93.82780456542969,
+              41.90178680419922
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "268:924",
+      "center": [
+        -93.68775939941406,
+        41.948936462402344
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.73443603515625,
+              41.90178680419922
+            ],
+            [
+              -93.64108276367188,
+              41.90178680419922
+            ],
+            [
+              -93.64108276367188,
+              41.996158599853516
+            ],
+            [
+              -93.73443603515625,
+              41.996158599853516
+            ],
+            [
+              -93.73443603515625,
+              41.90178680419922
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "268:925",
+      "center": [
+        -93.59439849853516,
+        41.948936462402344
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.64108276367188,
+              41.90178680419922
+            ],
+            [
+              -93.54771423339844,
+              41.90178680419922
+            ],
+            [
+              -93.54771423339844,
+              41.996158599853516
+            ],
+            [
+              -93.64108276367188,
+              41.996158599853516
+            ],
+            [
+              -93.64108276367188,
+              41.90178680419922
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    }
+  ],
+  "values": [
+    {
+      "cell": "266:923",
+      "variable": "sm_surface",
+      "value": 0.30687060952186584
+    },
+    {
+      "cell": "266:923",
+      "variable": "sm_rootzone",
+      "value": 0.3352237045764923
+    },
+    {
+      "cell": "266:924",
+      "variable": "sm_surface",
+      "value": 0.32981982827186584
+    },
+    {
+      "cell": "266:924",
+      "variable": "sm_rootzone",
+      "value": 0.3412051498889923
+    },
+    {
+      "cell": "266:925",
+      "variable": "sm_surface",
+      "value": 0.33226123452186584
+    },
+    {
+      "cell": "266:925",
+      "variable": "sm_rootzone",
+      "value": 0.3412051498889923
+    },
+    {
+      "cell": "267:923",
+      "variable": "sm_surface",
+      "value": 0.30479541420936584
+    },
+    {
+      "cell": "267:923",
+      "variable": "sm_rootzone",
+      "value": 0.3331485092639923
+    },
+    {
+      "cell": "267:924",
+      "variable": "sm_surface",
+      "value": 0.31797900795936584
+    },
+    {
+      "cell": "267:924",
+      "variable": "sm_rootzone",
+      "value": 0.3379092514514923
+    },
+    {
+      "cell": "267:925",
+      "variable": "sm_surface",
+      "value": 0.34971728920936584
+    },
+    {
+      "cell": "267:925",
+      "variable": "sm_rootzone",
+      "value": 0.3601260483264923
+    },
+    {
+      "cell": "268:923",
+      "variable": "sm_surface",
+      "value": 0.32835498452186584
+    },
+    {
+      "cell": "268:923",
+      "variable": "sm_rootzone",
+      "value": 0.3869815170764923
+    },
+    {
+      "cell": "268:924",
+      "variable": "sm_surface",
+      "value": 0.32139697670936584
+    },
+    {
+      "cell": "268:924",
+      "variable": "sm_rootzone",
+      "value": 0.3364444077014923
+    },
+    {
+      "cell": "268:925",
+      "variable": "sm_surface",
+      "value": 0.32017627358436584
+    },
+    {
+      "cell": "268:925",
+      "variable": "sm_rootzone",
+      "value": 0.3360781967639923
+    }
+  ]
+}

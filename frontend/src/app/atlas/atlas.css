@@ -1810,3 +1810,68 @@ to {
   .ra-sweep-track > div::before { display: none; }
   .ra-season-labels > span { border-color: CanvasText; }
 }
+/* Four-year decision workflow and evidence tables reuse the existing Atlas palette. */
+.ra-workflow {display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px}
+.ra-workflow button {border:1px solid #c6cebe;background:#f5f6ed;border-radius:8px;padding:10px 13px;min-height:44px;text-align:left;font-weight:600}
+.ra-form-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+.ra-farm-inputs h3 {margin:26px 0 8px}
+.ra-text-input select,.ra-text-input textarea,.ra-text-input input {width:100%;min-width:0;border:1px solid #bec8b6;border-radius:6px;background:#fffef9;color:#243e2e;padding:10px;min-height:44px;font:inherit}
+.ra-text-input textarea {resize:vertical}
+.ra-modal {max-width:850px!important}
+.ra-priorities .ra-form-grid {grid-template-columns:repeat(3,minmax(0,1fr))}
+.ra-priorities .ra-range {margin-bottom:0}
+.ra-four-year,.ra-decision-review {margin:24px 0}
+.ra-four-year th,.ra-four-year td {min-width:150px;vertical-align:top}
+.ra-app table small {display:block;font-size:12px;line-height:1.5;color:#56614e;font-weight:400;margin-top:4px}
+.ra-app caption {text-align:left;padding:12px 0;color:#56614e}
+.ra-status-pass {color:#27623d}.ra-status-fail {color:#9a3f2f}.ra-status-unknown {color:#805820}
+.ra-detail-wide {grid-column:1/-1;min-width:0}
+.ra-member-details p,.ra-chart-data p {margin-top:12px;max-width:100%}
+.ra-decision-review>.ra-text-input {margin:18px 0}
+.ra-decision-actions {display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.ra-field-evidence {display:grid;gap:24px;margin-bottom:24px}
+.ra-dataset-list {margin:14px 0;display:grid;gap:12px}
+.ra-dataset-list>details {border:1px solid #d6dccc;padding:14px;border-radius:8px}
+.ra-dataset-list summary {cursor:pointer;min-height:32px}
+.ra-dataset-list>details>summary {display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.ra-dataset-list p {margin:12px 0;overflow-wrap:anywhere}
+.ra-dataset-list ul {margin:12px 0;padding-left:22px}
+.ra-dataset-list pre {white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f4ec;font-size:12px;padding:12px}
+.ra-dataset-list code {display:block;overflow-wrap:anywhere;font-size:11px}
+.ra-dataset-list a,.ra-field-evidence a {text-decoration:underline}
+.ra-boundary-input {padding:14px;border-top:1px solid #cbd3c4}
+.ra-boundary-input summary {cursor:pointer;padding:6px 0}
+.ra-boundary-input .ra-text-input {margin:14px 0}
+.ra-boundary-input button {margin:4px 6px 4px 0}
+.ra-map-tools {flex-wrap:wrap}
+.ra-active-detail {align-items:start}
+.ra-member-details th,.ra-member-details td {min-width:130px;vertical-align:top}
+@media(max-width:1050px){.ra-priorities .ra-form-grid{grid-template-columns:1fr}.ra-workflow button{flex:1 1 160px}.ra-map-caption{flex-wrap:wrap;gap:12px}.ra-field-evidence table{min-width:640px}}
+@media(max-width:600px){.ra-form-grid{grid-template-columns:1fr}.ra-modal{padding:20px!important}.ra-decision-actions>*{width:100%}.ra-workflow button{font-size:13px}.ra-top-actions{gap:5px}}
+@media(forced-colors:active){.ra-status-pass,.ra-status-fail,.ra-status-unknown{color:CanvasText}.ra-workflow button,.ra-dataset-list>details{border:1px solid ButtonText}.ra-map svg path,.ra-map svg polygon{stroke:CanvasText}}
+/* Keep content outside the fixed sidebar at intermediate tablet widths. */
+.ra-workspace {margin-left:264px}
+.ra-app {--ra-text-label:.875rem}
+.ra-map-tools {position:static;padding:10px 14px}
+@media(max-width:1250px){.ra-workspace{margin-left:240px}}
+@media(max-width:1100px){.ra-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.ra-workspace{margin-left:0}}
+@media print{.ra-workspace{margin-left:0}}
+.ra-field-evidence,.ra-field-evidence>* {min-width:0}
+.ra-table-scroll table {border-collapse:collapse;width:100%;font-size:var(--ra-text-label)}
+.ra-table-scroll th,.ra-table-scroll td {padding:14px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--ra-line)}
+.ra-table-scroll th {font-weight:600}
+.ra-field-evidence .ra-table-scroll table {min-width:700px}
+.ra-table-scroll:focus-visible {outline:2px solid var(--ra-outline)}
+
+/* Historical evidence is visually distinct from modeled rotation calendars. */
+.ra-history{display:grid;gap:24px}.ra-history .ra-card{min-width:0;padding:24px}.ra-history h2{margin-bottom:12px}.ra-history p{line-height:1.65}.ra-history-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:22px 0}.ra-history-controls label{display:flex;flex-direction:column;gap:8px;font-size:.875rem;color:#334c3c}.ra-history-controls input,.ra-history-controls select,.ra-history-controls textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid #bac5b9;border-radius:7px;padding:10px;background:#fff;color:#203d31;min-height:44px;font:inherit}.ra-history-controls textarea{min-height:90px;resize:vertical}.ra-history-wide{grid-column:1/-1}.ra-history-controls button{align-self:end;min-height:44px}.ra-history-timeline{width:100%;min-width:880px;font-size:15px;color:#203d31}.ra-history-record{padding:18px 0;border-top:1px solid #d5ddd0}.ra-history-record button{margin:10px 8px 0 0}.ra-history table{width:100%;border-collapse:collapse;font-size:.875rem}.ra-history th,.ra-history td{padding:12px;text-align:left;border-bottom:1px solid #d5ddd0;vertical-align:top}.ra-history small{display:block;font-size:.78rem;line-height:1.5}.ra-history code{display:block;overflow-wrap:anywhere;font-size:.72rem;max-width:280px}.ra-history details{margin:12px 0}.ra-history summary{cursor:pointer;min-height:30px}.ra-history-exposure{padding:12px;background:#f0f4eb;border-left:3px solid #658567}.ra-history-map{margin-top:22px}.ra-history li{line-height:1.7;margin-bottom:10px}.ra-history li button{border:1px solid #aebda8;background:white;padding:6px 12px;border-radius:5px;color:#203d31}.ra-history-timeline:focus{outline:2px solid currentColor}
+@media(max-width:1100px){.ra-history-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.ra-history-controls{grid-template-columns:1fr}.ra-history .ra-card{padding:18px}.ra-history table{min-width:730px}}
+.ra-history-observation-scroll{max-height:520px;overflow:auto;border:1px solid #d5ddd0;border-radius:8px}.ra-history-observation-scroll thead{position:sticky;top:0;background:#f0f4eb;z-index:1}.ra-regional-context{border-left:4px solid #777d9b}.ra-regional-context code{display:block;overflow-wrap:anywhere;max-width:260px;font-size:.72rem}.ra-history-map{scroll-margin-top:90px}
+
+.ra-history-periods{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.ra-history-periods strong{flex-basis:100%}.ra-power-history{border-left:4px solid #658567}
+.ra-nasa-context small {display:block;overflow-wrap:anywhere}
+.ra-nasa-context select {max-width:100%;width:100%}
+.ra-nasa-context figure {margin:1rem 0}
+.ra-nasa-context figcaption {font-size:.85rem;max-width:65ch}

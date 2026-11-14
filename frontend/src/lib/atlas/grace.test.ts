@@ -1,0 +1,9 @@
+import {describe,it,expect} from 'vitest';
+import {readFileSync} from 'node:fs';
+import {parseGrace,parseGraceIndex,verifiedGrace,graceContains} from './grace';
+const raw=()=>JSON.parse(readFileSync('public/atlas/grace/iowa-region.json','utf8'));
+describe('Real GRACE regional archive',()=>{
+ it('preserves nominal months, gaps, regional support and native uncertainties',()=>{const d=parseGrace(raw());expect(d.records.filter(r=>r.status==='accepted')).toHaveLength(210);expect(d.records.filter(r=>r.status==='missing')).toHaveLength(30);expect(d.records.find(r=>r.month==='2011-12')!.time).toMatch(/^2012-01/);expect(d.records.find(r=>r.month==='2015-05')!.time).toMatch(/^2015-04/);expect(d.records.find(r=>r.month==='2017-08')!.regionalMm).toBeNull();expect(graceContains(d,[[-93.65,42.025]])).toBe(true);expect(graceContains(d,[[0,0]])).toBe(false);expect(d.region.areaKm2).toBeGreaterThan(500000);});
+ it('rejects units, duplicate intervals, fake gap zeros, weights and independent uncertainty',()=>{for(const change of [(d:ReturnType<typeof raw>)=>d.units='cm',(d:ReturnType<typeof raw>)=>d.records[1].sourceIndex=d.records[0].sourceIndex,(d:ReturnType<typeof raw>)=>d.records.find((r:{status:string})=>r.status==='missing').regionalMm=0,(d:ReturnType<typeof raw>)=>d.mascons[0].weight=.9,(d:ReturnType<typeof raw>)=>d.records[0].correlationBoundMm/=Math.sqrt(6),(d:ReturnType<typeof raw>)=>d.gainApplied=true,(d:ReturnType<typeof raw>)=>d.cells[0].landMask=0]){const d=raw();change(d);expect(()=>parseGrace(d)).toThrow();}});
+ it('checks full-file hash and counts before replay',async()=>{const index=parseGraceIndex(JSON.parse(readFileSync('public/atlas/grace-index.json','utf8'))),text=readFileSync('public/atlas/grace/iowa-region.json','utf8');expect((await verifiedGrace(text,index)).records).toHaveLength(240);await expect(verifiedGrace(text+' ',index)).rejects.toThrow('checksum');});
+});

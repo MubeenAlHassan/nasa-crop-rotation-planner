@@ -1,0 +1,788 @@
+{
+  "schemaVersion": "landsat-seasons-v1",
+  "field": {
+    "id": "iowa-demo",
+    "bbox": [
+      -93.654,
+      42.022,
+      -93.646,
+      42.028
+    ],
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -93.654,
+            42.022
+          ],
+          [
+            -93.646,
+            42.022
+          ],
+          [
+            -93.646,
+            42.028
+          ],
+          [
+            -93.654,
+            42.028
+          ],
+          [
+            -93.654,
+            42.022
+          ]
+        ]
+      ]
+    },
+    "areaHa": 44.1228,
+    "boundaryStatus": "illustrative-needs-farmer-confirmation"
+  },
+  "seasons": [
+    {
+      "id": "2023-04-01_2023-04-30",
+      "start": "2023-04-01",
+      "end": "2023-04-30",
+      "catalogComplete": true,
+      "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+      "minimumValidFraction": 0.8,
+      "nativeSupportM": 30,
+      "observations": [
+        {
+          "id": "LC08_L2SP_027031_20230405_02_T1",
+          "datasetId": "landsat",
+          "observedAt": "2023-04-05T16:59:30.573602Z",
+          "evidenceKind": "derived-from-satellite-retrieval",
+          "units": "dimensionless",
+          "ndvi": null,
+          "bsi": null,
+          "validFraction": 0.0,
+          "directAerosolRetrievalFieldFraction": 0.0,
+          "interpolatedAerosolFieldFraction": 0.0,
+          "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+          "classification": "withheld: no locally validated bare-soil/residue classifier",
+          "assets": [
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/blue.tif",
+              "sha256": "058ff5a4a75789d7bc8b5c475349e49eb972fa70e946c030641ac69cd341529d",
+              "variable": "blue",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B2.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/red.tif",
+              "sha256": "37815263aa7550ec40bb4b3d382428b0c2edea480541473e47bcd9c309067163",
+              "variable": "red",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B4.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/nir08.tif",
+              "sha256": "d07e41e967e2aca82d8e1242a440b733b5a5622c449ec44789f51762acdd968b",
+              "variable": "nir08",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B5.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/swir16.tif",
+              "sha256": "6e4013128c0b217706343cd1f43a448126812d2bb51d2c457fc903d3523850a2",
+              "variable": "swir16",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B6.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/qa_pixel.tif",
+              "sha256": "78c6b2abe5ee29a583ffd75a295420c7edf87d7423272deb5db1aa7d7287b32e",
+              "variable": "qa_pixel",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_QA_PIXEL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/qa_radsat.tif",
+              "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+              "variable": "qa_radsat",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_QA_RADSAT.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/qa_aerosol.tif",
+              "sha256": "1a7f67b7880bec061d3109e555be0d8e4246d5c432189685b7969d55a41100f9",
+              "variable": "qa_aerosol",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_QA_AEROSOL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/item.json",
+              "sha256": "dc3d3ff5753bedde86a1ddc95ff651eccee791e0989ff586e4810cab1c40e35b",
+              "variable": "source-stac-item"
+            }
+          ],
+          "nativeSupportM": 30,
+          "platform": "landsat-8",
+          "sceneCloudPercent": 37.09,
+          "validPixels": 0,
+          "status": "insufficient-coverage",
+          "partialNdvi": null,
+          "mapAsset": {
+            "path": "/atlas/history-maps/LC08_L2SP_027031_20230405_02_T1.geojson",
+            "sha256": "c5ce84ad060a336169b95e4e59d0d0866a1b703c82460a06ba4f9df2e5ce7323",
+            "variable": "native-pixel-map"
+          }
+        },
+        {
+          "id": "LC09_L2SP_026031_20230406_02_T1",
+          "datasetId": "landsat",
+          "observedAt": "2023-04-06T16:53:34.889079Z",
+          "evidenceKind": "derived-from-satellite-retrieval",
+          "units": "dimensionless",
+          "ndvi": 0.25,
+          "bsi": 0.0775,
+          "validFraction": 0.9077,
+          "directAerosolRetrievalFieldFraction": 0.07313,
+          "interpolatedAerosolFieldFraction": 0.83457,
+          "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+          "classification": "withheld: no locally validated bare-soil/residue classifier",
+          "assets": [
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/blue.tif",
+              "sha256": "a5f39132b56a980954ad8c2dc70735ee460560d0dc6ac89842f3516e31b2405a",
+              "variable": "blue",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B2.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/red.tif",
+              "sha256": "ef87b61e549b0f9d6eb7494e28962867ed78bb5aa9df1629f0edada528efcfb2",
+              "variable": "red",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B4.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/nir08.tif",
+              "sha256": "1a837f34493c943b29ebaa2890fb12cb77ea3e2656f5db9349caa724417a54a8",
+              "variable": "nir08",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B5.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/swir16.tif",
+              "sha256": "8fffc242022cd6fb054c5d8d448d2368e25633fc64d0f2f15e83aee33cbd6c10",
+              "variable": "swir16",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B6.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/qa_pixel.tif",
+              "sha256": "84bc402300825467fdf9fe51263a0b55f37aa97012a2c89211efa3b345050ae9",
+              "variable": "qa_pixel",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_QA_PIXEL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/qa_radsat.tif",
+              "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+              "variable": "qa_radsat",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_QA_RADSAT.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/qa_aerosol.tif",
+              "sha256": "5148d4535574a4c386f727b37cec894a027c5830cbddb119441c488cd54465a4",
+              "variable": "qa_aerosol",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_QA_AEROSOL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/item.json",
+              "sha256": "b4710d07846eec35e860a54f8974b28979b5c61c9a528796546663a572e3f1dc",
+              "variable": "source-stac-item"
+            }
+          ],
+          "nativeSupportM": 30,
+          "platform": "landsat-9",
+          "sceneCloudPercent": 0.01,
+          "validPixels": 480,
+          "status": "available",
+          "partialNdvi": 0.25,
+          "mapAsset": {
+            "path": "/atlas/history-maps/LC09_L2SP_026031_20230406_02_T1.geojson",
+            "sha256": "f2790bec097faefef66df1a5ff3ef0c8ea2e2148b45b51cc91efa5b805942f7b",
+            "variable": "native-pixel-map"
+          }
+        },
+        {
+          "id": "LC09_L2SP_027031_20230413_02_T1",
+          "datasetId": "landsat",
+          "observedAt": "2023-04-13T16:59:40.716589Z",
+          "evidenceKind": "derived-from-satellite-retrieval",
+          "units": "dimensionless",
+          "ndvi": 0.2704,
+          "bsi": 0.0671,
+          "validFraction": 0.95675,
+          "directAerosolRetrievalFieldFraction": 0.07932,
+          "interpolatedAerosolFieldFraction": 0.87743,
+          "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+          "classification": "withheld: no locally validated bare-soil/residue classifier",
+          "assets": [
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/blue.tif",
+              "sha256": "81013430c080881e294343aa12fbb191ca847d82676f7f7dd0f6b71647094573",
+              "variable": "blue",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B2.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/red.tif",
+              "sha256": "c9543f467063d9c5d2863302bd72d6de47c3c4f52e80b93d3d273efa466cda29",
+              "variable": "red",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B4.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/nir08.tif",
+              "sha256": "90aa78296cb6fae42e197855ad68028c1efa6690c0fb0f004604b2bfeedb86c5",
+              "variable": "nir08",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B5.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/swir16.tif",
+              "sha256": "e8ca03846c0d98cfee3e0b4c4444f55bb9e8f8383ac82787e24cbfdfc20d1d92",
+              "variable": "swir16",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B6.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/qa_pixel.tif",
+              "sha256": "81573c0c60f8ebd70ddae93c56f917ad0ee303e0ffac8acb4c5d89b3eabe5930",
+              "variable": "qa_pixel",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_QA_PIXEL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/qa_radsat.tif",
+              "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+              "variable": "qa_radsat",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_QA_RADSAT.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/qa_aerosol.tif",
+              "sha256": "43c70c6c14f906663d11818b73b98cb3db83e4c333a1d178e9839b7a98342af5",
+              "variable": "qa_aerosol",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_QA_AEROSOL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/item.json",
+              "sha256": "2f68db56d21e29f22dabd2253695e504d958525e7dfd49a04273938f4e882bc7",
+              "variable": "source-stac-item"
+            }
+          ],
+          "nativeSupportM": 30,
+          "platform": "landsat-9",
+          "sceneCloudPercent": 0.03,
+          "validPixels": 507,
+          "status": "available",
+          "partialNdvi": 0.2704,
+          "mapAsset": {
+            "path": "/atlas/history-maps/LC09_L2SP_027031_20230413_02_T1.geojson",
+            "sha256": "3b24fa773897a3563ddeea8a4456fd60f33cf4d0287c972d73bf49f604e0e737",
+            "variable": "native-pixel-map"
+          }
+        },
+        {
+          "id": "LC08_L2SP_026031_20230414_02_T1",
+          "datasetId": "landsat",
+          "observedAt": "2023-04-14T16:53:11.603115Z",
+          "evidenceKind": "derived-from-satellite-retrieval",
+          "units": "dimensionless",
+          "ndvi": null,
+          "bsi": null,
+          "validFraction": 0.0,
+          "directAerosolRetrievalFieldFraction": 0.0,
+          "interpolatedAerosolFieldFraction": 0.0,
+          "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+          "classification": "withheld: no locally validated bare-soil/residue classifier",
+          "assets": [
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/blue.tif",
+              "sha256": "1a930abb48905911e34c7852b683c7fd61337beab80955adeb92ae88d21f804b",
+              "variable": "blue",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B2.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/red.tif",
+              "sha256": "821e20b3eee2ee88da7424eb8b5ff83baf682003ab92e206ef174c3360dde3fe",
+              "variable": "red",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B4.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/nir08.tif",
+              "sha256": "e62ac40207d0c4a62e5c38650f6fb4fe4717ed2e09584fc873d478b3798ba8ed",
+              "variable": "nir08",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B5.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/swir16.tif",
+              "sha256": "74c0a932631b38f184fe392b5636808fec618c69638adcd894fbffc928e774d5",
+              "variable": "swir16",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B6.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/qa_pixel.tif",
+              "sha256": "822f83c83168adc9590c8b5fd9fb19a8377633234cfc1938e3740facbda58836",
+              "variable": "qa_pixel",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_QA_PIXEL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/qa_radsat.tif",
+              "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+              "variable": "qa_radsat",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_QA_RADSAT.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/qa_aerosol.tif",
+              "sha256": "7b18c8806bbd59bb6f1a935ac98f3116604d9967d135cbf80631caff2182ce39",
+              "variable": "qa_aerosol",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_QA_AEROSOL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/item.json",
+              "sha256": "f13ae5c928b253658fc9fbded696c0ded129db528884c2c200d2187c1fcea5b7",
+              "variable": "source-stac-item"
+            }
+          ],
+          "nativeSupportM": 30,
+          "platform": "landsat-8",
+          "sceneCloudPercent": 22.38,
+          "validPixels": 0,
+          "status": "insufficient-coverage",
+          "partialNdvi": null,
+          "mapAsset": {
+            "path": "/atlas/history-maps/LC08_L2SP_026031_20230414_02_T1.geojson",
+            "sha256": "5441b7543a4906f5faab19b6671fa36503f71421ef2d4d201106cffd1d17de38",
+            "variable": "native-pixel-map"
+          }
+        },
+        {
+          "id": "LC09_L2SP_026031_20230422_02_T2",
+          "datasetId": "landsat",
+          "observedAt": "2023-04-22T16:53:28.742766Z",
+          "evidenceKind": "derived-from-satellite-retrieval",
+          "units": "dimensionless",
+          "ndvi": null,
+          "bsi": null,
+          "validFraction": null,
+          "directAerosolRetrievalFieldFraction": null,
+          "interpolatedAerosolFieldFraction": null,
+          "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+          "classification": "withheld: no locally validated bare-soil/residue classifier",
+          "assets": [],
+          "nativeSupportM": 30,
+          "platform": "landsat-9",
+          "sceneCloudPercent": 99.96,
+          "status": "excluded-tier",
+          "reason": "Tier 2 geometry excluded by field-evidence policy; no field QA or index inferred."
+        },
+        {
+          "id": "LC09_L2SP_027031_20230429_02_T1",
+          "datasetId": "landsat",
+          "observedAt": "2023-04-29T16:59:33.968859Z",
+          "evidenceKind": "derived-from-satellite-retrieval",
+          "units": "dimensionless",
+          "ndvi": null,
+          "bsi": null,
+          "validFraction": 0.0,
+          "directAerosolRetrievalFieldFraction": 0.0,
+          "interpolatedAerosolFieldFraction": 0.0,
+          "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+          "classification": "withheld: no locally validated bare-soil/residue classifier",
+          "assets": [
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/blue.tif",
+              "sha256": "55f9538d59934e0afe55e1d1038bd3bab42420395c9592cba47d772e784baf2c",
+              "variable": "blue",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B2.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/red.tif",
+              "sha256": "f2431f4a6ea5dcb30033e00f1f9b9acba831f892085b86071ad2731bfba161ef",
+              "variable": "red",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B4.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/nir08.tif",
+              "sha256": "6f272a9062e8c675e591074f8048ec75fcf7cd2b9ac09be85153dec7917b2102",
+              "variable": "nir08",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B5.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/swir16.tif",
+              "sha256": "8817d6b3e7791ce7691a67a514e38596797cfa395ddd62cb6b34f59bacec3d22",
+              "variable": "swir16",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B6.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/qa_pixel.tif",
+              "sha256": "fdd6ac66e881b5702cb7f4772afb3787b52a4a52555803366a369669d03580c0",
+              "variable": "qa_pixel",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_QA_PIXEL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/qa_radsat.tif",
+              "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+              "variable": "qa_radsat",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_QA_RADSAT.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/qa_aerosol.tif",
+              "sha256": "b3d663d1ac1ccbf59116ec7bbee9f9f84fecc437b001d2fee9a3ea61903a4106",
+              "variable": "qa_aerosol",
+              "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_QA_AEROSOL.TIF"
+            },
+            {
+              "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/item.json",
+              "sha256": "a436ac2275e32fc22697eec983f2030542bf7c145a199c6d436c56e86f43444c",
+              "variable": "source-stac-item"
+            }
+          ],
+          "nativeSupportM": 30,
+          "platform": "landsat-9",
+          "sceneCloudPercent": 86.82,
+          "validPixels": 0,
+          "status": "insufficient-coverage",
+          "partialNdvi": null,
+          "mapAsset": {
+            "path": "/atlas/history-maps/LC09_L2SP_027031_20230429_02_T1.geojson",
+            "sha256": "d94ac572b34b4d979ed98788300924f1490e16d5c18d87c9fe74076e0bfbf6c9",
+            "variable": "native-pixel-map"
+          }
+        },
+        {
+          "id": "LC08_L2SP_026031_20230430_02_T2",
+          "datasetId": "landsat",
+          "observedAt": "2023-04-30T16:53:07.141119Z",
+          "evidenceKind": "derived-from-satellite-retrieval",
+          "units": "dimensionless",
+          "ndvi": null,
+          "bsi": null,
+          "validFraction": null,
+          "directAerosolRetrievalFieldFraction": null,
+          "interpolatedAerosolFieldFraction": null,
+          "qaPolicy": "landsat-c2-land-aerosol-tiered-v1",
+          "classification": "withheld: no locally validated bare-soil/residue classifier",
+          "assets": [],
+          "nativeSupportM": 30,
+          "platform": "landsat-8",
+          "sceneCloudPercent": 97.32,
+          "status": "excluded-tier",
+          "reason": "Tier 2 geometry excluded by field-evidence policy; no field QA or index inferred."
+        }
+      ],
+      "assets": [
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/blue.tif",
+          "sha256": "058ff5a4a75789d7bc8b5c475349e49eb972fa70e946c030641ac69cd341529d",
+          "variable": "blue",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B2.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/red.tif",
+          "sha256": "37815263aa7550ec40bb4b3d382428b0c2edea480541473e47bcd9c309067163",
+          "variable": "red",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B4.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/nir08.tif",
+          "sha256": "d07e41e967e2aca82d8e1242a440b733b5a5622c449ec44789f51762acdd968b",
+          "variable": "nir08",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B5.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/swir16.tif",
+          "sha256": "6e4013128c0b217706343cd1f43a448126812d2bb51d2c457fc903d3523850a2",
+          "variable": "swir16",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_B6.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/qa_pixel.tif",
+          "sha256": "78c6b2abe5ee29a583ffd75a295420c7edf87d7423272deb5db1aa7d7287b32e",
+          "variable": "qa_pixel",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_QA_PIXEL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/qa_radsat.tif",
+          "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+          "variable": "qa_radsat",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_QA_RADSAT.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/qa_aerosol.tif",
+          "sha256": "1a7f67b7880bec061d3109e555be0d8e4246d5c432189685b7969d55a41100f9",
+          "variable": "qa_aerosol",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_QA_AEROSOL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_027031_20230405_02_T1/item.json",
+          "sha256": "dc3d3ff5753bedde86a1ddc95ff651eccee791e0989ff586e4810cab1c40e35b",
+          "variable": "source-stac-item"
+        },
+        {
+          "path": "/atlas/history-maps/LC08_L2SP_027031_20230405_02_T1.geojson",
+          "sha256": "c5ce84ad060a336169b95e4e59d0d0866a1b703c82460a06ba4f9df2e5ce7323",
+          "variable": "native-pixel-map"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/blue.tif",
+          "sha256": "a5f39132b56a980954ad8c2dc70735ee460560d0dc6ac89842f3516e31b2405a",
+          "variable": "blue",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B2.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/red.tif",
+          "sha256": "ef87b61e549b0f9d6eb7494e28962867ed78bb5aa9df1629f0edada528efcfb2",
+          "variable": "red",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B4.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/nir08.tif",
+          "sha256": "1a837f34493c943b29ebaa2890fb12cb77ea3e2656f5db9349caa724417a54a8",
+          "variable": "nir08",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B5.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/swir16.tif",
+          "sha256": "8fffc242022cd6fb054c5d8d448d2368e25633fc64d0f2f15e83aee33cbd6c10",
+          "variable": "swir16",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_B6.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/qa_pixel.tif",
+          "sha256": "84bc402300825467fdf9fe51263a0b55f37aa97012a2c89211efa3b345050ae9",
+          "variable": "qa_pixel",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_QA_PIXEL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/qa_radsat.tif",
+          "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+          "variable": "qa_radsat",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_QA_RADSAT.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/qa_aerosol.tif",
+          "sha256": "5148d4535574a4c386f727b37cec894a027c5830cbddb119441c488cd54465a4",
+          "variable": "qa_aerosol",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC09_L2SP_026031_20230406_20230408_02_T1/LC09_L2SP_026031_20230406_20230408_02_T1_SR_QA_AEROSOL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_026031_20230406_02_T1/item.json",
+          "sha256": "b4710d07846eec35e860a54f8974b28979b5c61c9a528796546663a572e3f1dc",
+          "variable": "source-stac-item"
+        },
+        {
+          "path": "/atlas/history-maps/LC09_L2SP_026031_20230406_02_T1.geojson",
+          "sha256": "f2790bec097faefef66df1a5ff3ef0c8ea2e2148b45b51cc91efa5b805942f7b",
+          "variable": "native-pixel-map"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/blue.tif",
+          "sha256": "81013430c080881e294343aa12fbb191ca847d82676f7f7dd0f6b71647094573",
+          "variable": "blue",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B2.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/red.tif",
+          "sha256": "c9543f467063d9c5d2863302bd72d6de47c3c4f52e80b93d3d273efa466cda29",
+          "variable": "red",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B4.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/nir08.tif",
+          "sha256": "90aa78296cb6fae42e197855ad68028c1efa6690c0fb0f004604b2bfeedb86c5",
+          "variable": "nir08",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B5.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/swir16.tif",
+          "sha256": "e8ca03846c0d98cfee3e0b4c4444f55bb9e8f8383ac82787e24cbfdfc20d1d92",
+          "variable": "swir16",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_B6.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/qa_pixel.tif",
+          "sha256": "81573c0c60f8ebd70ddae93c56f917ad0ee303e0ffac8acb4c5d89b3eabe5930",
+          "variable": "qa_pixel",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_QA_PIXEL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/qa_radsat.tif",
+          "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+          "variable": "qa_radsat",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_QA_RADSAT.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/qa_aerosol.tif",
+          "sha256": "43c70c6c14f906663d11818b73b98cb3db83e4c333a1d178e9839b7a98342af5",
+          "variable": "qa_aerosol",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230413_20230415_02_T1/LC09_L2SP_027031_20230413_20230415_02_T1_SR_QA_AEROSOL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230413_02_T1/item.json",
+          "sha256": "2f68db56d21e29f22dabd2253695e504d958525e7dfd49a04273938f4e882bc7",
+          "variable": "source-stac-item"
+        },
+        {
+          "path": "/atlas/history-maps/LC09_L2SP_027031_20230413_02_T1.geojson",
+          "sha256": "3b24fa773897a3563ddeea8a4456fd60f33cf4d0287c972d73bf49f604e0e737",
+          "variable": "native-pixel-map"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/blue.tif",
+          "sha256": "1a930abb48905911e34c7852b683c7fd61337beab80955adeb92ae88d21f804b",
+          "variable": "blue",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B2.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/red.tif",
+          "sha256": "821e20b3eee2ee88da7424eb8b5ff83baf682003ab92e206ef174c3360dde3fe",
+          "variable": "red",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B4.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/nir08.tif",
+          "sha256": "e62ac40207d0c4a62e5c38650f6fb4fe4717ed2e09584fc873d478b3798ba8ed",
+          "variable": "nir08",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B5.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/swir16.tif",
+          "sha256": "74c0a932631b38f184fe392b5636808fec618c69638adcd894fbffc928e774d5",
+          "variable": "swir16",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_B6.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/qa_pixel.tif",
+          "sha256": "822f83c83168adc9590c8b5fd9fb19a8377633234cfc1938e3740facbda58836",
+          "variable": "qa_pixel",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_QA_PIXEL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/qa_radsat.tif",
+          "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+          "variable": "qa_radsat",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_QA_RADSAT.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/qa_aerosol.tif",
+          "sha256": "7b18c8806bbd59bb6f1a935ac98f3116604d9967d135cbf80631caff2182ce39",
+          "variable": "qa_aerosol",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/026/031/LC08_L2SP_026031_20230414_20230428_02_T1/LC08_L2SP_026031_20230414_20230428_02_T1_SR_QA_AEROSOL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC08_L2SP_026031_20230414_02_T1/item.json",
+          "sha256": "f13ae5c928b253658fc9fbded696c0ded129db528884c2c200d2187c1fcea5b7",
+          "variable": "source-stac-item"
+        },
+        {
+          "path": "/atlas/history-maps/LC08_L2SP_026031_20230414_02_T1.geojson",
+          "sha256": "5441b7543a4906f5faab19b6671fa36503f71421ef2d4d201106cffd1d17de38",
+          "variable": "native-pixel-map"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/blue.tif",
+          "sha256": "55f9538d59934e0afe55e1d1038bd3bab42420395c9592cba47d772e784baf2c",
+          "variable": "blue",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B2.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/red.tif",
+          "sha256": "f2431f4a6ea5dcb30033e00f1f9b9acba831f892085b86071ad2731bfba161ef",
+          "variable": "red",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B4.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/nir08.tif",
+          "sha256": "6f272a9062e8c675e591074f8048ec75fcf7cd2b9ac09be85153dec7917b2102",
+          "variable": "nir08",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B5.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/swir16.tif",
+          "sha256": "8817d6b3e7791ce7691a67a514e38596797cfa395ddd62cb6b34f59bacec3d22",
+          "variable": "swir16",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_B6.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/qa_pixel.tif",
+          "sha256": "fdd6ac66e881b5702cb7f4772afb3787b52a4a52555803366a369669d03580c0",
+          "variable": "qa_pixel",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_QA_PIXEL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/qa_radsat.tif",
+          "sha256": "0288acd2c0f2f11495fdddcb0411db50c1691655f6ee95e0234962560527d576",
+          "variable": "qa_radsat",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_QA_RADSAT.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/qa_aerosol.tif",
+          "sha256": "b3d663d1ac1ccbf59116ec7bbee9f9f84fecc437b001d2fee9a3ea61903a4106",
+          "variable": "qa_aerosol",
+          "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC09_L2SP_027031_20230429_20230501_02_T1/LC09_L2SP_027031_20230429_20230501_02_T1_SR_QA_AEROSOL.TIF"
+        },
+        {
+          "path": "/atlas/evidence-raw/LC09_L2SP_027031_20230429_02_T1/item.json",
+          "sha256": "a436ac2275e32fc22697eec983f2030542bf7c145a199c6d436c56e86f43444c",
+          "variable": "source-stac-item"
+        },
+        {
+          "path": "/atlas/history-maps/LC09_L2SP_027031_20230429_02_T1.geojson",
+          "sha256": "d94ac572b34b4d979ed98788300924f1490e16d5c18d87c9fe74076e0bfbf6c9",
+          "variable": "native-pixel-map"
+        },
+        {
+          "path": "/atlas/evidence-raw/landsat-search-2023-04-01-2023-04-30.json",
+          "sha256": "65e64da099f39f316ac1b4d527fedd3d3070d3de701d14414a396c3c3ed3098b",
+          "variable": "source-discovery-catalog"
+        }
+      ],
+      "summary": {
+        "discovered": 7,
+        "acquired": 5,
+        "usable": 2
+      },
+      "provenance": {
+        "pipeline": "backend/atlas/season_capture.py",
+        "pipelineSha256": "f92559d3c9cf6512676fb3d0ac5e478373be81ff124896c99894b028d6b5ff67",
+        "nativeCaptureSha256": "8292d0f3b861e6315ffc60e80d2e22e6720ac0ff5c8b4ab48b3e9d73932775fd",
+        "verifiedAt": "2026-11-12",
+        "resumption": "Existing native windows reused; failed missing assets retried on connected runs. Original 2024 pack preserved."
+      }
+    }
+  ],
+  "accessAttempt": {
+    "checkedAt": "2026-11-12",
+    "authentication": "unavailable: no environment pair, token or Earthdata netrc entry",
+    "products": [
+      {
+        "id": "smap-surface",
+        "product": "SPL3SMP_E",
+        "version": "006",
+        "representativeFileAcquired": false,
+        "failedStep": "credential-resolution",
+        "operatorAction": "Configure Earthdata Login environment/netrc credentials outside the repository and authorize the requested DAAC application (GES DISC for IMERG).",
+        "catalogMatchesInPage": 1,
+        "granuleId": "G3056406728-NSIDC_CPRD",
+        "producerGranuleId": "SMAP_L3_SM_P_E_20240601_R19240_001.h5",
+        "sourceUrl": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2024/06/01/SMAP_L3_SM_P_E_20240601_R19240_001.h5",
+        "httpStatus": 401
+      },
+      {
+        "id": "smap-rootzone",
+        "product": "SPL4SMGP",
+        "version": "008",
+        "representativeFileAcquired": false,
+        "failedStep": "credential-resolution",
+        "operatorAction": "Configure Earthdata Login environment/netrc credentials outside the repository and authorize the requested DAAC application (GES DISC for IMERG).",
+        "catalogMatchesInPage": 1,
+        "granuleId": "G4351837748-NSIDC_CPRD",
+        "producerGranuleId": "SMAP_L4_SM_gph_20240531T223000_Vv8012_001.h5",
+        "sourceUrl": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL4SMGP/008/2024/05/31/SMAP_L4_SM_gph_20240531T223000_Vv8012_001.h5",
+        "httpStatus": 401
+      },
+      {
+        "id": "imerg",
+        "product": "GPM_3IMERGHH",
+        "version": "07",
+        "representativeFileAcquired": false,
+        "failedStep": "credential-resolution",
+        "operatorAction": "Configure Earthdata Login environment/netrc credentials outside the repository and authorize the requested DAAC application (GES DISC for IMERG).",
+        "catalogMatchesInPage": 1,
+        "granuleId": "G3290981423-GES_DISC",
+        "producerGranuleId": "3B-HHR.MS.MRG.3IMERG.20240601-S000000-E002959.0000.V07B.HDF5",
+        "sourceUrl": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGHH.07/2024/153/3B-HHR.MS.MRG.3IMERG.20240601-S000000-E002959.0000.V07B.HDF5",
+        "httpStatus": 401
+      }
+    ]
+  }
+}

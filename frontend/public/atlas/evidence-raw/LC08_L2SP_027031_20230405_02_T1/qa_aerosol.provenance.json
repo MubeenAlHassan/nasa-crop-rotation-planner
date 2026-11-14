@@ -1,0 +1,20 @@
+{
+  "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2023/027/031/LC08_L2SP_027031_20230405_20230412_02_T1/LC08_L2SP_027031_20230405_20230412_02_T1_SR_QA_AEROSOL.TIF",
+  "sourceAsset": "qa_aerosol",
+  "sourceDtype": "uint8",
+  "sourceNoData": null,
+  "nativeCrs": "EPSG:32615",
+  "nativeResolution": [
+    30.0,
+    30.0
+  ],
+  "sourceWindow": {
+    "col_off": 6342,
+    "row_off": 2997,
+    "width": 23,
+    "height": 23
+  },
+  "retrievedAt": "2026-11-12T07:46:30.044682+00:00",
+  "processing": "Unresampled native-grid window, encoded values retained",
+  "sha256": "1a7f67b7880bec061d3109e555be0d8e4246d5c432189685b7969d55a41100f9"
+}

@@ -4,6 +4,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { renderToStaticMarkup, renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import data from '../../../public/atlas/iowa.json';
+import fieldData from '../../../public/atlas/field-evidence.json';
 import { DEFAULT_REQUEST } from '@/lib/atlas/catalog';
 import { saveDecision } from '@/lib/atlas/storage';
 import type { EvidenceSeries, SensitivityResult } from '@/lib/atlas/types';
@@ -32,7 +33,7 @@ describe('Workspace bootstrap and evidence retries', () => {
   });
   it('preserves edits when retrying evidence after restoring a saved decision', async () => {
     saveDecision({ ...DEFAULT_REQUEST, field: { ...DEFAULT_REQUEST.field, name: 'Saved farm' } });
-    const fetcher = vi.fn().mockRejectedValueOnce(new Error('Download interrupted')).mockResolvedValueOnce({ ok: true, json: async () => data });
+    let weatherCalls=0;const fetcher = vi.fn().mockImplementation(async (url:string)=>{if(url.includes('power-history')||url.includes('landsat-seasons')||url.includes('nasa-context'))return {ok:false,status:404};if((url.includes('field-evidence')||url.includes('/api/atlas/evidence')))return {ok:true,json:async()=>fieldData};if(weatherCalls++===0)throw new Error('Download interrupted');return {ok:true,json:async()=>data};});
     vi.stubGlobal('fetch', fetcher);
     vi.spyOn(window.navigator, 'onLine', 'get').mockReturnValue(false);
     await act(async () => root.render(<Atlas />));
@@ -47,12 +48,12 @@ describe('Workspace bootstrap and evidence retries', () => {
     await click('Farm assumptions');
     expect(residueInput().checked).toBe(false);
     expect(host.textContent).toContain('Saved farm');
-    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(weatherCalls).toBe(2);expect(fetcher).toHaveBeenCalledTimes(6);
   });
   it('updates connectivity through a browser subscription', async () => {
     let online = true;
     vi.spyOn(window.navigator, 'onLine', 'get').mockImplementation(() => online);
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => data }));
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url:string)=>({ok:true,json:async()=>(url.includes('field-evidence')||url.includes('/api/atlas/evidence'))?fieldData:data})));
     await act(async () => root.render(<Atlas />));
     expect(host.querySelector('.ra-connection')?.textContent).toContain('Online');
     online = false;
@@ -76,7 +77,7 @@ describe('Chart text alternatives', () => {
     host.innerHTML = renderToStaticMarkup(<SensitivityChart result={result} />);
     const cells = host.querySelectorAll('.ra-sweep-track > div');
     expect(cells[0].textContent).toContain('Winter cover');
-    expect(cells[1].textContent).toContain('No feasible option');
+    expect(cells[1].textContent).toContain('Preference withheld');
     expect(host.querySelector('tbody')?.textContent).toContain('Not available');
   });
 });

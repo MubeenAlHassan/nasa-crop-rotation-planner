@@ -1,0 +1,1120 @@
+{
+  "feed": {
+    "updated": "2026-11-08T04:36:21.172Z",
+    "id": "https://cmr.earthdata.nasa.gov:443/search/collections.json?short_name=SPL3SMP_E&version=006&page_size=20",
+    "title": "ECHO dataset metadata",
+    "entry": [
+      {
+        "processing_level_id": "3",
+        "cloud_hosted": true,
+        "boxes": [
+          "-85.044 -180 90 180"
+        ],
+        "has_combine": false,
+        "time_start": "2015-03-31T00:00:00.000Z",
+        "version_id": "006",
+        "dataset_id": "SMAP Enhanced L3 Radiometer Global and Polar Grid Daily 9 km EASE-Grid Soil Moisture V006",
+        "entry_id": "SPL3SMP_E_006",
+        "has_spatial_subsetting": true,
+        "has_transforms": true,
+        "associations": {
+          "variables": [
+            "V3707344958-NSIDC_CPRD",
+            "V3707344777-NSIDC_CPRD",
+            "V3707345017-NSIDC_CPRD",
+            "V3707344605-NSIDC_CPRD",
+            "V3707344804-NSIDC_CPRD",
+            "V3707344647-NSIDC_CPRD",
+            "V3707345607-NSIDC_CPRD",
+            "V3707345084-NSIDC_CPRD",
+            "V3707344660-NSIDC_CPRD",
+            "V3707345357-NSIDC_CPRD",
+            "V3707345472-NSIDC_CPRD",
+            "V3707344998-NSIDC_CPRD",
+            "V3707345291-NSIDC_CPRD",
+            "V3707344250-NSIDC_CPRD",
+            "V3707344931-NSIDC_CPRD",
+            "V3707344262-NSIDC_CPRD",
+            "V3707345088-NSIDC_CPRD",
+            "V3707344908-NSIDC_CPRD",
+            "V3707345421-NSIDC_CPRD",
+            "V3707345249-NSIDC_CPRD",
+            "V3707344944-NSIDC_CPRD",
+            "V3707344979-NSIDC_CPRD",
+            "V3707344707-NSIDC_CPRD",
+            "V3707345090-NSIDC_CPRD",
+            "V3707345050-NSIDC_CPRD",
+            "V3707345590-NSIDC_CPRD",
+            "V3707345614-NSIDC_CPRD",
+            "V3707344545-NSIDC_CPRD",
+            "V3707344974-NSIDC_CPRD",
+            "V3707344590-NSIDC_CPRD",
+            "V3707345598-NSIDC_CPRD",
+            "V3707344897-NSIDC_CPRD",
+            "V3707345521-NSIDC_CPRD",
+            "V3707344562-NSIDC_CPRD",
+            "V3707345410-NSIDC_CPRD",
+            "V3707344614-NSIDC_CPRD",
+            "V3707344623-NSIDC_CPRD",
+            "V3707344985-NSIDC_CPRD",
+            "V3707345153-NSIDC_CPRD",
+            "V3707344582-NSIDC_CPRD",
+            "V3707344380-NSIDC_CPRD",
+            "V3707344630-NSIDC_CPRD",
+            "V3707344779-NSIDC_CPRD",
+            "V3707344797-NSIDC_CPRD",
+            "V3707344241-NSIDC_CPRD",
+            "V3707345436-NSIDC_CPRD",
+            "V3707345581-NSIDC_CPRD",
+            "V3707344911-NSIDC_CPRD",
+            "V3707344795-NSIDC_CPRD",
+            "V3707344783-NSIDC_CPRD",
+            "V3707345417-NSIDC_CPRD",
+            "V3707344400-NSIDC_CPRD",
+            "V3707344599-NSIDC_CPRD",
+            "V3707344799-NSIDC_CPRD",
+            "V3707344492-NSIDC_CPRD",
+            "V3707344806-NSIDC_CPRD",
+            "V3707344245-NSIDC_CPRD",
+            "V3707344904-NSIDC_CPRD",
+            "V3707344609-NSIDC_CPRD",
+            "V3707345100-NSIDC_CPRD",
+            "V3707345429-NSIDC_CPRD",
+            "V3707345192-NSIDC_CPRD",
+            "V3707345482-NSIDC_CPRD",
+            "V3707345451-NSIDC_CPRD",
+            "V3707344221-NSIDC_CPRD",
+            "V3707345601-NSIDC_CPRD",
+            "V3707345182-NSIDC_CPRD",
+            "V3707344820-NSIDC_CPRD",
+            "V3707344810-NSIDC_CPRD",
+            "V3707344952-NSIDC_CPRD",
+            "V3707344572-NSIDC_CPRD",
+            "V3707344692-NSIDC_CPRD",
+            "V3707345544-NSIDC_CPRD",
+            "V3707345057-NSIDC_CPRD",
+            "V3707345279-NSIDC_CPRD",
+            "V3707344638-NSIDC_CPRD",
+            "V3707345432-NSIDC_CPRD",
+            "V3707345073-NSIDC_CPRD",
+            "V3707344775-NSIDC_CPRD",
+            "V3707345444-NSIDC_CPRD",
+            "V3707344993-NSIDC_CPRD",
+            "V3707345025-NSIDC_CPRD",
+            "V3707344773-NSIDC_CPRD",
+            "V3707344254-NSIDC_CPRD",
+            "V3707344686-NSIDC_CPRD",
+            "V3707345130-NSIDC_CPRD",
+            "V3707344627-NSIDC_CPRD",
+            "V3707344789-NSIDC_CPRD",
+            "V3707344465-NSIDC_CPRD",
+            "V3707344237-NSIDC_CPRD",
+            "V3707344621-NSIDC_CPRD",
+            "V3707344815-NSIDC_CPRD",
+            "V3707345462-NSIDC_CPRD",
+            "V3707345574-NSIDC_CPRD",
+            "V3707344983-NSIDC_CPRD",
+            "V3707345003-NSIDC_CPRD",
+            "V3707344965-NSIDC_CPRD",
+            "V3707345425-NSIDC_CPRD",
+            "V3707345009-NSIDC_CPRD",
+            "V3707344760-NSIDC_CPRD",
+            "V3707344505-NSIDC_CPRD",
+            "V3707344875-NSIDC_CPRD",
+            "V3707345082-NSIDC_CPRD",
+            "V3707345059-NSIDC_CPRD",
+            "V3707344225-NSIDC_CPRD",
+            "V3707345609-NSIDC_CPRD",
+            "V3707344916-NSIDC_CPRD",
+            "V3707344889-NSIDC_CPRD",
+            "V3707345007-NSIDC_CPRD",
+            "V3707344768-NSIDC_CPRD",
+            "V3707345414-NSIDC_CPRD",
+            "V3707344987-NSIDC_CPRD",
+            "V3707344926-NSIDC_CPRD",
+            "V3707344808-NSIDC_CPRD",
+            "V3707344607-NSIDC_CPRD",
+            "V3707344252-NSIDC_CPRD",
+            "V3707344770-NSIDC_CPRD",
+            "V3707344510-NSIDC_CPRD",
+            "V3707345405-NSIDC_CPRD",
+            "V3707345438-NSIDC_CPRD",
+            "V3707345220-NSIDC_CPRD",
+            "V3707345078-NSIDC_CPRD",
+            "V3707345412-NSIDC_CPRD",
+            "V3707345449-NSIDC_CPRD",
+            "V3707344792-NSIDC_CPRD",
+            "V3707345382-NSIDC_CPRD",
+            "V3707345174-NSIDC_CPRD",
+            "V3707345005-NSIDC_CPRD",
+            "V3707344722-NSIDC_CPRD",
+            "V3707345093-NSIDC_CPRD",
+            "V3707344256-NSIDC_CPRD",
+            "V3707345605-NSIDC_CPRD",
+            "V3707344634-NSIDC_CPRD",
+            "V3707344619-NSIDC_CPRD",
+            "V3707344625-NSIDC_CPRD",
+            "V3707344247-NSIDC_CPRD",
+            "V3707345398-NSIDC_CPRD",
+            "V3707344990-NSIDC_CPRD",
+            "V3707345556-NSIDC_CPRD",
+            "V3707344764-NSIDC_CPRD",
+            "V3707344230-NSIDC_CPRD",
+            "V3707344900-NSIDC_CPRD",
+            "V3707345038-NSIDC_CPRD",
+            "V3707344228-NSIDC_CPRD",
+            "V3707344995-NSIDC_CPRD",
+            "V3707345310-NSIDC_CPRD",
+            "V3707345587-NSIDC_CPRD",
+            "V3707344758-NSIDC_CPRD",
+            "V3707345434-NSIDC_CPRD",
+            "V3707345324-NSIDC_CPRD",
+            "V3707344269-NSIDC_CPRD",
+            "V3707345504-NSIDC_CPRD",
+            "V3707344528-NSIDC_CPRD",
+            "V3707345013-NSIDC_CPRD",
+            "V3707345442-NSIDC_CPRD",
+            "V3707345612-NSIDC_CPRD",
+            "V3707345364-NSIDC_CPRD",
+            "V3707345064-NSIDC_CPRD",
+            "V3707345592-NSIDC_CPRD",
+            "V3707345370-NSIDC_CPRD",
+            "V3707345201-NSIDC_CPRD",
+            "V3707344632-NSIDC_CPRD",
+            "V3707344933-NSIDC_CPRD",
+            "V3707344264-NSIDC_CPRD",
+            "V3707345447-NSIDC_CPRD",
+            "V3707345373-NSIDC_CPRD",
+            "V3707344333-NSIDC_CPRD",
+            "V3707345531-NSIDC_CPRD",
+            "V3707345453-NSIDC_CPRD",
+            "V3707344603-NSIDC_CPRD",
+            "V3707345264-NSIDC_CPRD",
+            "V3707344260-NSIDC_CPRD",
+            "V3707344297-NSIDC_CPRD",
+            "V3707345030-NSIDC_CPRD",
+            "V3707344939-NSIDC_CPRD",
+            "V3707344859-NSIDC_CPRD",
+            "V3707345066-NSIDC_CPRD",
+            "V3707344748-NSIDC_CPRD",
+            "V3707344883-NSIDC_CPRD",
+            "V3707344674-NSIDC_CPRD",
+            "V3707345165-NSIDC_CPRD",
+            "V3707345568-NSIDC_CPRD",
+            "V3707345069-NSIDC_CPRD",
+            "V3707344781-NSIDC_CPRD",
+            "V3707344314-NSIDC_CPRD",
+            "V3707344914-NSIDC_CPRD",
+            "V3707344612-NSIDC_CPRD",
+            "V3707345440-NSIDC_CPRD",
+            "V3707345335-NSIDC_CPRD",
+            "V3707344419-NSIDC_CPRD",
+            "V3707345427-NSIDC_CPRD",
+            "V3707344597-NSIDC_CPRD",
+            "V3707345105-NSIDC_CPRD",
+            "V3707344258-NSIDC_CPRD",
+            "V3707345348-NSIDC_CPRD",
+            "V3707344235-NSIDC_CPRD",
+            "V3707345390-NSIDC_CPRD",
+            "V3707345456-NSIDC_CPRD",
+            "V3707345120-NSIDC_CPRD",
+            "V3707344551-NSIDC_CPRD"
+          ],
+          "services": [
+            "S3671941188-XYZ_PROV",
+            "S2472217299-NSIDC_CPRD",
+            "S3107386427-NSIDC_CPRD",
+            "S3213793274-NSIDC_CPRD"
+          ],
+          "tools": [
+            "TL4019517520-NSIDC_CPRD",
+            "TL4019507017-NSIDC_CPRD",
+            "TL3010466318-NSIDC_CPRD",
+            "TL4019511337-NSIDC_CPRD"
+          ],
+          "citations": [
+            "CIT4201246706-ESDIS",
+            "CIT3857564219-ESDIS",
+            "CIT3804301390-ESDIS",
+            "CIT3963297052-ESDIS",
+            "CIT4106688630-ESDIS",
+            "CIT4248443244-ESDIS",
+            "CIT4321025633-ESDIS",
+            "CIT4321030581-ESDIS",
+            "CIT3804309590-ESDIS",
+            "CIT4248445521-ESDIS",
+            "CIT3804192651-ESDIS",
+            "CIT3857570811-ESDIS",
+            "CIT4201246866-ESDIS",
+            "CIT3963294797-ESDIS",
+            "CIT3857570517-ESDIS",
+            "CIT3804213093-ESDIS",
+            "CIT4106688220-ESDIS",
+            "CIT3857570573-ESDIS",
+            "CIT4106695610-ESDIS",
+            "CIT4321022750-ESDIS",
+            "CIT3963295771-ESDIS",
+            "CIT4321028956-ESDIS",
+            "CIT3857566546-ESDIS",
+            "CIT4248446500-ESDIS",
+            "CIT4106695075-ESDIS",
+            "CIT3963294050-ESDIS",
+            "CIT3804220775-ESDIS",
+            "CIT4106713622-ESDIS",
+            "CIT4106689656-ESDIS",
+            "CIT4201245900-ESDIS"
+          ],
+          "visualizations": [
+            "VIS3660440295-ESDIS",
+            "VIS3660440314-ESDIS"
+          ]
+        },
+        "has_variables": true,
+        "data_center": "NSIDC_CPRD",
+        "short_name": "SPL3SMP_E",
+        "organizations": [
+          "NASA NSIDC DAAC",
+          "NASA/JPL/SMAP"
+        ],
+        "title": "SMAP Enhanced L3 Radiometer Global and Polar Grid Daily 9 km EASE-Grid Soil Moisture V006",
+        "coordinate_system": "CARTESIAN",
+        "summary": "This enhanced Level-3 (L3) soil moisture product provides a composite of daily estimates of global land surface conditions retrieved by the Soil Moisture Active Passive (SMAP) radiometer. This product is a daily composite of SMAP Level-2 (L2) soil moisture which is derived from SMAP Level-1C (L1C) interpolated brightness temperatures. Backus-Gilbert optimal interpolation techniques are used to extract information from SMAP antenna temperatures and convert them to brightness temperatures, which are posted to the 9 km Equal-Area Scalable Earth Grid, Version 2.0 (EASE-Grid 2.0) in a global cylindrical projection. As of 2021, the data are also posted to the Northern Hemisphere EASE-Grid 2.0, an azimuthal equal-area projection.",
+        "service_features": {
+          "harmony": {
+            "has_formats": true,
+            "has_variables": true,
+            "has_transforms": true,
+            "has_combine": false,
+            "has_spatial_subsetting": true,
+            "has_temporal_subsetting": false
+          },
+          "opendap": {
+            "has_formats": false,
+            "has_variables": false,
+            "has_transforms": false,
+            "has_combine": false,
+            "has_spatial_subsetting": false,
+            "has_temporal_subsetting": false
+          },
+          "esi": {
+            "has_formats": false,
+            "has_variables": false,
+            "has_transforms": false,
+            "has_combine": false,
+            "has_spatial_subsetting": false,
+            "has_temporal_subsetting": false
+          }
+        },
+        "orbit_parameters": {},
+        "id": "C2938664763-NSIDC_CPRD",
+        "has_formats": true,
+        "consortiums": [
+          "GEOSS",
+          "EOSDIS"
+        ],
+        "original_format": "ISO19115",
+        "archive_center": "NASA NSIDC DAAC",
+        "has_temporal_subsetting": false,
+        "browse_flag": true,
+        "platforms": [
+          "SMAP"
+        ],
+        "association_details": {
+          "variables": [
+            {
+              "concept_id": "V3707344958-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344777-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345017-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344605-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344804-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344647-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345607-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345084-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344660-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345357-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345472-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344998-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345291-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344250-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344931-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344262-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345088-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344908-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345421-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345249-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344944-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344979-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344707-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345090-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345050-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345590-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345614-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344545-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344974-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344590-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345598-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344897-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345521-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344562-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345410-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344614-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344623-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344985-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345153-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344582-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344380-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344630-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344779-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344797-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344241-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345436-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345581-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344911-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344795-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344783-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345417-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344400-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344599-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344799-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344492-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344806-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344245-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344904-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344609-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345100-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345429-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345192-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345482-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345451-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344221-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345601-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345182-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344820-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344810-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344952-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344572-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344692-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345544-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345057-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345279-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344638-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345432-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345073-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344775-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345444-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344993-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345025-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344773-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344254-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344686-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345130-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344627-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344789-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344465-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344237-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344621-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344815-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345462-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345574-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344983-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345003-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344965-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345425-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345009-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344760-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344505-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344875-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345082-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345059-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344225-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345609-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344916-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344889-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345007-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344768-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345414-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344987-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344926-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344808-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344607-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344252-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344770-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344510-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345405-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345438-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345220-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345078-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345412-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345449-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344792-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345382-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345174-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345005-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344722-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345093-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344256-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345605-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344634-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344619-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344625-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344247-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345398-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344990-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345556-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344764-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344230-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344900-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345038-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344228-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344995-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345310-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345587-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344758-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345434-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345324-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344269-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345504-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344528-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345013-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345442-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345612-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345364-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345064-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345592-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345370-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345201-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344632-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344933-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344264-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345447-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345373-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344333-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345531-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345453-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344603-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345264-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344260-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344297-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345030-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344939-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344859-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345066-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344748-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344883-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344674-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345165-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345568-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345069-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344781-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344314-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344914-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344612-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345440-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345335-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344419-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345427-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344597-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345105-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344258-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345348-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344235-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345390-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345456-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707345120-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "V3707344551-NSIDC_CPRD"
+            }
+          ],
+          "services": [
+            {
+              "concept_id": "S3671941188-XYZ_PROV"
+            },
+            {
+              "concept_id": "S2472217299-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "S3107386427-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "S3213793274-NSIDC_CPRD"
+            }
+          ],
+          "tools": [
+            {
+              "concept_id": "TL4019517520-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "TL4019507017-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "TL3010466318-NSIDC_CPRD"
+            },
+            {
+              "concept_id": "TL4019511337-NSIDC_CPRD"
+            }
+          ],
+          "citations": [
+            {
+              "concept_id": "CIT4201246706-ESDIS"
+            },
+            {
+              "concept_id": "CIT3857564219-ESDIS"
+            },
+            {
+              "concept_id": "CIT3804301390-ESDIS"
+            },
+            {
+              "concept_id": "CIT3963297052-ESDIS"
+            },
+            {
+              "concept_id": "CIT4106688630-ESDIS"
+            },
+            {
+              "concept_id": "CIT4248443244-ESDIS"
+            },
+            {
+              "concept_id": "CIT4321025633-ESDIS"
+            },
+            {
+              "concept_id": "CIT4321030581-ESDIS"
+            },
+            {
+              "concept_id": "CIT3804309590-ESDIS"
+            },
+            {
+              "concept_id": "CIT4248445521-ESDIS"
+            },
+            {
+              "concept_id": "CIT3804192651-ESDIS"
+            },
+            {
+              "concept_id": "CIT3857570811-ESDIS"
+            },
+            {
+              "concept_id": "CIT4201246866-ESDIS"
+            },
+            {
+              "concept_id": "CIT3963294797-ESDIS"
+            },
+            {
+              "concept_id": "CIT3857570517-ESDIS"
+            },
+            {
+              "concept_id": "CIT3804213093-ESDIS"
+            },
+            {
+              "concept_id": "CIT4106688220-ESDIS"
+            },
+            {
+              "concept_id": "CIT3857570573-ESDIS"
+            },
+            {
+              "concept_id": "CIT4106695610-ESDIS"
+            },
+            {
+              "concept_id": "CIT4321022750-ESDIS"
+            },
+            {
+              "concept_id": "CIT3963295771-ESDIS"
+            },
+            {
+              "concept_id": "CIT4321028956-ESDIS"
+            },
+            {
+              "concept_id": "CIT3857566546-ESDIS"
+            },
+            {
+              "concept_id": "CIT4248446500-ESDIS"
+            },
+            {
+              "concept_id": "CIT4106695075-ESDIS"
+            },
+            {
+              "concept_id": "CIT3963294050-ESDIS"
+            },
+            {
+              "concept_id": "CIT3804220775-ESDIS"
+            },
+            {
+              "concept_id": "CIT4106713622-ESDIS"
+            },
+            {
+              "concept_id": "CIT4106689656-ESDIS"
+            },
+            {
+              "concept_id": "CIT4201245900-ESDIS"
+            }
+          ],
+          "visualizations": [
+            {
+              "concept_id": "VIS3660440295-ESDIS"
+            },
+            {
+              "concept_id": "VIS3660440314-ESDIS"
+            }
+          ]
+        },
+        "online_access_flag": true,
+        "links": [
+          {
+            "length": "0.0KB",
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+            "hreflang": "en-US",
+            "href": "https://search.earthdata.nasa.gov/search/granules?p=C2938664763-NSIDC_CPRD"
+          },
+          {
+            "length": "0.0KB",
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+            "hreflang": "en-US",
+            "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2938664763-NSIDC_CPRD"
+          },
+          {
+            "length": "0.0KB",
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+            "hreflang": "en-US",
+            "href": "https://nsidc.org/data/data-access-tool/SPL3SMP_E/versions/6/"
+          },
+          {
+            "length": "0.0KB",
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+            "hreflang": "en-US",
+            "href": "https://appeears.earthdatacloud.nasa.gov/"
+          },
+          {
+            "length": "0.0KB",
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+            "hreflang": "en-US",
+            "href": "https://earthaccess.readthedocs.io/en/stable/"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+            "hreflang": "en-US",
+            "href": "https://worldview.earthdata.nasa.gov/?v=-196,-79,132,72&l=SMAP_L3_Passive_Enhanced_Night_Soil_Moisture,SMAP_L3_Passive_Enhanced_Day_Soil_Moisture,Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor&t=2015-03-31"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+            "hreflang": "en-US",
+            "href": "https://doi.org/10.5067/M20OXIZHY3RJ"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://doi.org/10.5067/M20OXIZHY3RJ"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://nsidc.org/sites/default/files/documents/user-guide/spl3smp_e-v006-userguide.pdf"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://nsidc.org/sites/default/files/l2_sm_p_atbd_rev_g_final_oct2021_0.pdf"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://nsidc.org/sites/default/files/d5629220smap20l3_sm_p_e20psd_version2050_final.pdf"
+          }
+        ]
+      }
+    ]
+  }
+}

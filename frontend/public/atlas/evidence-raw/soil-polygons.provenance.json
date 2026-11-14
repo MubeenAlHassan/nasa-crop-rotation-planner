@@ -1,0 +1,10 @@
+{
+  "url": "https://sdmdataaccess.nrcs.usda.gov/Tabular/post.rest",
+  "params": null,
+  "query": {
+    "query": "SELECT p.mupolygonkey,p.mukey,m.musym,m.muname,p.mupolygongeo.STAsText() AS wkt FROM mupolygon p INNER JOIN mapunit m ON p.mukey=m.mukey WHERE p.mupolygonkey IN (SELECT mupolygonkey FROM SDA_Get_Mupolygonkey_from_intersection_with_WktWgs84('POLYGON((-93.654 42.022,-93.646 42.022,-93.646 42.028,-93.654 42.028,-93.654 42.022))'))",
+    "format": "JSON+COLUMNNAME"
+  },
+  "retrievedAt": "2026-11-07T10:13:40.661642+00:00",
+  "sha256": "c8dad069ea1d943492cc96b93292fd1866265dace398a4e0a263c87ef43b061f"
+}
