@@ -191,6 +191,16 @@
   display:flex;
   align-items:center;
   gap:var(--ra-space-3)}
+.ra-export-menu {position:relative}
+.ra-export-menu>.ra-button {display:inline-flex;align-items:center;gap:8px}
+.ra-export-list {
+  position:absolute;right:0;top:calc(100% + 6px);z-index:40;margin:0;padding:6px;list-style:none;min-width:240px;
+  background:#fffef9;border:1px solid #c6cebe;border-radius:10px;box-shadow:0 10px 28px rgba(32,61,49,.12)}
+.ra-export-list button {
+  width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;color:#243e2e;font:inherit}
+.ra-export-list button:hover,.ra-export-list button:focus-visible {background:#eef2e6;outline:none}
+.ra-export-list strong {display:block;font-size:.95rem}
+.ra-export-list small {display:block;margin-top:2px;color:#56614e;font-size:.78rem;line-height:1.35}
 .ra-connection {
   display:flex;
   align-items:center;

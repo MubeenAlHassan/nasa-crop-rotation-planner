@@ -1,12 +1,11 @@
 import type {GraceEvidence} from './grace';
-import {ecoMatches, type EcoEvidence} from './ecostress';
-import {seasonalWindow,type NasaSeason} from './nasa-season';
-import type { ComparisonResult, EvidenceSeries, ScenarioRequest } from './types';
+import type {EcoEvidence} from './ecostress';
+import type {NasaSeason} from './nasa-season';
+import type { EvidenceSeries, ScenarioRequest } from './types';
 import { DEFAULT_REQUEST } from './catalog';
-import { matchesEvidenceField, type FieldEvidence } from './field-evidence';
+import type { FieldEvidence } from './field-evidence';
 import { validateRequest } from './engine';
-import { historyMatchesField, historyReport } from './history';
-import { attachStrategyRationales } from './strategy-rationale';
+import { buildReportPayload, downloadFormattedReport, type ExportFormat } from './export-report';
 export const STORAGE_KEY='rotation-atlas-decision-v1';
 export interface SavedDecision { schema:1; updatedAt:string; request:ScenarioRequest; pending:boolean; }
 export function saveDecision(request:ScenarioRequest):SavedDecision { validateRequest(request); const value:SavedDecision={schema:1,updatedAt:new Date().toISOString(),request,pending:true}; localStorage.setItem(STORAGE_KEY,JSON.stringify(value)); return value; }
@@ -17,15 +16,7 @@ export async function syncDecision(value:SavedDecision):Promise<boolean> {
     const latest=loadDecision(); if(latest?.updatedAt===value.updatedAt) localStorage.setItem(STORAGE_KEY,JSON.stringify({...value,pending:false})); return true;
   } catch { return false; }
 }
-export function downloadReport(request:ScenarioRequest,result:unknown,evidence:EvidenceSeries|null,fieldEvidence:FieldEvidence|null=null,historicalWeather:EvidenceSeries|null=evidence,regionalSeasonalEvidence:NasaSeason|null=null,ecostressEvidence:EcoEvidence|null=null,graceEvidence:GraceEvidence|null=null,regionalSeasonalPackages:NasaSeason[]=[]):void {
-  const crossMonthWindows=historyMatchesField(request.history,request.field)?request.history.windows.map(w=>({id:w.id,status:w.status,summary:seasonalWindow(regionalSeasonalPackages,w.start+'T00:00:00Z',new Date(Date.parse(w.end+'T00:00:00Z')+86400000).toISOString())})):null;
-  const packages=regionalSeasonalPackages.length?regionalSeasonalPackages:regionalSeasonalEvidence?[regionalSeasonalEvidence]:[];
-  const enriched=result&&typeof result==='object'&&Array.isArray((result as ComparisonResult).strategies)
-    ?attachStrategyRationales(result as ComparisonResult,request,{weather:evidence??historicalWeather,fieldEvidence,seasonalPackages:packages,ecostress:ecostressEvidence,grace:graceEvidence})
-    :result;
-  const strategyReviewQuestions=(enriched&&typeof enriched==='object'&&Array.isArray((enriched as ComparisonResult).strategies))
-    ?(enriched as ComparisonResult).strategies.flatMap(s=>s.rationale?.localReviewQuestions??[])
-    :[];
-  const payload={comparisonBasis:{rotations:'Fixed templates; not satellite-generated',forcing:'POWER 2013–2024 paired four-year blocks',satelliteRole:'Historical exploration only; does not modify scoring',rationaleMethod:'strategy-rationale-v1'},ecostressEvidenceApplicability:ecostressEvidence?(ecoMatches(ecostressEvidence,request)?'matching-boundary':'different-boundary-not-field-evidence'):'unavailable',regionalSeasonalPackages,crossMonthWindows,graceEvidence,ecostressEvidence,regionalSeasonalEvidence,historicalWeather:historicalWeather?{...historicalWeather,weather:undefined,satellites:undefined}:null,title:'Rotation Atlas decision report',createdAt:new Date().toISOString(),request,result:enriched,history:historyReport(request.history,request.field,historicalWeather,fieldEvidence),evidence:evidence?{...evidence,weather:undefined,satellites:undefined}:null,fieldEvidence,fieldEvidenceApplicability:fieldEvidence?(matchesEvidenceField(request.field,fieldEvidence)?'matching-boundary':'different-boundary-not-field-evidence'):'unavailable',decisionStatus:request.decision.selection===null?'draft-unselected':request.decision.reviewed?'farmer-reviewed-not-validated':'draft-needs-review',reviewQuestions:[...new Set(['Are these planting windows suitable for the cultivar and farm?','Is available water capacity measured or assumed?','Are buyers and machinery confirmed?','Do local costs and nitrogen credits match these assumptions?',...strategyReviewQuestions])],notice:'Illustrative decision support, not a forecast or fertilizer prescription. AI-assisted software. POWER source responses and real Landsat/soil provenance are retained. Crop, yield, nutrient and economic outcomes are simplified scenarios; no probabilities of benefit are available. Per-strategy rationale separates observed context, agronomic mechanisms and unvalidated projections.'};
-  const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'})); const a=document.createElement('a');a.href=url;a.download='rotation-atlas-decision.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+export function downloadReport(request:ScenarioRequest,result:unknown,evidence:EvidenceSeries|null,fieldEvidence:FieldEvidence|null=null,historicalWeather:EvidenceSeries|null=evidence,regionalSeasonalEvidence:NasaSeason|null=null,ecostressEvidence:EcoEvidence|null=null,graceEvidence:GraceEvidence|null=null,regionalSeasonalPackages:NasaSeason[]=[],format:ExportFormat='json'):void {
+  const payload=buildReportPayload(request,result,evidence,fieldEvidence,historicalWeather,regionalSeasonalEvidence,ecostressEvidence,graceEvidence,regionalSeasonalPackages);
+  downloadFormattedReport(payload,format);
 }
