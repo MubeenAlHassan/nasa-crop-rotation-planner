@@ -1,5 +1,20 @@
 # Field Shift implementation — updated 14 November 2026
 
+## Vercel production-mode test imports — 15 November 2026
+
+Reproduced the reported `readFileSync is not a function` failure with
+`NODE_ENV=production npx vitest run src/app/atlas/nasa-season-panel.test.tsx`.
+Vite's browser transform externalized the DOM test's Node fixture/crypto imports.
+Configured only that test to use SSR module transformation while retaining its
+jsdom environment and all scientific/cancellation assertions. No application
+runtime or Vercel settings changed; no tests skipped.
+
+Verified the targeted production-mode test, all 126 tests in 25 files, TypeScript,
+and the complete Next.js build with `CI=true NODE_ENV=production npm run build`;
+ESLint and diff whitespace checks passed. An initial sandboxed full build passed
+the tests but failed during Next.js subprocess config parsing; rerunning with
+normal subprocess permissions completed successfully. No deployment performed.
+
 ## Seasonal loading recovery and complete offline regression — 15 November 2026
 
 Resolved the previously unverified full-season browser milestone. The old test
