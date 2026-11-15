@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
-import {readFileSync} from 'node:fs';
 import {act} from 'react';
 import {createRoot,type Root} from 'react-dom/client';
-import {afterEach,beforeEach,describe,expect,it} from 'vitest';
+import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {DEFAULT_FIELD} from '@/lib/atlas/catalog';
 import {parseFieldEvidence} from '@/lib/atlas/field-evidence';
 import {FieldMap} from './field-map';
 
+// Load Node's fixture reader directly; jsdom's Vite transform stubs node:fs.
+const {readFileSync}=await vi.importActual<typeof import('node:fs')>('node:fs');
 const evidence=parseFieldEvidence(JSON.parse(readFileSync('public/atlas/field-evidence.json','utf8')));
 let host:HTMLDivElement;
 let root:Root;

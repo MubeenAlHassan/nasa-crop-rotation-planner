@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
-import {readFileSync} from 'node:fs';
 import {describe,expect,it,vi} from 'vitest';
 import {DEFAULT_REQUEST} from './catalog';
 import {compare} from './engine';
 import {buildReportPayload,downloadFormattedReport,reportToExcel,reportToPdf,reportToWord} from './export-report';
 import type {EvidenceSeries} from './types';
 
+// Load Node's fixture reader directly; jsdom's Vite transform stubs node:fs.
+const {readFileSync}=await vi.importActual<typeof import('node:fs')>('node:fs');
 const data=JSON.parse(readFileSync('public/atlas/iowa.json','utf8')) as EvidenceSeries;
 
 function confirmed(){
