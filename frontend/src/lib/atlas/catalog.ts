@@ -1,4 +1,13 @@
-import type { Crop, CropId, FieldContext, ScenarioRequest, StrategyId } from './types';
+import type { Crop, CropId, EnterpriseInputs, FieldContext, ScenarioRequest, StrategyId } from './types';
+export const DEFAULT_ENTERPRISE: EnterpriseInputs = {
+  schemaVersion: 'enterprise-inputs-v1',
+  source: 'catalog-default',
+  reviewed: false,
+  note: '',
+  crops: {},
+  cloverCreditKgN: [45, 90],
+  nitrogenCreditUsdPerKg: 1.17,
+};
 export const MODEL_VERSION = 'atlas-2.1.0';
 export const SOURCES = {
   power: 'https://power.larc.nasa.gov/docs/services/api/temporal/daily/',
@@ -46,6 +55,7 @@ export const DEFAULT_REQUEST: ScenarioRequest = {
   weights:{soil:1,water:1,economy:1}, showScores:true,
   decision:{selection:null,notes:'',reviewed:false},
   history:{schemaVersion:'field-history-v1',boundary:null,start:'2024-03-01',end:'2024-11-30',lowNdvi:0.3,maxGapDays:16,rainThresholdMm:25,heatThresholdC:35,windows:[],management:[]},
+  enterprise:structuredClone(DEFAULT_ENTERPRISE),
 };
 export const NORMALIZATION = {
   version:'iowa-four-year-v1',

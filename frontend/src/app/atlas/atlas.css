@@ -191,6 +191,16 @@
   display:flex;
   align-items:center;
   gap:var(--ra-space-3)}
+.ra-export-menu {position:relative}
+.ra-export-menu>.ra-button {display:inline-flex;align-items:center;gap:8px}
+.ra-export-list {
+  position:absolute;right:0;top:calc(100% + 6px);z-index:40;margin:0;padding:6px;list-style:none;min-width:240px;
+  background:#fffef9;border:1px solid #c6cebe;border-radius:10px;box-shadow:0 10px 28px rgba(32,61,49,.12)}
+.ra-export-list button {
+  width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;color:#243e2e;font:inherit}
+.ra-export-list button:hover,.ra-export-list button:focus-visible {background:#eef2e6;outline:none}
+.ra-export-list strong {display:block;font-size:.95rem}
+.ra-export-list small {display:block;margin-top:2px;color:#56614e;font-size:.78rem;line-height:1.35}
 .ra-connection {
   display:flex;
   align-items:center;
@@ -778,6 +788,29 @@
   background:#f7f0dd;
   border-radius:var(--ra-radius-sm);
   margin-top:var(--ra-space-3)}
+.ra-rationale {
+  margin-top:var(--ra-space-4);
+  padding:var(--ra-space-4);
+  border:1px solid var(--ra-line);
+  border-radius:var(--ra-radius-sm);
+  background:#fbfaf6}
+.ra-rationale summary {
+  cursor:pointer;
+  font-weight:600;
+  color:#415936}
+.ra-rationale h3 {
+  margin:var(--ra-space-3) 0 var(--ra-space-2);
+  font-size:var(--ra-text-label);
+  color:#415936}
+.ra-rationale ul {
+  margin:0;
+  padding-left:var(--ra-space-5);
+  font-size:var(--ra-text-label);
+  color:var(--ra-muted)}
+.ra-rationale em {
+  display:inline;
+  font-style:normal;
+  color:#6b5a3c}
 .ra-explorer {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -1810,9 +1843,62 @@ to {
   .ra-sweep-track > div::before { display: none; }
   .ra-season-labels > span { border-color: CanvasText; }
 }
-/* Four-year decision workflow and evidence tables reuse the existing Atlas palette. */
-.ra-workflow {display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px}
-.ra-workflow button {border:1px solid #c6cebe;background:#f5f6ed;border-radius:8px;padding:10px 13px;min-height:44px;text-align:left;font-weight:600}
+/* Decision workflow: step labels, not filter chips. */
+.ra-workflow {margin:18px 0 24px}
+.ra-workflow-steps {
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 0;
+  border-bottom:1px solid #d5dccb;
+  padding-bottom:12px}
+.ra-workflow-steps>li {
+  display:flex;
+  align-items:center}
+.ra-workflow-steps>li:not(:last-child)::after {
+  content:"";
+  width:18px;
+  height:1px;
+  margin:0 10px;
+  background:#c5ceba;
+  flex:0 0 auto}
+.ra-workflow-step {
+  appearance:none;
+  border:0;
+  background:transparent;
+  border-radius:0;
+  padding:6px 2px;
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:#56614e;
+  font:inherit;
+  font-weight:500;
+  text-align:left;
+  cursor:pointer}
+.ra-workflow-step:hover {color:#243e2e}
+.ra-workflow-step:focus-visible {
+  outline:2px solid #415936;
+  outline-offset:3px}
+.ra-workflow-num {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:1.35rem;
+  color:#7a8670;
+  font-size:.8rem;
+  font-weight:600;
+  letter-spacing:.02em}
+.ra-workflow-label {line-height:1.3}
+.ra-workflow-steps>li[aria-current="step"] .ra-workflow-step {
+  color:#203d31;
+  font-weight:700;
+  box-shadow:inset 0 -2px 0 #415936}
+.ra-workflow-steps>li[aria-current="step"] .ra-workflow-num {color:#415936}
 .ra-form-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
 .ra-farm-inputs h3 {margin:26px 0 8px}
 .ra-text-input select,.ra-text-input textarea,.ra-text-input input {width:100%;min-width:0;border:1px solid #bec8b6;border-radius:6px;background:#fffef9;color:#243e2e;padding:10px;min-height:44px;font:inherit}
@@ -1846,9 +1932,9 @@ to {
 .ra-map-tools {flex-wrap:wrap}
 .ra-active-detail {align-items:start}
 .ra-member-details th,.ra-member-details td {min-width:130px;vertical-align:top}
-@media(max-width:1050px){.ra-priorities .ra-form-grid{grid-template-columns:1fr}.ra-workflow button{flex:1 1 160px}.ra-map-caption{flex-wrap:wrap;gap:12px}.ra-field-evidence table{min-width:640px}}
-@media(max-width:600px){.ra-form-grid{grid-template-columns:1fr}.ra-modal{padding:20px!important}.ra-decision-actions>*{width:100%}.ra-workflow button{font-size:13px}.ra-top-actions{gap:5px}}
-@media(forced-colors:active){.ra-status-pass,.ra-status-fail,.ra-status-unknown{color:CanvasText}.ra-workflow button,.ra-dataset-list>details{border:1px solid ButtonText}.ra-map svg path,.ra-map svg polygon{stroke:CanvasText}}
+@media(max-width:1050px){.ra-priorities .ra-form-grid{grid-template-columns:1fr}.ra-workflow-steps>li:not(:last-child)::after{width:10px;margin:0 6px}.ra-map-caption{flex-wrap:wrap;gap:12px}.ra-field-evidence table{min-width:640px}}
+@media(max-width:600px){.ra-form-grid{grid-template-columns:1fr}.ra-modal{padding:20px!important}.ra-decision-actions>*{width:100%}.ra-workflow-label{font-size:13px}.ra-workflow-steps>li:not(:last-child)::after{display:none}.ra-workflow-steps{gap:8px 14px}.ra-top-actions{gap:5px}}
+@media(forced-colors:active){.ra-status-pass,.ra-status-fail,.ra-status-unknown{color:CanvasText}.ra-workflow-step,.ra-dataset-list>details{border:1px solid ButtonText}.ra-workflow-steps>li[aria-current="step"] .ra-workflow-step{box-shadow:inset 0 -2px 0 ButtonText}.ra-map svg path,.ra-map svg polygon{stroke:CanvasText}}
 /* Keep content outside the fixed sidebar at intermediate tablet widths. */
 .ra-workspace {margin-left:264px}
 .ra-app {--ra-text-label:.875rem}

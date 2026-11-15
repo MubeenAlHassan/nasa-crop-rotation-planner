@@ -132,10 +132,14 @@ one-arc-second postings and unresolved source-class masks; it is terrain context
 
 Model exports contain the complete request, horizon, model/normalization versions,
 weather evidence ID and source checksums, paired member totals, units, constraints,
-review flags, and field evidence with applicability and provenance. Source products,
-asset hashes, retrieval/observation timestamps, QA policy and transformations are
-retained in the field package. Offline core caching includes the complete processed
-evidence/map package. Raw files are cached on first access, not all precached.
+review flags, per-strategy evidence-linked rationale (`strategy-rationale-v1`), and
+field evidence with applicability and provenance. Rationale separates observed
+context, agronomic mechanisms, contrary/missing evidence and local-review questions;
+mismatched or unsupported satellite packages are withheld from cited context and
+never alter scores. Source products, asset hashes, retrieval/observation timestamps,
+QA policy and transformations are retained in the field package. Offline core
+caching includes the complete processed evidence/map package. Raw files are cached
+on first access, not all precached.
 
 ## Verification versus validation
 
