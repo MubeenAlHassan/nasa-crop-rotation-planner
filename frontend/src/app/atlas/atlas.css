@@ -1903,7 +1903,30 @@ to {
 .ra-farm-inputs h3 {margin:26px 0 8px}
 .ra-text-input select,.ra-text-input textarea,.ra-text-input input {width:100%;min-width:0;border:1px solid #bec8b6;border-radius:6px;background:#fffef9;color:#243e2e;padding:10px;min-height:44px;font:inherit}
 .ra-text-input textarea {resize:vertical}
-.ra-modal {max-width:850px!important}
+.ra-modal {width:720px;max-width:100%}
+/* Keep wrapped labels above their controls and align each row's input edges. */
+.ra-farm-inputs .ra-text-input {
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  gap:8px;
+  min-width:0;
+}
+.ra-farm-inputs .ra-form-grid > .ra-text-input {margin:0}
+.ra-farm-inputs .ra-text-input input,
+.ra-farm-inputs .ra-text-input select,
+.ra-farm-inputs .ra-text-input textarea {display:block;margin:0}
+.ra-farm-inputs .ra-form-grid {row-gap:20px;column-gap:16px}
+.ra-farm-inputs .ra-table-scroll input {
+  width:112px;
+  min-height:44px;
+  padding:10px;
+  border:1px solid #bec8b6;
+  border-radius:6px;
+  background:#fffef9;
+  color:#243e2e;
+  font:inherit;
+}
 .ra-priorities .ra-form-grid {grid-template-columns:repeat(3,minmax(0,1fr))}
 .ra-priorities .ra-range {margin-bottom:0}
 .ra-four-year,.ra-decision-review {margin:24px 0}
