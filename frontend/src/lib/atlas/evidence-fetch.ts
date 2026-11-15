@@ -3,6 +3,15 @@ export const EVIDENCE_DOWNLOAD_TIMEOUT_MS = 120_000;
 
 /** Bound the entire transfer, including JSON decoding; always respect unmount/retry. */
 export async function readEvidenceJson(url:string, parent:AbortSignal):Promise<unknown> {
+  return readEvidence(url,parent,response=>response.json());
+}
+
+/** Keep original bytes for checksum verification, bounding headers and body together. */
+export async function readEvidenceText(url:string, parent:AbortSignal):Promise<string> {
+  return readEvidence(url,parent,response=>response.text());
+}
+
+async function readEvidence<T>(url:string,parent:AbortSignal,read:(response:Response)=>Promise<T>):Promise<T> {
   parent.throwIfAborted();
   const timeout=new AbortController();
   const signal=AbortSignal.any([parent,timeout.signal]);
@@ -16,9 +25,9 @@ export async function readEvidenceJson(url:string, parent:AbortSignal):Promise<u
   try {
     return await Promise.race([
       (async()=>{
-        const response=await fetch(url,{signal});
+        const response=await fetch(url,{signal,cache:'no-store'});
         if(!response.ok)throw new Error(`Evidence unavailable (HTTP ${response.status}).`);
-        const value:unknown=await response.json();
+        const value=await read(response);
         signal.throwIfAborted();
         return value;
       })(),

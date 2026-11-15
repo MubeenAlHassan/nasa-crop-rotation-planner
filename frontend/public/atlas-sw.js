@@ -1,5 +1,5 @@
 /* Versioned self-contained offline shell. Never cache mutation requests or API responses. */
-const CACHE='rotation-atlas-4cd691ca0d143e97';
+const CACHE='rotation-atlas-3aad6aa081d5df19';
 const CORE=["/atlas/app.js","/atlas/app.css","/atlas/iowa.json","/atlas/field-evidence.json","/atlas/field-evidence.geojson","/atlas/offline.html","/atlas/modis-context.json","/atlas/access-status.json","/atlas/access-attempt.json","/atlas/power-history.json","/atlas/landsat-seasons.json","/atlas/nasa-context.json","/atlas/nasa-season-index.json","/atlas/ecostress-index.json","/atlas/grace-index.json"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('rotation-atlas-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
