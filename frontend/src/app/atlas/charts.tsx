@@ -25,7 +25,7 @@ export function RainChart({ data, adjustment }: { data: EvidenceSeries; adjustme
       <div className="ra-chart-bar-pair">{value===null ? <small>Withheld</small> : <><span data-rain-series="historical" data-value={value} style={{ height: `${value / max * 100}%` }} /><span data-rain-series="scenario" data-value={value * adjustment / 100} className="ra-pattern-hatch" style={{ height: `${value * adjustment / 100 / max * 100}%` }} /></>}</div><small>{months[i]}</small>
     </div>)}</div>
     <div className="ra-legend" aria-hidden="true"><span><i className="ra-historical-key" />Historical mean · left</span><span><i className="ra-scenario-key ra-pattern-hatch" />Scenario · right</span></div>
-    <details className="ra-chart-data"><summary>View monthly rainfall values</summary><div className="ra-table-scroll"><table>
+    <details className="ra-chart-data"><summary>View monthly rainfall values</summary><div className="ra-table-scroll" tabIndex={0}><table>
       <caption>Mean monthly precipitation (mm); scenario at {adjustment}% of history</caption>
       <thead><tr><th scope="col">Month</th><th scope="col">Historical mean</th><th scope="col">Scenario</th></tr></thead>
       <tbody>{totals.map((value, i) => <tr key={months[i]}><th scope="row">{months[i]}</th><td>{value===null?'Withheld':number(value)}</td><td>{value===null?'Withheld':number(value * adjustment / 100)}</td></tr>)}</tbody>
@@ -41,7 +41,7 @@ export function SensitivityChart({ result }: { result: SensitivityResult }) {
     <div className="ra-sweep-track">{result.sweeps.rainfall.map(p => <div key={p.value} style={{ '--ra-sweep-color': p.preferred ? strategyColors[p.preferred] : '#e4e1d7' } as CSSProperties}>
       <span><strong>{p.value}%</strong><span>{p.preferred ? shortNames[p.preferred] : 'Preference withheld'}</span></span>
     </div>)}</div>
-    <details className="ra-chart-data"><summary>View rainfall sensitivity values</summary><div className="ra-table-scroll"><table>
+    <details className="ra-chart-data"><summary>View rainfall sensitivity values</summary><div className="ra-table-scroll" tabIndex={0}><table>
       <caption>Rainfall sensitivity: preference and reference-strategy margin (baseline while preference is withheld)</caption>
       <thead><tr><th scope="col">Rainfall (% of history)</th><th scope="col">Preferred rotation</th><th scope="col">Margin ($/ha/year)</th></tr></thead>
       <tbody>{result.sweeps.rainfall.map(p => <tr key={p.value}><th scope="row">{p.value}%</th><td>{p.preferred ? shortNames[p.preferred] : 'Preference withheld'}</td><td>{p.margin === null ? 'Not available' : number(p.margin)}</td></tr>)}</tbody>
@@ -71,11 +71,11 @@ export function Timeline({ result }: { result: StrategyResult }) {
         <div className="ra-season-labels">{periods.map(p => <span key={p.start}>{p.crop ? CROPS[p.crop].name : 'Possible cover gap'}: {p.start.slice(5)}–{p.end.slice(5)}</span>)}</div>
       </div>
     </div>)}
-    <details className="ra-chart-data"><summary>View crop calendar dates</summary><div className="ra-table-scroll"><table aria-describedby={id}>
+    <details className="ra-chart-data"><summary>View crop calendar dates</summary><div className="ra-table-scroll" tabIndex={0}><table aria-describedby={id}>
       <caption>{result.name}: four-year planning horizon (source-weather dates)</caption><thead><tr><th scope="col">Crop / period</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Days</th></tr></thead>
       <tbody>{years.flatMap(({ periods }) => periods.map(p => <tr key={p.start}><th scope="row">{p.crop ? CROPS[p.crop].name : 'Possible cover gap'}</th><td>{p.start}</td><td>{p.end}</td><td>{p.days}</td></tr>))}</tbody>
     </table></div></details>
-    <details className="ra-chart-data"><summary>Planting, harvest and termination events</summary><div className="ra-table-scroll"><table><thead><tr><th>Planning year</th><th>Source-weather date</th><th>Operation</th></tr></thead><tbody>{result.daily.filter(d=>d.events.length).map(d=><tr key={d.date}><td>{d.planningYear}</td><td>{d.date}</td><td>{d.events.join('; ')}</td></tr>)}</tbody></table></div></details>
+    <details className="ra-chart-data"><summary>Planting, harvest and termination events</summary><div className="ra-table-scroll" tabIndex={0}><table><thead><tr><th>Planning year</th><th>Source-weather date</th><th>Operation</th></tr></thead><tbody>{result.daily.filter(d=>d.events.length).map(d=><tr key={d.date}><td>{d.planningYear}</td><td>{d.date}</td><td>{d.events.join('; ')}</td></tr>)}</tbody></table></div></details>
     <p className="ra-small">Modeled calendar, not observed crop history. Living cover is calendar occupancy, including winter dormancy; it does not measure biomass or protective ground cover. Residue can remain during gaps.</p>
   </div>;
 }

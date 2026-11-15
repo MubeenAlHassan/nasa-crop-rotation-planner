@@ -1409,8 +1409,7 @@
   font-size:var(--ra-text-heading)}
 .ra-crop-circles {
   right:15px;
-  top:80px;
-  opacity:.7}
+  top:80px}
 .ra-crop-circles span {
   width:28px;
   height:28px}
@@ -1937,6 +1936,7 @@ to {
 .ra-app caption {text-align:left;padding:12px 0;color:#56614e}
 .ra-status-pass {color:#27623d}.ra-status-fail {color:#9a3f2f}.ra-status-unknown {color:#805820}
 .ra-detail-wide {grid-column:1/-1;min-width:0}
+.ra-window-connections > .ra-button {max-width:100%;white-space:normal}
 .ra-member-details p,.ra-chart-data p {margin-top:12px;max-width:100%}
 .ra-decision-review>.ra-text-input {margin:18px 0}
 .ra-decision-actions {display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}

@@ -31,6 +31,26 @@ describe('Workspace bootstrap and evidence retries', () => {
     expect(renderToString(<Atlas />)).toContain('Restoring your workspace');
     expect(read).not.toHaveBeenCalled();
   });
+  it('keeps keyboard focus inside assumptions and returns to the actual opener',async()=>{
+    vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:false,status:404}));
+    await act(async()=>root.render(<Atlas/>));
+    const sidebar=host.querySelector<HTMLButtonElement>('.ra-sidebar-settings')!;
+    const heading=host.querySelector<HTMLButtonElement>('[aria-label="Edit farm assumptions"]')!;
+    for(const opener of [sidebar,heading]){
+      opener.focus();await act(async()=>opener.click());
+      const close=host.querySelector<HTMLButtonElement>('[aria-label="Close assumptions"]')!;
+      const apply=host.querySelector<HTMLButtonElement>('.ra-modal > .ra-full')!;
+      expect(document.activeElement).toBe(close);
+      await act(async()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',shiftKey:true,cancelable:true})));
+      expect(document.activeElement).toBe(apply);
+      await act(async()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',cancelable:true})));
+      expect(document.activeElement).toBe(close);
+      if(opener===sidebar)await act(async()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'})));
+      else await act(async()=>apply.click());
+      expect(host.querySelector('.ra-modal')).toBeNull();
+      expect(document.activeElement).toBe(opener);
+    }
+  });
   it('preserves edits when retrying evidence after restoring a saved decision', async () => {
     saveDecision({ ...DEFAULT_REQUEST, field: { ...DEFAULT_REQUEST.field, name: 'Saved farm' } });
     let weatherCalls=0;const fetcher = vi.fn().mockImplementation(async (url:string)=>{if(url.includes('power-history')||url.includes('landsat-seasons')||url.includes('nasa-context'))return {ok:false,status:404};if((url.includes('field-evidence')||url.includes('/api/atlas/evidence')))return {ok:true,json:async()=>fieldData};if(weatherCalls++===0)throw new Error('Download interrupted');return {ok:true,json:async()=>data};});

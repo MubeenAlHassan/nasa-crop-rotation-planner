@@ -16,7 +16,7 @@ export function ExportMenu({disabled,onExport,label='Export report'}:{disabled?:
     return()=>{document.removeEventListener('mousedown',onPointer);document.removeEventListener('keydown',onKey);};
   },[open]);
   return <div className={`ra-export-menu${open?' ra-export-open':''}`} ref={root}>
-    <button type="button" className="ra-button ra-button-outline" aria-haspopup="menu" aria-expanded={open} aria-controls={menuId} disabled={disabled} onClick={()=>setOpen(v=>!v)}>
+    <button type="button" className="ra-button ra-button-outline" aria-label={label} aria-haspopup="menu" aria-expanded={open} aria-controls={menuId} disabled={disabled} onClick={()=>setOpen(v=>!v)}>
       <Download size={15}/><span>{label}</span><ChevronDown size={14} aria-hidden="true"/>
     </button>
     {open&&<ul className="ra-export-list" role="menu" id={menuId}>
