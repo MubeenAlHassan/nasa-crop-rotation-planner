@@ -50,3 +50,14 @@ ECOSTRESS archive has 24 records; June LST has 2 usable field observations (June
 4. Reconciled obsolete 12-year comparison, locked dates, pairwise ranking and pending-authenticated-data statements in `ROTATION_ATLAS.md`; historical release logs remain labeled historical.
 
 Verification results and remaining work are recorded in the final audit entry of `IMPLEMENTATION_PLAN.md`. This audit supports a labeled local demonstration, not quantitative farm reliance or production readiness.
+
+## Vercel demonstration update — 15 November 2026
+
+Server decision sync is disabled in the current code: HTTP 501, no filesystem
+operations or client retry queue. Save controls identify browser/device scope and
+backup exports; legacy drafts remain restorable. Production and static Chrome
+checks pass with no decision API requests. 113 frontend/API tests, lint, types and
+production build pass. This resolves the demo persistence incompatibility without
+claiming G5 production accounts or durable cloud storage. Owner redeployment is
+required. Existing live evidence APIs and all nine monthly package checksums were
+verified separately; no deployment was performed by this agent.

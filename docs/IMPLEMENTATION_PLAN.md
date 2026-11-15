@@ -1,5 +1,32 @@
 # Field Shift implementation — updated 14 November 2026
 
+## Vercel demonstration saving — 15 November 2026
+
+Device-local saving now applies to Next.js and static deployments. Save controls
+identify the device scope and recommend report export as a backup. Automatic
+sync and reconnect retries are removed; existing schema-1 pending drafts migrate
+without losing inputs or timestamps. Readable drafts remain restorable if the
+browser blocks migration writes. `/api/atlas/decisions` returns HTTP 501 with
+`SERVER_SYNC_DISABLED`, no-store, and no filesystem access. No database or account
+service added; no deployment performed. Historical sync test results below refer
+to the previous implementation.
+
+Live read-only checks of https://rotationatlas.vercel.app on 15 November: homepage,
+workspace, evidence/history/season index/June/ECOSTRESS/GRACE APIs returned 200;
+JSON endpoints decoded successfully. All nine live March–November seasonal APIs
+returned 200 and matched their indexed SHA-256 checksums; report:
+`artifacts/vercel-season-api-check.json`. These checks describe the existing deployment,
+not deployment of the local save fix. All 113 frontend/API tests, ESLint, TypeScript and production build passed.
+Production Chrome verified device-local save, export, offline reload/recalculation,
+reconnect, tablet/phone layout and zero server-sync requests or browser exceptions.
+Legacy pending migration and blocked-write restoration are covered by tests.
+The browser smoke script was updated for the existing export-format menu after
+its first run stopped before selecting JSON; the corrected production run passed.
+Standalone static Chrome also passed device-local saving, JSON export, tablet/phone
+layout, offline replay and zero sync requests/browser exceptions. These are software
+checks, not new scientific validation.
+
+
 
 ## Evidence-linked per-strategy rationale — verified 14 November 2026
 

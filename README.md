@@ -28,7 +28,7 @@ See [implementation and validation](agent_docs/ROTATION_ATLAS.md) for model limi
 node scripts/build-atlas.mjs
 ```
 
-This produces `dist-atlas/`, a static demonstration that calculates locally. The full Next.js app additionally provides `/api/atlas/compare` and `/api/atlas/decisions`; decision sync requires persistent writable storage. See the implementation guide for storage and offline limits.
+This produces `dist-atlas/`, a static demonstration that calculates locally. The full Next.js app additionally provides `/api/atlas/compare`. Decision saving is device-local on both hosts; `/api/atlas/decisions` explicitly returns `501 SERVER_SYNC_DISABLED` without reading or writing server files. Export a report as a backup; clearing browser storage can remove drafts. See the implementation guide for storage and offline limits.
 
 ## Data tooling
 

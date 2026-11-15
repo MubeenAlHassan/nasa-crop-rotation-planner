@@ -18,7 +18,7 @@ npm run dev --prefix frontend
 
 The comparison service is `POST /api/atlas/compare` in Next.js. It runs the same pure TypeScript engine as the browser; the Iowa experience does not require a Python server. Python is used only for optional capture, QA and harmonization.
 
-`node scripts/build-atlas.mjs` also produces `dist-atlas/`, a portable static demonstration, and the self-contained offline shell in `frontend/public/atlas/`. Serve the static demonstration at `/atlas/` for service-worker coverage. The static artifact calculates locally; it has no server comparison endpoint. Saved edits remain on the device and can be exported. On the full Next.js application, pending saved scenarios are synced to the decision storage service when connectivity returns. The `POST/GET /api/atlas/decisions` service stores the latest decision behind a per-device UUID capability key (no public listing). It uses `.atlas-decisions/` or `ATLAS_DECISIONS_DIR`; production hosting needs a persistent writable volume. This demo mechanism is not account-based cross-device storage or a multi-user authentication system. Keep the device key private. Static hosting has no sync endpoint and retains the pending device copy.
+`node scripts/build-atlas.mjs` also produces `dist-atlas/`, a portable static demonstration, and the self-contained offline shell in `frontend/public/atlas/`. Serve the static demonstration at `/atlas/` for service-worker coverage. The static artifact calculates locally; it has no server comparison endpoint. Saved edits remain on the device and can be exported. Decision saving is device-local in both Next.js and static deployments. Server synchronization is disabled; `/api/atlas/decisions` returns HTTP 501 with `SERVER_SYNC_DISABLED` and performs no filesystem operations. Existing drafts are restored without a sync queue. Clearing browser storage can remove drafts; export a report as a backup.
 
 Build the offline bundle before the Next.js production build. The build script hashes HTML, scripts, CSS and the evidence package into the service-worker cache version. A new release replaces older Atlas caches without touching other applications' caches. The initial visit must be online. Raw NASA archives are cached only when opened; the weather package, comparison engine and export work offline without them.
 
@@ -118,7 +118,7 @@ No farmer interviews, five-person trial or agronomic validation were performed b
 - Full Next.js production build and TypeScript validation: passed.
 - Fresh Chrome desktop/mobile checks: passed; no JavaScript exceptions and no 390 px horizontal overflow.
 - Browser checks: four comparison cards, 34 sensitivity cases, valid JSON report export, offline reload and recalculation, real server persistence, and queued synchronization after reconnection all passed.
-- Private hosted **static demonstration**: https://rotation-atlas-iowa-2026.famedotter2.chatgpt.site . This published artifact evaluates locally; server sync is available in the full Next.js deployment, not the static demo.
+- Private hosted **static demonstration**: https://rotation-atlas-iowa-2026.famedotter2.chatgpt.site . This published artifact evaluates locally; server sync is now disabled in both deployments.
 - At that historical release authenticated granules remained outstanding. Current mission acquisitions are recorded in the implementation plan; measured soil data, farmer usability trials and agronomic validation still remain outstanding.
 
 ## Legacy frontend removal — 2026-11-03

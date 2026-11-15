@@ -29,7 +29,7 @@ deliverables merely because an older prompt asks to create them.
 | Requirements/scientific audit | `READINESS_AUDIT.md` exists; identified defects and fixes documented | Revisit partial requirements; update audit after changes |
 | Agronomic validity | Explicit scenario assumptions and limitations | Calibration, independent predictive evaluation and multi-season alternative-rotation evidence |
 | Usability | Automated browser checks documented | Actual farmer/adviser sessions, consent and comprehension evaluation |
-| Production | Local prototype; not deployed | G5 identity/access, privacy, durable storage, retention, monitoring, backup/recovery and ownership |
+| Production | Vercel demo reported by owner; live evidence endpoints checked 15 Nov. Device-local save fix prepared locally; requires redeployment | G5 identity/access, privacy, durable storage, retention, monitoring, backup/recovery and ownership |
 
 Software verification is recorded in `IMPLEMENTATION_PLAN.md`; do not count passing
 tests as field accuracy, farmer usability or calibrated uncertainty. Repeat checks
@@ -110,3 +110,10 @@ external blockers and the exact next action. Do not deploy or purchase services.
   or secrets through Git or chat.
 - Replace this summary as work completes; retain dated verification and evidence
   references. Explicitly distinguish done, partial, externally blocked and deferred.
+
+## Save behavior update — 15 November 2026
+
+Saving is device-local only; server decision sync is explicitly disabled (HTTP 501).
+Existing drafts migrate without data loss. Changes must be deployed by the owner
+to update the public Vercel demo. No backend host or database is needed for this mode.
+See the latest implementation-plan entry for verification and live-check scope.
