@@ -51,3 +51,4 @@ frontend/public/atlas/app.css
 frontend/public/atlas/offline.html
 frontend/.atlas-decisions/
 .openai
+.slide-build
