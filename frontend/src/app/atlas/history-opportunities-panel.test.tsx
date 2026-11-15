@@ -8,6 +8,10 @@ import {DEFAULT_REQUEST} from '@/lib/atlas/catalog';
 import {saveDecision,loadDecision} from '@/lib/atlas/storage';
 import Atlas from './atlas-client';
 
+// Exercise the real review/save/correction flow. Daily calendar rendering has
+// separate exhaustive coverage and does not need to repeat on every form edit.
+vi.mock('./charts',async importOriginal=>({...await importOriginal<typeof import('./charts')>(),Timeline:()=>null}));
+
 let host:HTMLDivElement,root:Root;
 beforeEach(()=>{
   localStorage.clear();host=document.createElement('div');document.body.append(host);root=createRoot(host);
@@ -34,7 +38,7 @@ const control=async(label:string,value:string)=>{
   await act(async()=>{Object.getOwnPropertyDescriptor(proto,'value')!.set!.call(element,value);element.dispatchEvent(new Event(element.tagName==='SELECT'?'change':'input',{bubbles:true}));});
 };
 
-describe('Observation to farmer review to comparison workflow',()=>{
+describe('Observation to farmer review to comparison workflow',{timeout:15_000},()=>{
   it('requires local confirmation, inspects without choosing, corrects and restores the draft offline',async()=>{
     const request=structuredClone(DEFAULT_REQUEST);
     Object.assign(request.field,{boundaryConfirmed:true,baselineConfirmed:true,laborAvailable:true,coverEquipment:true,smallGrainBuyer:true,smallGrainEquipment:true,smallGrainSuitable:true,forageSuitable:true,forageBuyer:true,forageEquipment:true,budget:4000});

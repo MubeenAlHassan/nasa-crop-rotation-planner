@@ -6,6 +6,11 @@ import weather from '../../../public/atlas/iowa.json';
 import field from '../../../public/atlas/field-evidence.json';
 import Atlas from './atlas-client';
 
+// Calendar rendering is covered exhaustively in charts-plotting.test.tsx.
+// Keep this workflow focused on real farm inputs, constraints and review notes
+// rather than rebuilding 1,461 daily chart marks after every input change.
+vi.mock('./charts',async importOriginal=>({...await importOriginal<typeof import('./charts')>(),Timeline:()=>null}));
+
 let host:HTMLDivElement,root:Root;
 beforeEach(()=>{
   localStorage.clear();host=document.createElement('div');document.body.append(host);root=createRoot(host);
@@ -23,7 +28,7 @@ const select=async(label:string,value:string)=>{
   await act(async()=>{Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value')!.set!.call(input,value);input.dispatchEvent(new Event('change',{bubbles:true}));});
 };
 
-describe('Rotation review guidance',()=>{
+describe('Rotation review guidance',{timeout:15_000},()=>{
   it('explains unknown farm checks with an action and keeps model limitations separate',async()=>{
     await act(async()=>root.render(<Atlas/>));await click('Compare rotations');
     const review=host.querySelector('.ra-feasibility-review')!;

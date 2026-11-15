@@ -156,3 +156,41 @@ the complete history explanations. Desktop and phone checks passed on both
 production and static hosts. All 168 frontend tests, lint, TypeScript, production
 compilation and the main interaction/export/offline browser suite passed. No
 source observations, calculations or scientific claims changed in this follow-up.
+
+## Follow-up: Vercel build timeouts
+
+The earlier four-worker cap was not enough for smaller CI runners. Restricting
+the original test process to two CPU cores reproduced failures in the same four
+files reported by Vercel: six tests exceeded the default five-second deadline.
+No assertion failures or invalid evidence values were reported in that run.
+
+The test configuration now uses at most two workers and respects a single
+available CPU. The longer review workflows, exhaustive chart checks and monthly
+API validations have explicit 15-second limits. Smaller tests retain Vitest's
+five-second default; existing full-season tests retain their separate limits.
+
+The two form-workflow suites omit the daily calendar component, which otherwise
+rebuilds 1,461 marks after each edit. Their real inputs, comparison engine,
+feasibility checks, saved drafts and correction flow are still exercised. The
+calendar itself keeps its exhaustive tests in `charts-plotting.test.tsx` and the
+browser suite. Each monthly API archive now has its own test and deadline, so
+all nine months are still checked without sharing one timeout across the loop.
+The first API test still validates the full file on both its 200 and 304 paths.
+
+All **176 cases in 30 files** passed with one CPU and with two CPUs under
+`CI=1 NODE_ENV=production`. The increase from 168 cases comes from counting the
+nine monthly API checks separately. Lint and TypeScript also passed. Test reports
+and build output are retained in ignored `artifacts/ci-timeouts/`. The complete
+production build also passed with `CI=1 NODE_ENV=production` and two CPU cores,
+including all tests, route generation, TypeScript and Next.js compilation.
+
+To reproduce the restricted-CPU checks on Linux, choose CPU IDs allowed by the
+host's affinity settings. The following commands used CPUs 0 and 1 locally:
+
+```sh
+CI=1 NODE_ENV=production taskset -c 0 npm run test --prefix frontend -- --run
+CI=1 NODE_ENV=production taskset -c 0,1 npm run build --prefix frontend
+```
+
+This follow-up changes test execution and documentation only. Application code,
+scientific data, checksum checks and production calculations are unchanged.

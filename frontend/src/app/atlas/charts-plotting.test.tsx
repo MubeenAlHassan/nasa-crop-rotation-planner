@@ -52,7 +52,9 @@ describe('Rainfall bars: source totals, scale and missingness',()=>{
   });
 });
 
-describe('Modeled crop and sensitivity charts',()=>{
+// Exhaustive multi-strategy DOM checks and scenario replays exceed the default
+// five-second unit-test budget on small CI runners. Keep a finite scoped limit.
+describe('Modeled crop and sensitivity charts',{timeout:15_000},()=>{
   it('matches every daily crop, complete date span, event and period length for all four strategies',()=>{
     const result=compare(weather,confirmed());
     for(const strategy of result.strategies){
@@ -192,5 +194,5 @@ describe('Native evidence maps: values, units, quality and geographic orientatio
       }
     }
     expect(cells).toBe(6171);
-  });
+  },15_000);
 });

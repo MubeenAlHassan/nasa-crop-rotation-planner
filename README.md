@@ -88,6 +88,11 @@ node scripts/atlas-browser-smoke.mjs http://127.0.0.1:3000 --server
 
 It checks the comparison workflow, exports, responsive layouts and offline reopening. The [pre-merge audit](docs/PRE_MERGE_AUDIT.md) records the broader test coverage, fixes and remaining limits.
 
+The test runner uses at most two workers, or one when only one CPU is available.
+Tests that drive the full workspace or validate whole evidence archives have
+explicit time limits; smaller tests keep Vitest's five-second default. This
+keeps the production build usable on smaller CI runners such as Vercel.
+
 ## Data tools and documentation
 
 The optional acquisition and processing scripts are in `backend/atlas/`. Use a separate Python environment for this work. Exact replay of the captured evidence uses Python 3.12 and the versions in `backend/atlas/requirements-evidence.txt`; the native-file tests also need the original captured files in the local provider cache.
