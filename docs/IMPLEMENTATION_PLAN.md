@@ -1,5 +1,46 @@
 # Field Shift implementation — updated 14 November 2026
 
+## Drawing and slow-network recovery — 15 November 2026
+
+Fixed the Draw field state transition: selecting the outline layer no longer
+immediately cancels drawing. At least three corners are required; clearing,
+canceling, applying a closed ring and restoring the captured boundary work.
+Changed boundaries still withhold the original Landsat/soil overlays.
+
+Evidence downloads now prefer cacheable static archives (including service-worker
+copies), with API fallback when online. The full fetch and JSON body are bounded
+at 120 seconds per file instead of the previous 3/15-second cutoffs. Caller
+cancellation aborts obsolete work on retry/unmount. Field evidence is published as
+soon as its verified base archive is available; optional NASA context and additional
+Landsat seasons load concurrently and cannot remove valid base observations.
+Schema/QA/boundary checks, scientific values, forcing and scoring are unchanged.
+
+Overview/history/comparison expose download progress and a restart/retry control.
+Failed field downloads are labeled unavailable in the map rather than permanently
+loading. Extended-history failures have a separate retry control. Retries preserve
+current farm inputs and device drafts. Source data are never invented or imputed.
+
+Verification: 123 tests across 24 files passed, including a simulated 90-second
+JSON transfer, stalled-body timeout, caller cancellation, early base publication,
+optional-context failure, static/API history fallback, failed-field retry without
+input loss, and drawing/clear/cancel/closed-boundary tests. Full ESLint, TypeScript,
+production build and diff whitespace checks passed. The first lint run identified
+state updates inside effects; moved reset transitions into retry event handlers and
+reran lint/build successfully.
+
+Browser checks on local static and production builds: drawing mode enters/cancels;
+static preview placed four corners, applied the ring, withheld mismatched imagery,
+restored the captured boundary and soil overlay, compared four rotations and saved
+locally. Production history displayed 17 usable / 66 discovered 2024 acquisitions;
+no captured browser errors. Production history had no page overflow at 390 and
+1024 px. Slow/failing network behavior is verified through deterministic tests;
+no claim of a newly completed live-Vercel or full offline browser suite.
+
+No deployment performed. Owner must deploy these changes before the public Vercel
+site receives the fixes; the earlier live-test report describes the previous build.
+
+
+
 ## Vercel demonstration saving — 15 November 2026
 
 Device-local saving now applies to Next.js and static deployments. Save controls

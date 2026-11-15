@@ -117,3 +117,12 @@ Saving is device-local only; server decision sync is explicitly disabled (HTTP 5
 Existing drafts migrate without data loss. Changes must be deployed by the owner
 to update the public Vercel demo. No backend host or database is needed for this mode.
 See the latest implementation-plan entry for verification and live-check scope.
+
+## Demo fixes — 15 November 2026
+
+Draw field mode and slow-network evidence recovery are fixed locally. See the
+latest implementation-plan entry for tests and scope. Static-first downloads
+publish base field evidence before optional context; failed loads have explicit
+retry controls. 123 tests, lint, types and production build pass; local static and
+production browser checks passed. No live deployment was performed. Redeploy before
+asking judges to verify these changes. Existing scientific validation gates remain.
