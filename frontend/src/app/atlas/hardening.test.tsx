@@ -60,6 +60,22 @@ describe('Workspace bootstrap and evidence retries', () => {
     await act(async () => window.dispatchEvent(new Event('offline')));
     expect(host.querySelector('.ra-connection')?.textContent).toContain('Offline');
   });
+  it('restores old pending drafts and saves offline/reconnect without server requests', async () => {
+    localStorage.setItem('rotation-atlas-decision-v1', JSON.stringify({schema:1, updatedAt:'2026-11-14T00:00:00Z', request:DEFAULT_REQUEST, pending:true}));
+    let online=true;
+    vi.spyOn(window.navigator,'onLine','get').mockImplementation(()=>online);
+    const fetcher=vi.fn().mockResolvedValue({ok:false,status:404});
+    vi.stubGlobal('fetch',fetcher);
+    await act(async()=>root.render(<Atlas/>));
+    expect(JSON.parse(localStorage.getItem('rotation-atlas-decision-v1')!).pending).toBe(false);
+    await click('Save on this device');
+    expect(host.textContent).toContain('Clearing browser storage can remove your draft');
+    online=false;await act(async()=>window.dispatchEvent(new Event('offline')));
+    await click('Save on this device');
+    online=true;await act(async()=>window.dispatchEvent(new Event('online')));
+    expect(fetcher.mock.calls.some(([url])=>String(url).includes('/api/atlas/decisions'))).toBe(false);
+    expect(JSON.parse(localStorage.getItem('rotation-atlas-decision-v1')!).request).toEqual(DEFAULT_REQUEST);
+  });
 });
 describe('Chart text alternatives', () => {
   it('provides monthly historical and scenario values in a semantic table', () => {

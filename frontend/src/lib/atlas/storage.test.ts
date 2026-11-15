@@ -3,10 +3,10 @@ import {parseEco} from './ecostress';
 import {parseSeason} from './nasa-season';
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {DEFAULT_REQUEST} from './catalog';
-import {downloadReport,loadDecision,saveDecision,STORAGE_KEY,syncDecision} from './storage';
+import {downloadReport,loadDecision,saveDecision,STORAGE_KEY} from './storage';
 beforeEach(()=>{localStorage.clear();vi.restoreAllMocks();});
 afterEach(()=>{vi.unstubAllGlobals();});
-describe('Device decision queue',()=>{
+describe('Device-local decisions',()=>{
  it('exports retained historical records when weather and modeled results are unavailable',async()=>{
    // Load Node's fixture reader directly; jsdom's Vite transform stubs node:fs.
    const {readFileSync}=await vi.importActual<typeof import('node:fs')>('node:fs');
@@ -38,6 +38,7 @@ describe('Device decision queue',()=>{
  it('adds empty history to existing four-year drafts without discarding inputs',()=>{const r=structuredClone(DEFAULT_REQUEST) as Partial<typeof DEFAULT_REQUEST>;delete r.history;r.field!.name='My saved field';localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:1,request:r,pending:true,updatedAt:'2026-11-07'}));const loaded=loadDecision();expect(loaded?.request.field.name).toBe('My saved field');expect(loaded?.request.history.windows).toEqual([]);expect(loaded?.request.history.boundary).toBeNull();});
  it('adds default enterprise assumptions without inventing farmer review',()=>{const r=structuredClone(DEFAULT_REQUEST) as Partial<typeof DEFAULT_REQUEST>;delete r.enterprise;r.field!.name='Budget field';localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:1,request:r,pending:true,updatedAt:'2026-11-14'}));const loaded=loadDecision();expect(loaded?.request.field.name).toBe('Budget field');expect(loaded?.request.enterprise.schemaVersion).toBe('enterprise-inputs-v1');expect(loaded?.request.enterprise.reviewed).toBe(false);expect(loaded?.request.enterprise.source).toBe('catalog-default');expect(loaded?.request.enterprise.crops).toEqual({});});
  it('ignores corrupted stored decisions',()=>{localStorage.setItem(STORAGE_KEY,'{');expect(loadDecision()).toBeNull();localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:1,request:{}}));expect(loadDecision()).toBeNull();});
- it('retains a pending edit when the service cannot be reached',async()=>{vi.stubGlobal('fetch',vi.fn().mockRejectedValue(new Error('offline')));const saved=saveDecision(DEFAULT_REQUEST);expect(await syncDecision(saved)).toBe(false);expect(loadDecision()?.pending).toBe(true);});
- it('clears pending only after the service saves the current saved scenario',async()=>{vi.stubGlobal('fetch',vi.fn().mockImplementation(async (_url,options)=>({ok:true,json:async()=>({status:'saved',updatedAt:JSON.parse(options.body).updatedAt})})));const saved=saveDecision(DEFAULT_REQUEST);expect(await syncDecision(saved)).toBe(true);expect(loadDecision()?.pending).toBe(false);});
+ it('saves locally without network requests or a sync queue',()=>{const fetcher=vi.fn();vi.stubGlobal('fetch',fetcher);const saved=saveDecision(DEFAULT_REQUEST);expect(saved.pending).toBe(false);expect(loadDecision()?.request).toEqual(DEFAULT_REQUEST);expect(fetcher).not.toHaveBeenCalled();});
+ it('migrates old pending drafts without losing their content or timestamp',()=>{const updatedAt='2026-11-14T00:00:00Z';localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:1,updatedAt,request:DEFAULT_REQUEST,pending:true}));const loaded=loadDecision();expect(loaded?.request).toEqual(DEFAULT_REQUEST);expect(loaded?.updatedAt).toBe(updatedAt);expect(loaded?.pending).toBe(false);expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).pending).toBe(false);});
+ it('restores a readable legacy draft even if migration cannot be written',()=>{localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:1,updatedAt:'2026-11-14',request:DEFAULT_REQUEST,pending:true}));vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw Error('Storage full');});expect(loadDecision()?.request).toEqual(DEFAULT_REQUEST);expect(loadDecision()?.pending).toBe(false);});
 });
