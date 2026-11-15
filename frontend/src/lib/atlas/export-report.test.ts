@@ -2,7 +2,7 @@
 import {describe,expect,it,vi} from 'vitest';
 import {DEFAULT_REQUEST} from './catalog';
 import {compare} from './engine';
-import {buildReportPayload,downloadFormattedReport,reportToExcel,reportToPdf,reportToWord} from './export-report';
+import {buildReportPayload,downloadFormattedReport,reportSummaryLines,reportToExcel,reportToPdf,reportToWord} from './export-report';
 import type {EvidenceSeries} from './types';
 
 // Load Node's fixture reader directly; jsdom's Vite transform stubs node:fs.
@@ -16,6 +16,70 @@ function confirmed(){
 }
 
 describe('Multi-format decision export',()=>{
+  it('keeps Unicode and markup-like farmer notes as text in Word and Excel',async()=>{
+    const request=confirmed();
+    request.decision.notes='Café 水 🌾 <script>alert("x")</script> & =SUM(1,2)';
+    const payload=buildReportPayload(request,null,null);
+    const read=async(blob:Blob)=>new Promise<string>(resolve=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.readAsText(blob);});
+    const excel=new DOMParser().parseFromString(await read(reportToExcel(payload)),'application/xml');
+    expect(excel.querySelector('parsererror')).toBeNull();
+    expect(Array.from(excel.getElementsByTagName('Data')).some(cell=>cell.textContent===request.decision.notes)).toBe(true);
+    expect(excel.querySelector('[Formula]')).toBeNull();
+    const word=new DOMParser().parseFromString(await read(reportToWord(payload)),'text/html');
+    expect(word.querySelector('script')).toBeNull();
+    expect(word.body.textContent).toContain(request.decision.notes);
+  });
+  it('writes exact PDF byte offsets and stream lengths for accented, scientific and local Unicode text',async()=>{
+    const request=confirmed();
+    request.field.name='Café (north) \\ 42° – 水 🌾';
+    request.enterprise.note='W'.repeat(400);
+    const payload=buildReportPayload(request,compare(data,request),data);
+    // Exercise unbroken text and line breaks in farmer-entered notes as well.
+    payload.notice+='\n'+request.enterprise.note+'\r\nEnd of note.';
+    const blob=reportToPdf(payload);
+    const buffer=await new Promise<ArrayBuffer>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result as ArrayBuffer);reader.onerror=reject;reader.readAsArrayBuffer(blob);});
+    const bytes=new Uint8Array(buffer),pdf=new TextDecoder().decode(bytes);
+    const xref=Number(/startxref\n(\d+)/.exec(pdf)![1]);
+    expect(new TextDecoder().decode(bytes.slice(xref,xref+4))).toBe('xref');
+    const entries=pdf.slice(xref).split('\n');
+    const count=Number(entries[1].split(' ')[1]);
+    for(let id=1;id<count;id++){
+      const offset=Number(entries[id+2].slice(0,10));
+      expect(new TextDecoder().decode(bytes.slice(offset,offset+`${id} 0 obj`.length))).toBe(`${id} 0 obj`);
+    }
+    for(const stream of pdf.matchAll(/\/Length (\d+) >>\nstream\n([\s\S]*?)\nendstream/g)){
+      expect(new TextEncoder().encode(stream[2]).length).toBe(Number(stream[1]));
+    }
+    // Standard PDF fonts require a declared single-byte encoding. Unsupported
+    // characters stay explicit rather than disappearing or becoming mojibake.
+    expect(pdf).toContain('/Encoding /WinAnsiEncoding');
+    expect(pdf).toContain('[U+6C34]');expect(pdf).toContain('[U+1F33E]');
+    expect(pdf).toContain('Caf\\351 \\(north\\) \\\\ 42\\260 \\226');
+    expect(pdf).not.toMatch(/[^\x00-\x7F]/);
+  });
+  it('retains reviewed-window provenance, calendar overlap, trade-offs and corrections in every format',async()=>{
+    const request=confirmed();
+    request.history.boundary=structuredClone(request.field.boundary);
+    request.history.windows=[{id:'local-fixture',start:'2024-03-01',end:'2024-03-09',status:'farmer-confirmed',cover:'bare-soil',note:'Synthetic local scouting record',updatedAt:'2026-11-15T00:00:00Z',observationIds:['missing-fixture']}];
+    const payload=buildReportPayload(request,compare(data,request),data);
+    expect(payload.historyOpportunities[0].satelliteLink).toBe('local-record-only');
+    expect(payload.historyOpportunities[0].calendars.find(c=>c.strategyId==='cover')!.years[1].addedDays).toBe(9);
+    expect(JSON.stringify(payload.result)).toContain('windowConnections');
+    expect(reportSummaryLines(payload).join('\n')).toContain('whole four-year water shortfall delta');
+    const read=async(blob:Blob)=>new Promise<string>(resolve=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.readAsText(blob);});
+    for(const blob of [reportToExcel(payload),reportToWord(payload),reportToPdf(payload)]){
+      const text=await read(blob);
+      expect(text).toContain('Synthetic local scouting record');expect(text).toContain('local-record-only');
+      expect(text).toContain('baseline 0; added 9');expect(text).toContain('calendar analogy');
+    }
+    request.history.windows[0].cover='residue-present';
+    const corrected=buildReportPayload(request,null,null);
+    expect(corrected.historyOpportunities[0].calendars).toEqual([]);
+    expect(reportSummaryLines(corrected).join()).toContain('other-cover');
+    expect(reportSummaryLines(corrected).join()).not.toContain('added 9');
+    request.field.boundary[1][0]-=.001;
+    expect(buildReportPayload(request,null,null).historyOpportunities[0].status).toBe('withheld');
+  });
   it('builds JSON, Excel, Word and PDF downloads with distinct content types',async()=>{
     const request=confirmed();
     const result=compare(data,request);

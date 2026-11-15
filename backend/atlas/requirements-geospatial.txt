@@ -3,6 +3,7 @@
 earthaccess>=0.14,<1
 rasterio>=1.4,<2
 shapely>=2.0,<3
+pyproj>=3.7,<4
 pyarrow>=18,<30
 h5py>=3.12,<4
 

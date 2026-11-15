@@ -1,4 +1,6 @@
 # Versions used to capture/inspect the checked-in native-support evidence.
+# Use an isolated Python 3.12 environment for byte-exact replay. The repository's
+# older Python 3.11 environment cannot install this pinned NumPy version.
 numpy==2.5.4
 rasterio==1.5.2
 shapely==2.2.0

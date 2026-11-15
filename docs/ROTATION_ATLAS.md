@@ -24,6 +24,45 @@ Build the offline bundle before the Next.js production build. The build script h
 
 ## Captured evidence
 
+### Reviewed-window calendar connections — 15 November 2026
+
+In **Field history & windows**, review a Landsat low-NDVI interval, inspect its
+dates and valid-area coverage, and enter the locally observed condition and a
+dated source note. Confirmation requires a condition and a nonempty local note;
+the candidate prompt is never prefilled as an observation. Manual local records
+also work, with satellite support explicitly absent when no accepted pair is linked.
+
+The **What your reviewed windows could change** panel appears in both history and
+comparison. A confirmed bare-soil window is mapped to the same seasonal dates in
+each year of the 2027–2030 planning horizon. It uses the engine's shared crop
+calendar to show scheduled crops, baseline occupancy, additional and lost calendar
+days, and existing whole-horizon modeled water/margin differences. Inspecting a
+rotation does not select it. Failed or unknown feasibility still prevents ranking.
+
+This is a seasonal analogy, not a prediction that historical exposure recurs.
+Scheduled occupancy includes dormancy and does not measure protective biomass.
+Other cover conditions, uncertain records, conflicting confirmed windows,
+unconfirmed/mismatched boundaries, unconfirmed baselines and windows outside the
+selected history period withhold the calendar connection. Leap dates unsupported
+in a planning year and intervals beyond the horizon are omitted explicitly.
+
+Corrections, source IDs/dates/QA, limitations and calendar connections are retained
+in device drafts and JSON/Excel/Word/PDF exports; each strategy rationale includes
+its connection. The `reviewed-window-calendar-v1` method changes explanations only:
+it does not alter forcing, physical outcomes, feasibility, normalization, scores,
+or the farmer's selection. No new data acquisition or calibration is claimed.
+
+Browser verification (after a production build and local start):
+
+```sh
+node scripts/atlas-window-connection-smoke.mjs http://127.0.0.1:4173
+```
+
+The script uses a clearly labeled local-review fixture with actual captured
+Landsat dates; it does not assert real scouting. It checks required source notes,
+calendar connections, unchanged existing outcomes/scores, independent inspection,
+export, mobile layout, offline reload and correction to residue cover.
+
 - Illustrative Iowa location: 42.025° N, 93.650° W. The name and boundary are demonstration inputs, not a participating farm.
 - NASA POWER: all 4,383 UTC days from 2013-01-01 through 2024-12-31; no missing required parameters in the captured package.
 - Parameters: PRECTOTCORR, T2M_MIN, T2M_MAX, RH2M, WS2M, ALLSKY_SFC_SW_DWN.

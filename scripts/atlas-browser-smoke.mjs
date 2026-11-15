@@ -115,8 +115,19 @@ try{
  await click('Save on this device');await until(`localStorage.getItem('rotation-atlas-decision-v1')!==null`);
  await until(`JSON.parse(localStorage.getItem('rotation-atlas-decision-v1')).pending===false`);
  await call('Page.setDownloadBehavior',{behavior:'allow',downloadPath:artifacts});await rm(path.join(artifacts,'rotation-atlas-decision.json'),{force:true});await click('Export report');await click('JSON');
- await pause(300);const report=JSON.parse(await readFile(path.join(artifacts,'rotation-atlas-decision.json'),'utf8'));if(report.result.strategies.length!==4||report.result.sensitivity.tested!==34||report.request.decision.selection!=='cover'||report.fieldEvidence.observations.length<=3||report.result.strategies[0].members.length!==3)throw Error('Incomplete report export');
+ const download=async name=>{for(let i=0;i<100;i++){try{return await readFile(path.join(artifacts,name));}catch{await pause(100);}}throw Error('Download did not finish: '+name);};
+ const report=JSON.parse((await download('rotation-atlas-decision.json')).toString('utf8'));if(report.result.strategies.length!==4||report.result.sensitivity.tested!==34||report.request.decision.selection!=='cover'||report.fieldEvidence.observations.length<=3||report.result.strategies[0].members.length!==3)throw Error('Incomplete report export');
  if(report.request.history.windows.length!==1||report.request.history.windows[0].status!=='farmer-confirmed'||!report.comparisonBasis.rotations.includes('not satellite-generated'))throw Error('Reviewed demonstration window or comparison limitations lost in export');
+ for(const [label,extension,marker] of [['Excel','xls','<Workbook'],['Word','doc','<html'],['PDF','pdf','%PDF-1.4']]){
+  const filename=`rotation-atlas-decision-${report.createdAt.slice(0,10)}.${extension}`;
+  await rm(path.join(artifacts,filename),{force:true});await click('Export report');await click(label);
+  const bytes=await download(filename),text=bytes.toString('utf8');
+  if(!text.includes(marker)||!text.includes('Rotation Atlas decision report'))throw Error('Invalid '+label+' download');
+  if(extension==='pdf'){
+   const offset=Number(/startxref\n(\d+)/.exec(text)?.[1]);
+   if(bytes.subarray(offset,offset+4).toString()!=='xref')throw Error('PDF cross-reference byte offset is wrong');
+  }
+ }
  shot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(artifacts,'atlas-comparison.png'),Buffer.from(shot.data,'base64'));
  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await pause(200);
  if(await evaluate('document.documentElement.scrollWidth>window.innerWidth'))throw Error('Mobile horizontal overflow');
@@ -135,5 +146,5 @@ try{
  const home=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(artifacts,'atlas-landing.png'),Buffer.from(home.data,'base64'));}
  if([...requests.values()].some(url=>url.includes('/api/atlas/decisions')))throw Error('Device-local demo attempted server decision sync');
  if(errors.length)throw Error('Browser errors: '+errors.join('\n'));
- const verification={desktop:'passed',reviewedWindow:'Labeled demonstration fixture reviewed before comparison, retained in export and offline reopening',chartLabels:'non-color labels and tables',forcedColors:'keyboard focus and selection passed',comparison:'4 strategies, 4 years, paired members, tri-state feasibility, priority reversal, independent farmer selection',sensitivity:'34 cases',export:'passed',mobile:'no overflow at 390px; tablet 1024px passed',evidence:'Landsat/soil/elevation visible; QA withheld; edited-boundary gating passed',offline:'reload and recalculation passed',serverSync:'disabled; device-local save survives offline/reconnect',retiredRoutes:serverMode?'404; landing navigation clean':'not applicable to static hosting',browserExceptions:errors,artifacts};await writeFile(path.join(artifacts,'atlas-browser-verification.json'),JSON.stringify(verification,null,2));console.log(JSON.stringify(verification,null,2));
+ const verification={desktop:'passed',reviewedWindow:'Labeled demonstration fixture reviewed before comparison, retained in export and offline reopening',chartLabels:'non-color labels and tables',forcedColors:'keyboard focus and selection passed',comparison:'4 strategies, 4 years, paired members, tri-state feasibility, priority reversal, independent farmer selection',sensitivity:'34 cases',export:'JSON, Excel, Word and PDF downloaded; PDF byte offset valid',mobile:'no overflow at 390px; tablet 1024px passed',evidence:'Landsat/soil/elevation visible; QA withheld; edited-boundary gating passed',offline:'reload and recalculation passed',serverSync:'disabled; device-local save survives offline/reconnect',retiredRoutes:serverMode?'404; landing navigation clean':'not applicable to static hosting',browserExceptions:errors,artifacts};await writeFile(path.join(artifacts,'atlas-browser-verification.json'),JSON.stringify(verification,null,2));console.log(JSON.stringify(verification,null,2));
 }finally{if(ws?.readyState===1)ws.send(JSON.stringify({id:++counter,method:'Browser.close'}));await pause(200);ws?.close();chrome.kill('SIGTERM');}

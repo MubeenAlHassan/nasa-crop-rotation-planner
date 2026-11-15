@@ -2,7 +2,7 @@ import type { EvidenceSeries } from './types';
 /** Fixed forcing support; incomplete or duplicate days withhold totals, never imply zero. */
 export function rainfallSummary(data: EvidenceSeries) {
   const rows = new Map<string, EvidenceSeries['weather']>();
-  for (const row of data.weather) rows.set(row.date, [...(rows.get(row.date) ?? []), row]);
+  for (const row of data.timeStandard==='UTC'?data.weather:[]) rows.set(row.date, [...(rows.get(row.date) ?? []), row]);
   const sums = Array<number>(12).fill(0), valid = Array<number>(12).fill(0), expected = Array<number>(12).fill(0);
   for (let time=Date.UTC(2013,0,1); time<Date.UTC(2025,0,1); time+=86400000) {
     const date=new Date(time), month=date.getUTCMonth(), matches=rows.get(date.toISOString().slice(0,10));

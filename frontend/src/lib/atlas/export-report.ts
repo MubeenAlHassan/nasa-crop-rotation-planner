@@ -5,6 +5,7 @@ import type {ComparisonResult,EvidenceSeries,ScenarioRequest,StrategyResult} fro
 import {matchesEvidenceField,type FieldEvidence} from './field-evidence';
 import {historyMatchesField,historyReport} from './history';
 import {attachStrategyRationales} from './strategy-rationale';
+import {historyOpportunities,WINDOW_CONNECTION_LIMIT,WINDOW_CONNECTION_METHOD} from './history-opportunities';
 
 export type ExportFormat='json'|'excel'|'word'|'pdf';
 export const EXPORT_FORMATS: {id:ExportFormat;label:string;extension:string;hint:string}[]=[
@@ -24,6 +25,7 @@ export interface ReportPayload {
   request:ScenarioRequest;
   result:unknown;
   history:ReturnType<typeof historyReport>;
+  historyOpportunities:ReturnType<typeof historyOpportunities>;
   evidence:unknown;
   fieldEvidence:FieldEvidence|null;
   fieldEvidenceApplicability:string;
@@ -63,7 +65,7 @@ export function buildReportPayload(
   return {
     title:'Rotation Atlas decision report',
     createdAt:new Date().toISOString(),
-    comparisonBasis:{rotations:'Fixed templates; not satellite-generated',forcing:'POWER 2013–2024 paired four-year blocks',satelliteRole:'Historical exploration only; does not modify scoring',rationaleMethod:'strategy-rationale-v1'},
+    comparisonBasis:{rotations:'Fixed templates; not satellite-generated',forcing:'POWER 2013–2024 paired four-year blocks',satelliteRole:'Reviewed windows inform seasonal calendar comparisons; do not modify scoring',rationaleMethod:'strategy-rationale-v1',windowConnectionMethod:WINDOW_CONNECTION_METHOD},
     ecostressEvidenceApplicability:ecostressEvidence?(ecoMatches(ecostressEvidence,request)?'matching-boundary':'different-boundary-not-field-evidence'):'unavailable',
     regionalSeasonalPackages,
     crossMonthWindows,
@@ -74,6 +76,7 @@ export function buildReportPayload(
     request,
     result:enriched,
     history:historyReport(request.history,request.field,historicalWeather,fieldEvidence),
+    historyOpportunities:historyOpportunities(request,fieldEvidence),
     evidence:evidence?{...evidence,weather:undefined,satellites:undefined}:null,
     fieldEvidence,
     fieldEvidenceApplicability:fieldEvidence?(matchesEvidenceField(request.field,fieldEvidence)?'matching-boundary':'different-boundary-not-field-evidence'):'unavailable',
@@ -109,6 +112,7 @@ export function reportSummaryLines(payload:ReportPayload):string[] {
     '',
   ];
   const list=strategies(payload);
+  lines.push(...windowSummaryLines(payload));
   if(list.length){
     lines.push('Strategy comparison (annualized means)');
     lines.push('Strategy | Feasibility | Margin USD/ha/yr | Water shortfall mm/yr | Living cover days/yr | Preference');
@@ -145,6 +149,25 @@ export function reportSummaryLines(payload:ReportPayload):string[] {
   return lines;
 }
 
+/** Shared across every export so local corrections and abstentions survive offline reporting. */
+function windowSummaryLines(payload:ReportPayload):string[] {
+  const lines=['Reviewed windows and rotation calendars',WINDOW_CONNECTION_LIMIT];
+  if(!payload.historyOpportunities.length)lines.push('No historical windows recorded.');
+  for(const w of payload.historyOpportunities){
+    lines.push(`Window ${w.windowId}: ${w.start} to ${w.end} | ${w.status} | ${w.cover}`);
+    lines.push(`Local record: ${w.note||'No note'} | updated ${w.updatedAt}`);
+    lines.push(w.reason,`Satellite connection: ${w.satelliteLink}`,...w.warnings);
+    for(const o of w.observations)lines.push(`Landsat ${o.date}: NDVI ${o.ndvi}; valid area ${num(o.validFraction*100)}%; QA ${o.qaPolicy}; ID ${o.id}`);
+    for(const c of w.calendars){
+      for(const y of c.years)lines.push(`${c.strategyId} ${y.start} to ${y.end}: ${y.scheduledDays}/${y.days} scheduled days; baseline ${y.baselineDays}; added ${y.addedDays}; lost ${y.lostDays}; crops ${y.crops.join(', ')||'none'}`);
+      if(c.omittedYears.length)lines.push(`${c.strategyId}: omitted start years ${c.omittedYears.join(', ')} (leap date or horizon limit).`);
+      const strategy=strategies(payload).find(s=>s.id===c.strategyId);
+      if(strategy)lines.push(`${c.strategyId}: feasibility ${strategy.feasibility}; whole four-year water shortfall delta ${num(strategy.pairedDifferences.deficit.mean)} mm; gross margin delta ${num(strategy.pairedDifferences.margin.mean)} USD/ha. Unvalidated scenarios, not benefits attributed to this window.`);
+    }
+  }
+  return [...lines,''];
+}
+
 export function reportToExcel(payload:ReportPayload):Blob {
   const rows:string[][]=[
     ['Section','Field','Value'],
@@ -173,6 +196,7 @@ export function reportToExcel(payload:ReportPayload):Blob {
     rows.push(['Strategy',`${s.id}.sequence`,s.sequence]);
   }
   for(const [i,q] of payload.reviewQuestions.entries())rows.push(['Review question',String(i+1),q]);
+  for(const [i,line] of windowSummaryLines(payload).entries())rows.push(['Reviewed window connection',String(i+1),line]);
   // SpreadsheetML opens cleanly in Excel without extra libraries.
   const cells=rows.map(row=>`<Row>${row.map(cell=>`<Cell><Data ss:Type="String">${xmlEscape(cell)}</Data></Cell>`).join('')}</Row>`).join('');
   const xml=`<?xml version="1.0"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Decision report"><Table>${cells}</Table></Worksheet></Workbook>`;
@@ -185,13 +209,37 @@ export function reportToWord(payload:ReportPayload):Blob {
   return new Blob(['\ufeff',html],{type:'application/msword'});
 }
 
+// The standard PDF fonts do not accept UTF-8 string bytes. Keep WinAnsi glyphs
+// (accents, degree signs, scientific units and punctuation), and make unsupported
+// code points explicit. JSON/Word/Excel retain the complete original Unicode.
+const WIN_ANSI_EXTRA=new Map(Array.from('€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ').map((char,i)=>
+  [char,[128,130,131,132,133,134,135,136,137,138,139,140,142,145,146,147,148,149,150,151,152,153,154,155,156,158,159][i]] as const));
+function pdfVisibleText(value:string):string {
+  return Array.from(value).map(char=>{
+    const code=char.codePointAt(0)!;
+    if((code>=32&&code<=126)||(code>=160&&code<=255)||WIN_ANSI_EXTRA.has(char))return char;
+    if(/\s/u.test(char)||code<32||code===127)return ' ';
+    return `[U+${code.toString(16).toUpperCase()}]`;
+  }).join('');
+}
+function pdfLiteral(value:string):string {
+  return Array.from(value).map(char=>{
+    const byte=WIN_ANSI_EXTRA.get(char)??char.charCodeAt(0);
+    if(byte>=128)return '\\'+byte.toString(8).padStart(3,'0');
+    return /[\\()]/.test(char)?'\\'+char:char;
+  }).join('');
+}
+
 export function reportToPdf(payload:ReportPayload):Blob {
-  const lines=reportSummaryLines(payload).flatMap(line=>{
+  const lines=[...reportSummaryLines(payload),'PDF text: unsupported glyphs appear as [U+...]. JSON retains original Unicode.'].map(pdfVisibleText).flatMap(line=>{
     const width=92;
     if(line.length<=width)return [line];
     const out:string[]=[];
     let rest=line;
-    while(rest.length>width){out.push(rest.slice(0,width));rest=rest.slice(width);}
+    while(rest.length>width){
+      const space=rest.lastIndexOf(' ',width),cut=space>=width/2?space:width;
+      out.push(rest.slice(0,cut));rest=rest.slice(cut).trimStart();
+    }
     if(rest)out.push(rest);
     return out;
   });
@@ -203,12 +251,13 @@ export function reportToPdf(payload:ReportPayload):Blob {
   const objects:string[]=[''];
   const kids:number[]=[];
   const add=(body:string)=>{objects.push(body);return objects.length-1;};
-  const font=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  // Courier's fixed 5.4 pt advance at 9 pt guarantees even long unbroken farmer
+  // notes fit: 92 characters occupy 496.8 pt within the 516 pt printable width.
+  const font=add('<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>');
   for(const pageLines of pages){
     const content=pageLines.map((line,i)=>{
       const y=pageHeight-margin-(i+1)*lineHeight;
-      const safe=line.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
-      return `BT /F1 10 Tf ${margin} ${y} Td (${safe}) Tj ET`;
+      return `BT /F1 9 Tf ${margin} ${y} Td (${pdfLiteral(line)}) Tj ET`;
     }).join('\n');
     const contentId=add(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
     const pageId=add(`<< /Type /Page /Parent 0 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 ${font} 0 R >> >> /Contents ${contentId} 0 R >>`);

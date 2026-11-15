@@ -69,6 +69,7 @@ export interface MemberResult {
   years: YearResult[]; maxWaterResidual: number;
 }
 export interface StrategyRationale {
+  windowConnections:import('./history-opportunities').StrategyWindowConnection[];
   method: 'strategy-rationale-v1';
   strategyId: StrategyId;
   templateBasis: string;
