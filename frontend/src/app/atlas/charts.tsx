@@ -22,7 +22,7 @@ export function RainChart({ data, adjustment }: { data: EvidenceSeries; adjustme
   return <div className="ra-rainchart">
     <p id={id} className="ra-small">Mean monthly NASA POWER precipitation, 2013–2024. Incomplete or duplicate daily support withholds that monthly mean. Solid left bars: historical mean; hatched right bars: your rainfall scenario.</p>
     <div className="ra-chart-bars" role="img" aria-labelledby={id}>{totals.map((value, i) => <div key={months[i]}>
-      <div className="ra-chart-bar-pair">{value===null ? <small>Withheld</small> : <><span style={{ height: `${value / max * 100}%` }} /><span className="ra-pattern-hatch" style={{ height: `${value * adjustment / 100 / max * 100}%` }} /></>}</div><small>{months[i]}</small>
+      <div className="ra-chart-bar-pair">{value===null ? <small>Withheld</small> : <><span data-rain-series="historical" data-value={value} style={{ height: `${value / max * 100}%` }} /><span data-rain-series="scenario" data-value={value * adjustment / 100} className="ra-pattern-hatch" style={{ height: `${value * adjustment / 100 / max * 100}%` }} /></>}</div><small>{months[i]}</small>
     </div>)}</div>
     <div className="ra-legend" aria-hidden="true"><span><i className="ra-historical-key" />Historical mean · left</span><span><i className="ra-scenario-key ra-pattern-hatch" />Scenario · right</span></div>
     <details className="ra-chart-data"><summary>View monthly rainfall values</summary><div className="ra-table-scroll"><table>
@@ -62,12 +62,12 @@ export function Timeline({ result }: { result: StrategyResult }) {
     }
     return { year, days, periods };
   });
-  return <div className="ra-timeline">
+  return <div className="ra-timeline ra-prose">
     <p id={id} className="ra-small">2027–2030 planning calendar using the 2013–2016 weather member. Named periods identify crops; dates below retain source-weather months and days.</p>
-    <div className="ra-months" aria-hidden="true">{months.map(m => <span key={m}>{m}</span>)}</div>
     {years.map(({ year, days, periods }) => <div className="ra-season" key={year.year}>
       <span>{year.year}<small>{CROPS[year.crop].name}<br/>weather {year.weatherYear}</small></span><div className="ra-season-body">
-        <div className="ra-season-track" aria-hidden="true">{days.map(d => <span key={d.date} className={d.crop ? `ra-crop-pattern-${d.crop}` : 'ra-gap'} title={`${d.date}: ${d.crop ? CROPS[d.crop].name : 'Possible cover gap'} · ${number(d.deficit)} mm unmet demand`} style={{ backgroundColor: d.crop ? CROPS[d.crop].color : undefined }} />)}</div>
+        <div className="ra-season-months" aria-hidden="true">{months.map((month,i)=><span key={month} style={{flex:new Date(Date.UTC(year.weatherYear,i+1,0)).getUTCDate()}}>{month}</span>)}</div>
+        <div className="ra-season-track" aria-hidden="true">{days.map(d => <span key={d.date} data-date={d.date} data-crop={d.crop??'gap'} className={d.crop ? `ra-crop-pattern-${d.crop}` : 'ra-gap'} title={`${d.date}: ${d.crop ? CROPS[d.crop].name : 'Possible cover gap'} · ${number(d.deficit)} mm unmet demand`} style={{ backgroundColor: d.crop ? CROPS[d.crop].color : undefined }} />)}</div>
         <div className="ra-season-labels">{periods.map(p => <span key={p.start}>{p.crop ? CROPS[p.crop].name : 'Possible cover gap'}: {p.start.slice(5)}–{p.end.slice(5)}</span>)}</div>
       </div>
     </div>)}

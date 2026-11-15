@@ -3,6 +3,7 @@ import {ecoMatches,type EcoEvidence} from './ecostress';
 import {matchesEvidenceField,type FieldEvidence} from './field-evidence';
 import {graceContains,type GraceEvidence} from './grace';
 import {historyMatchesField,usableObservation} from './history';
+import {historyOpportunities,strategyWindowConnections,type HistoryOpportunity,type StrategyWindowConnection} from './history-opportunities';
 import type {NasaSeason} from './nasa-season';
 import type {EvidenceSeries,ScenarioRequest,StrategyId,StrategyResult} from './types';
 
@@ -29,6 +30,7 @@ export interface AgronomicMechanism {
 }
 
 export interface StrategyRationale {
+  windowConnections:StrategyWindowConnection[];
   method:typeof RATIONALE_METHOD;
   strategyId:StrategyId;
   templateBasis:string;
@@ -230,7 +232,7 @@ function contraryOrMissing(id:StrategyId,strategy:StrategyResult,request:Scenari
 }
 
 /** Build qualified, evidence-linked rationale for one strategy. Does not change scores. */
-export function buildStrategyRationale(strategy:StrategyResult,request:ScenarioRequest,bundle:RationaleEvidenceBundle):StrategyRationale {
+export function buildStrategyRationale(strategy:StrategyResult,request:ScenarioRequest,bundle:RationaleEvidenceBundle,windows:HistoryOpportunity[]=historyOpportunities(request,bundle.fieldEvidence)):StrategyRationale {
   const meta=STRATEGIES.find(s=>s.id===strategy.id)!;
   const citations=[
     powerCitation(bundle.weather),
@@ -242,6 +244,7 @@ export function buildStrategyRationale(strategy:StrategyResult,request:ScenarioR
     {id:`template-${strategy.id}`,source:'template' as const,role:'management-assumption' as const,applicability:'not-used' as const,period:`${request.horizon.startYear}–${request.horizon.startYear+request.horizon.years-1}`,summary:`${meta.name}: ${meta.sequence}.`,claimLimit:TEMPLATE_BASIS},
   ];
   return {
+    windowConnections:strategyWindowConnections(windows,strategy.id),
     method:RATIONALE_METHOD,
     strategyId:strategy.id,
     templateBasis:TEMPLATE_BASIS,
@@ -260,8 +263,9 @@ export function attachStrategyRationales<T extends {strategies:StrategyResult[]}
   request:ScenarioRequest,
   bundle:RationaleEvidenceBundle,
 ):T {
+  const windows=historyOpportunities(request,bundle.fieldEvidence);
   return {
     ...result,
-    strategies:result.strategies.map(s=>({...s,rationale:buildStrategyRationale(s,request,bundle)})),
+    strategies:result.strategies.map(s=>({...s,rationale:buildStrategyRationale(s,request,bundle,windows)})),
   };
 }

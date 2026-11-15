@@ -490,7 +490,7 @@
   width:50%;
   border-radius:var(--ra-radius-sm) 3px 0 0;
   background:#cbd5c1;
-  min-height:2px}
+  min-height:0}
 .ra-chart-bar-pair span+span {
   background:#56755a}
 .ra-chart-bars small {
@@ -674,6 +674,8 @@
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:var(--ra-space-4)}
+.ra-strategies + .ra-window-connections {
+  margin-block-start:var(--ra-space-6)}
 .ra-strategy {
   text-align:left;
   border:1px solid var(--ra-line)!important;
@@ -1984,3 +1986,41 @@ to {
 .ra-nasa-context select {max-width:100%;width:100%}
 .ra-nasa-context figure {margin:1rem 0}
 .ra-nasa-context figcaption {font-size:.85rem;max-width:65ch}
+
+.ra-window-connections table {min-width:1000px;table-layout:fixed}
+.ra-window-connections th:nth-child(1) {width:16%}
+.ra-window-connections th:nth-child(2) {width:26%}
+.ra-window-connections th:nth-child(3),.ra-window-connections th:nth-child(4) {width:13%}
+.ra-window-connections th:nth-child(5) {width:10%}
+.ra-window-connections th:nth-child(6) {width:22%}
+.ra-window-connections .ra-table-scroll:focus-visible {outline:2px solid currentColor;outline-offset:3px}
+.ra-window-connections code {overflow-wrap:anywhere}
+
+.ra-feasibility-review,.ra-model-notes {margin:20px 0;padding:18px;border:1px solid #d7dfd4;border-radius:12px;background:#f5f7f1;color:#203d31}
+.ra-feasibility-review h3,.ra-model-notes h3 {margin:0 0 8px}
+.ra-feasibility-review h4 {margin:16px 0 8px}
+.ra-season-months {display:flex;font-size:var(--ra-text-label);color:var(--ra-muted);text-align:center;margin-bottom:6px}
+.ra-season-months > span {min-width:0}
+.ra-chart-bar-pair span[data-value="0"] {border-width:0!important}
+
+/* Shared reading styles for explanations in comparison, history and evidence.
+   Declare these explicitly so Next's reset and the offline shell agree. */
+.ra-prose {font-size:var(--ra-text-body);line-height:1.7}
+.ra-app .ra-prose p,.ra-prose ul:not(.ra-export-list),.ra-prose ol {max-inline-size:78ch;font-size:var(--ra-text-body);line-height:1.7;overflow-wrap:anywhere}
+.ra-prose p {margin-block:.75rem}
+.ra-prose p.ra-small {font-size:.925rem!important}
+.ra-prose ul:not(.ra-export-list),.ra-prose ol {margin-block:1rem 1.25rem;padding-inline-start:1.5rem;list-style-position:outside}
+.ra-prose ul:not(.ra-export-list) {list-style-type:disc}
+.ra-prose ol {list-style-type:decimal}
+.ra-prose :is(ul:not(.ra-export-list),ol) > li {margin-block:.65rem;padding-inline-start:.25rem;line-height:1.7;overflow-wrap:anywhere}
+.ra-prose :is(ul:not(.ra-export-list),ol) > li::marker {color:var(--ra-ink)}
+.ra-prose h2 {margin-block:0 1rem;font-size:var(--ra-text-title);font-weight:600;line-height:1.35}
+.ra-prose .ra-section-heading h2 {margin:0}
+.ra-prose .ra-insight strong {display:inline}
+.ra-prose h3 {margin-block:1.5rem .65rem;line-height:1.4;font-size:1rem;font-weight:600}
+.ra-prose h4 {margin-block:1.25rem .5rem;line-height:1.4;font-weight:600}
+.ra-prose summary {font-weight:600;line-height:1.5}
+.ra-rationale {margin-block-start:1.5rem}
+.ra-rationale > summary {font-size:1rem;margin-block-end:1rem}
+.ra-rationale li > em {display:block;margin-block-start:.35rem;color:var(--ra-muted)}
+.ra-prose p a,.ra-prose li a {text-decoration:underline;text-underline-offset:3px}
