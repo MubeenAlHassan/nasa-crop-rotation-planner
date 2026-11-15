@@ -1,0 +1,20 @@
+{
+  "sourceUrl": "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2024/027/031/LC09_L2SP_027031_20241008_20241010_02_T1/LC09_L2SP_027031_20241008_20241010_02_T1_SR_B4.TIF",
+  "sourceAsset": "red",
+  "sourceDtype": "uint16",
+  "sourceNoData": 0.0,
+  "nativeCrs": "EPSG:32615",
+  "nativeResolution": [
+    30.0,
+    30.0
+  ],
+  "sourceWindow": {
+    "col_off": 6262,
+    "row_off": 2997,
+    "width": 23,
+    "height": 23
+  },
+  "retrievedAt": "2026-11-08T04:47:09.390318+00:00",
+  "processing": "Unresampled native-grid window, encoded values retained",
+  "sha256": "4b4f09992e1458cab5d65682f56913a167a80fe6b77fb0b477effcc2af1a1544"
+}

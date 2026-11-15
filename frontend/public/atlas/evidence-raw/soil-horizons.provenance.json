@@ -1,0 +1,10 @@
+{
+  "url": "https://sdmdataaccess.nrcs.usda.gov/Tabular/post.rest",
+  "params": null,
+  "query": {
+    "query": "SELECT l.areasymbol,s.saverest,m.mukey,c.cokey,c.compname,c.comppct_r,c.drainagecl,c.hydgrp,h.chkey,h.hzdept_r,h.hzdepb_r,h.awc_r,h.om_r,h.ksat_r FROM mapunit m INNER JOIN legend l ON m.lkey=l.lkey INNER JOIN sacatalog s ON l.areasymbol=s.areasymbol INNER JOIN component c ON m.mukey=c.mukey LEFT JOIN chorizon h ON c.cokey=h.cokey WHERE m.mukey IN (SELECT mukey FROM SDA_Get_Mukey_from_intersection_with_WktWgs84('POLYGON((-93.654 42.022,-93.646 42.022,-93.646 42.028,-93.654 42.028,-93.654 42.022))')) ORDER BY m.mukey,c.cokey,h.hzdept_r",
+    "format": "JSON+COLUMNNAME"
+  },
+  "retrievedAt": "2026-11-07T10:13:42.101432+00:00",
+  "sha256": "d167e8396091daf54f7469dcdfac703c4554a391d4617cde1f2b98713880874d"
+}

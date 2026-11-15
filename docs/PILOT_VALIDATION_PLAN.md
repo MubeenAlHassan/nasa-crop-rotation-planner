@@ -1,0 +1,38 @@
+# Supervised pilot validation plan
+
+14 November 2026. Proposed work, **no participants recruited, measurements collected or validation results claimed**. Iowa pilot polygon/name are illustrative. Software fixtures and farmer-confirmation controls are not evidence of real participation.
+
+## Gates, owners and withheld claims
+
+| Gate | Required work and evidence | Completion criterion | Claims withheld until passed |
+|---|---|---|---|
+| G0: participating field and consent | Farmer/adviser confirms cropped polygon, exclusions, tenancy/data permission, four-year baseline, actual planting/harvest/termination dates, residue retention/removal/tillage, irrigation allocation/efficiency, markets, machinery, labor, restrictions and risk priorities | Dated signed input review; every hard constraint resolved or explicitly unknown; boundary/version associated with all observations | Locally feasible recommendations or farm-specific evidence on the illustrative polygon |
+| G1: soil and water observations | Texture, bulk density, organic matter, pH, nutrients and laboratory method/depth/date; rooting limits, tile drainage and groundwater. Calibrated moisture probes across soil/management strata, gravimetric checks, rain gauge and logged irrigation volumes | Sensor QC/calibration/drift/missingness protocol approved before comparison; independent held-out locations and time blocks; sampling uncertainty documented | Calibrated root-zone water, irrigation savings, validated SMAP accuracy |
+| G2: historical exposure labels | Dated georeferenced crop stage, fractional live cover, residue cover, bare soil, standing water and operations. Photos/transects around overpasses, independent labelers with disagreement/adjudication | Pre-registered classes, tolerances and evaluation thresholds; independent fields/seasons held out; precision/recall, confusion matrix, coverage and abstention reported | Automatic bare-soil/residue detection, protective-cover inference from low NDVI, reliable vulnerability detection |
+| G3: decision usability | Farmers and advisers perform tasks below using consented fields; record experience and accessibility needs separately | At least 4/5 initial participants finish core tasks without coaching; all identify uncertainty and final farmer authority; no unresolved safety-critical misunderstanding. Iterate and retest with new participants | Farmer usability/effectiveness or adoption claims |
+| G4: quantitative projections | Repeated measured yield/moisture, irrigation/withdrawal, fertilizer and harvested N, biomass/residue, labor/cost/sales and weather across rotations and seasons; matched controls or randomized feasible field strips for causal questions | Separate training/calibration/final evaluation; pre-agreed tolerances; outperform transparent baselines on held-out fields/future seasons, with interval coverage/width and decision regret assessed | Predictive intervals, calibrated yields/profits/water savings, causal rotation benefits |
+| G5: production operations | Consent/access policies, identity/authorization, private durable storage, deletion/retention, backup restore, monitoring, support owner and outage procedure | Security review and recovery drill passed; data governance approved; no secret-bearing URLs in exported/cached archives | Production readiness |
+
+## Spatial and temporal measurement design
+
+SMAP L3 probes must represent near-surface 0–5 cm and be matched to actual retrieval times, not merely catalog date. L4 root-zone comparisons need a defensible 0–100 cm depth-weighted profile; a single shallow probe cannot validate it. Record sensor response/calibration, soil heterogeneity and footprint representativeness; multiple probes within one coarse cell are not independent satellite samples. Do not relax rejected L3 QA to obtain a matchup. The current nearest-pilot L3 record has no accepted observations; move the validation question to an actually supported matchup or retain abstention.
+
+Gauge and flow-meter timestamps must retain timezone, accumulation bounds, calibration and undercatch/missingness. Compare half-hour IMERG using interval overlap; missing periods are missing. POWER UTC days are not local calendar days. Evaluate rain occurrence and amounts against gauges independently of products sharing forcing. Flux-tower/lysimeter or carefully closed local water-balance measurements are needed for ET; canopy temperature with meteorology and wet/dry baselines is needed before considering CWSI. ECO instantaneous thermal values cannot validate daily ET by themselves.
+
+Sample soil strata and edge/mixed-pixel conditions explicitly. Quantify point-to-area mismatch rather than treating each 30 m display cell as independent ground truth. Record cloud and temporal offset exclusions before seeing errors. GRACE remains regional storage context; any future groundwater work needs independent surface-water, snow and soil-water components and correlated error propagation.
+
+## Independent evaluation
+
+Freeze dataset, product/policy versions, field polygons and model parameters before final evaluation. Split by field/coarse-support block and forward in time; do not put overlapping pixels or shared SMAP/IMERG cells into both training and test sets. Keep fitting, interval calibration and final evaluation separate. Use persistence/seasonal mean and current transparent process model as baselines. Report sample counts, exclusions, bias, MAE/RMSE, event precision/recall, interval coverage and width, subgroup errors and out-of-domain abstention. Thresholds must be agreed with local experts before evaluation, not invented after favorable results.
+
+Observed current rotations alone cannot validate unobserved alternatives. Randomized or defensibly matched multi-season comparisons must address soil, management, weather and selection confounding. Carbon needs repeated equivalent-soil-mass sampling and multi-year duration; pests need species-specific scouting; erosion needs calibrated runoff/sediment observations. Nitrogen contributions require biomass/N uptake, timing and loss accounting. Withhold precise long-term effects until these separate measurements exist.
+
+## Farmer/adviser session
+
+Use one clearly labeled demonstration before a real field: select and verify boundary/history; distinguish observed Landsat from L4 assimilation and modeled projections; create/correct an uncertain window; explain why low NDVI does not establish bare soil; inspect rainfall overlap and rejected L3; compare baseline plus two conditionally feasible alternatives; change priorities; identify a local-review question; choose independently of score; export; reopen offline with one package intentionally absent. Ask the participant to identify what is missing and what the tool cannot conclude. Measure unassisted completion, time, errors, comprehension and confidence. Facilitator observations are research records, not software test outputs.
+
+## Implementable now versus external dependencies
+
+Code work: evidence-linked per-strategy rationale with explicit provenance and uncertainty; editable reviewed local enterprise inputs; evaluation dataset/version contracts and abstention reporting; production security/recovery controls. These are remaining tasks, not authorized architectural expansion in this audit.
+
+External work: participating farms and consent, adviser review, soil labs, instruments/maintenance, dated labels, usability participants, alternative-rotation trials and additional seasons. No software test can substitute for these. A supervised pilot may proceed for exploration with clear assumptions; quantitative farm decisions must retain local expert authority and pass the relevant gates above.

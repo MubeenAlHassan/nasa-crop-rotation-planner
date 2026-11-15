@@ -1,0 +1,45 @@
+{
+  "checkedAt": "2026-11-12",
+  "authentication": "unavailable: no environment pair, token or Earthdata netrc entry",
+  "products": [
+    {
+      "id": "smap-surface",
+      "product": "SPL3SMP_E",
+      "version": "006",
+      "representativeFileAcquired": false,
+      "failedStep": "credential-resolution",
+      "operatorAction": "Configure Earthdata Login environment/netrc credentials outside the repository and authorize the requested DAAC application (GES DISC for IMERG).",
+      "catalogMatchesInPage": 1,
+      "granuleId": "G3056406728-NSIDC_CPRD",
+      "producerGranuleId": "SMAP_L3_SM_P_E_20240601_R19240_001.h5",
+      "sourceUrl": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2024/06/01/SMAP_L3_SM_P_E_20240601_R19240_001.h5",
+      "httpStatus": 401
+    },
+    {
+      "id": "smap-rootzone",
+      "product": "SPL4SMGP",
+      "version": "008",
+      "representativeFileAcquired": false,
+      "failedStep": "credential-resolution",
+      "operatorAction": "Configure Earthdata Login environment/netrc credentials outside the repository and authorize the requested DAAC application (GES DISC for IMERG).",
+      "catalogMatchesInPage": 1,
+      "granuleId": "G4351837748-NSIDC_CPRD",
+      "producerGranuleId": "SMAP_L4_SM_gph_20240531T223000_Vv8012_001.h5",
+      "sourceUrl": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL4SMGP/008/2024/05/31/SMAP_L4_SM_gph_20240531T223000_Vv8012_001.h5",
+      "httpStatus": 401
+    },
+    {
+      "id": "imerg",
+      "product": "GPM_3IMERGHH",
+      "version": "07",
+      "representativeFileAcquired": false,
+      "failedStep": "credential-resolution",
+      "operatorAction": "Configure Earthdata Login environment/netrc credentials outside the repository and authorize the requested DAAC application (GES DISC for IMERG).",
+      "catalogMatchesInPage": 1,
+      "granuleId": "G3290981423-GES_DISC",
+      "producerGranuleId": "3B-HHR.MS.MRG.3IMERG.20240601-S000000-E002959.0000.V07B.HDF5",
+      "sourceUrl": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGHH.07/2024/153/3B-HHR.MS.MRG.3IMERG.20240601-S000000-E002959.0000.V07B.HDF5",
+      "httpStatus": 401
+    }
+  ]
+}

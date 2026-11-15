@@ -1,0 +1,544 @@
+{
+  "id": "modis",
+  "status": "available",
+  "evidenceKind": "regional-composite-context",
+  "product": "MOD13Q1.061 Terra MODIS Vegetation Indices",
+  "version": "061 verified from captured CSV granule IDs; matching JSON encoded arrays",
+  "sourceUrl": "https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod13q1-061",
+  "spatialSupport": "Native nominal 250 m sinusoidal grid (231.656358264 m postings). Full 9 \u00d7 9 cell neighborhood (~2.085 \u00d7 2.085 km), not the 44 ha field. No resampling.",
+  "dates": [
+    "2024-03-05",
+    "2024-03-21",
+    "2024-04-06",
+    "2024-04-22",
+    "2024-05-08",
+    "2024-05-24",
+    "2024-06-09",
+    "2024-06-25",
+    "2024-07-11",
+    "2024-07-27",
+    "2024-08-12",
+    "2024-08-28",
+    "2024-09-13",
+    "2024-09-29",
+    "2024-10-15",
+    "2024-10-31"
+  ],
+  "units": "NDVI/EVI dimensionless; encoded scale 0.0001, offset 0, fill -3000; QA unscaled; composite pixel day-of-year 1\u2013366, fill -1",
+  "qa": {
+    "policy": "mod13q1-061-conservative-v1",
+    "minimumRegionalValidFraction": 0.8,
+    "method": "Pixel reliability 0; MODLAND 0; usefulness 0\u20132; low/intermediate aerosol; land only; no adjacent/mixed cloud, snow or shadow; valid VI and selected day within composite period. No gap filling.",
+    "bandMetadata": [
+      {
+        "band": "250m_16_days_blue_reflectance",
+        "description": "Surface Reflectance Band 3",
+        "units": "reflectance",
+        "valid_range": "0 to 10000",
+        "fill_value": "-1000",
+        "scale_factor": "0.0001",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_composite_day_of_the_year",
+        "description": "Day of year VI pixel",
+        "units": "Julian day of the year",
+        "valid_range": "1 to 366",
+        "fill_value": "-1"
+      },
+      {
+        "band": "250m_16_days_EVI",
+        "description": "16 day EVI average",
+        "units": "EVI ratio - No units",
+        "valid_range": "-2000 to 10000",
+        "fill_value": "-3000",
+        "scale_factor": "0.0001",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_MIR_reflectance",
+        "description": "Surface Reflectance Band 7",
+        "units": "reflectance",
+        "valid_range": "0 to 10000",
+        "fill_value": "-1000",
+        "scale_factor": "0.0001",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_NDVI",
+        "description": "16 day NDVI average",
+        "units": "NDVI ratio - No units",
+        "valid_range": "-2000 to 10000",
+        "fill_value": "-3000",
+        "scale_factor": "0.0001",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_NIR_reflectance",
+        "description": "Surface Reflectance Band 2",
+        "units": "reflectance",
+        "valid_range": "0 to 10000",
+        "fill_value": "-1000",
+        "scale_factor": "0.0001",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_pixel_reliability",
+        "description": "Quality reliability of VI pixel",
+        "units": "rank",
+        "valid_range": "0 to 3",
+        "fill_value": "-1"
+      },
+      {
+        "band": "250m_16_days_red_reflectance",
+        "description": "Surface Reflectance Band 1",
+        "units": "reflectance",
+        "valid_range": "0 to 10000",
+        "fill_value": "-1000",
+        "scale_factor": "0.0001",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_relative_azimuth_angle",
+        "description": "Relative azimuth angle of VI pixel",
+        "units": "degrees",
+        "valid_range": "-3600 to 3600",
+        "fill_value": "-4000",
+        "scale_factor": "0.1",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_sun_zenith_angle",
+        "description": "Sun zenith angle of VI pixel",
+        "units": "degrees",
+        "valid_range": "-9000 to 9000",
+        "fill_value": "-10000",
+        "scale_factor": "0.01",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_view_zenith_angle",
+        "description": "View zenith angle of VI Pixel",
+        "units": "degrees",
+        "valid_range": "-9000 to 9000",
+        "fill_value": "-10000",
+        "scale_factor": "0.01",
+        "add_offset": "0"
+      },
+      {
+        "band": "250m_16_days_VI_Quality",
+        "description": "VI quality indicators",
+        "units": "bit field",
+        "valid_range": "0 to 65534",
+        "fill_value": "-1"
+      }
+    ]
+  },
+  "summary": {
+    "requestedStart": "2024-03-01",
+    "requestedEnd": "2024-11-30",
+    "center": [
+      42.025,
+      -93.65
+    ],
+    "regionAreaKm2": 4.346838,
+    "series": [
+      {
+        "periodStart": "2024-03-05",
+        "periodEnd": "2024-03-20",
+        "ndvi": 0.3067,
+        "evi": 0.1737,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-03-06",
+        "selectedPixelDateMax": "2024-03-20",
+        "sourceGranules": [
+          "MOD13Q1.A2024065.h11v04.061.2024085183541"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-03-21",
+        "periodEnd": "2024-04-05",
+        "ndvi": 0.3091,
+        "evi": 0.1719,
+        "validPixels": 71,
+        "totalPixels": 81,
+        "validFraction": 0.876543,
+        "status": "available",
+        "selectedPixelDateMin": "2024-03-28",
+        "selectedPixelDateMax": "2024-04-04",
+        "sourceGranules": [
+          "MOD13Q1.A2024081.h11v04.061.2024099105034"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-04-06",
+        "periodEnd": "2024-04-21",
+        "ndvi": 0.3846,
+        "evi": 0.2359,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-04-09",
+        "selectedPixelDateMax": "2024-04-21",
+        "sourceGranules": [
+          "MOD13Q1.A2024097.h11v04.061.2024115200127"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-04-22",
+        "periodEnd": "2024-05-07",
+        "ndvi": null,
+        "evi": null,
+        "validPixels": 63,
+        "totalPixels": 81,
+        "validFraction": 0.777778,
+        "status": "insufficient-regional-coverage",
+        "selectedPixelDateMin": "2024-04-23",
+        "selectedPixelDateMax": "2024-04-24",
+        "sourceGranules": [
+          "MOD13Q1.A2024113.h11v04.061.2024133221602"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-05-08",
+        "periodEnd": "2024-05-23",
+        "ndvi": 0.5183,
+        "evi": 0.3465,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-05-10",
+        "selectedPixelDateMax": "2024-05-22",
+        "sourceGranules": [
+          "MOD13Q1.A2024129.h11v04.061.2024153222210"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-05-24",
+        "periodEnd": "2024-06-08",
+        "ndvi": 0.5501,
+        "evi": 0.3844,
+        "validPixels": 77,
+        "totalPixels": 81,
+        "validFraction": 0.950617,
+        "status": "available",
+        "selectedPixelDateMin": "2024-05-25",
+        "selectedPixelDateMax": "2024-06-08",
+        "sourceGranules": [
+          "MOD13Q1.A2024145.h11v04.061.2024162170023"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-06-09",
+        "periodEnd": "2024-06-24",
+        "ndvi": 0.5575,
+        "evi": 0.3533,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-06-09",
+        "selectedPixelDateMax": "2024-06-14",
+        "sourceGranules": [
+          "MOD13Q1.A2024161.h11v04.061.2024181211324"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-06-25",
+        "periodEnd": "2024-07-10",
+        "ndvi": 0.5888,
+        "evi": 0.4006,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-06-26",
+        "selectedPixelDateMax": "2024-07-08",
+        "sourceGranules": [
+          "MOD13Q1.A2024177.h11v04.061.2024195022907"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-07-11",
+        "periodEnd": "2024-07-26",
+        "ndvi": 0.5479,
+        "evi": 0.4628,
+        "validPixels": 71,
+        "totalPixels": 81,
+        "validFraction": 0.876543,
+        "status": "available",
+        "selectedPixelDateMin": "2024-07-17",
+        "selectedPixelDateMax": "2024-07-17",
+        "sourceGranules": [
+          "MOD13Q1.A2024193.h11v04.061.2024212093303"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-07-27",
+        "periodEnd": "2024-08-11",
+        "ndvi": null,
+        "evi": null,
+        "validPixels": 22,
+        "totalPixels": 81,
+        "validFraction": 0.271605,
+        "status": "insufficient-regional-coverage",
+        "selectedPixelDateMin": "2024-08-01",
+        "selectedPixelDateMax": "2024-08-03",
+        "sourceGranules": [
+          "MOD13Q1.A2024209.h11v04.061.2024228023622"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-08-12",
+        "periodEnd": "2024-08-27",
+        "ndvi": null,
+        "evi": null,
+        "validPixels": 63,
+        "totalPixels": 81,
+        "validFraction": 0.777778,
+        "status": "insufficient-regional-coverage",
+        "selectedPixelDateMin": "2024-08-18",
+        "selectedPixelDateMax": "2024-08-26",
+        "sourceGranules": [
+          "MOD13Q1.A2024225.h11v04.061.2024247142355"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-08-28",
+        "periodEnd": "2024-09-12",
+        "ndvi": 0.5301,
+        "evi": 0.31,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-09-02",
+        "selectedPixelDateMax": "2024-09-04",
+        "sourceGranules": [
+          "MOD13Q1.A2024241.h11v04.061.2024258125501"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-09-13",
+        "periodEnd": "2024-09-28",
+        "ndvi": 0.493,
+        "evi": 0.3101,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-09-17",
+        "selectedPixelDateMax": "2024-09-26",
+        "sourceGranules": [
+          "MOD13Q1.A2024257.h11v04.061.2024275121503"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-09-29",
+        "periodEnd": "2024-10-14",
+        "ndvi": 0.4782,
+        "evi": 0.2864,
+        "validPixels": 73,
+        "totalPixels": 81,
+        "validFraction": 0.901235,
+        "status": "available",
+        "selectedPixelDateMin": "2024-10-06",
+        "selectedPixelDateMax": "2024-10-13",
+        "sourceGranules": [
+          "MOD13Q1.A2024273.h11v04.061.2024290023420"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-10-15",
+        "periodEnd": "2024-10-30",
+        "ndvi": 0.4148,
+        "evi": 0.2464,
+        "validPixels": 81,
+        "totalPixels": 81,
+        "validFraction": 1.0,
+        "status": "available",
+        "selectedPixelDateMin": "2024-10-16",
+        "selectedPixelDateMax": "2024-10-26",
+        "sourceGranules": [
+          "MOD13Q1.A2024289.h11v04.061.2024306180804"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      },
+      {
+        "periodStart": "2024-10-31",
+        "periodEnd": "2024-11-15",
+        "ndvi": null,
+        "evi": null,
+        "validPixels": 0,
+        "totalPixels": 81,
+        "validFraction": 0.0,
+        "status": "insufficient-regional-coverage",
+        "selectedPixelDateMin": null,
+        "selectedPixelDateMax": null,
+        "sourceGranules": [
+          "MOD13Q1.A2024305.h11v04.061.2024326213330"
+        ],
+        "grid": {
+          "xllcorner": "-7736627.41",
+          "yllcorner": "4671813.74",
+          "cellsize": 231.656358264,
+          "nrows": 9,
+          "ncols": 9
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "A composite selects different observation days at different pixels; its start date is not a simultaneous overpass or a 16-day mean.",
+    "Mixed land covers and coarse support: regional seasonal context only, never used to fill Landsat gaps or confirm a field condition.",
+    "Conservative QA can withhold an entire regional mean. No calibrated uncertainty, bare-soil classification or agronomic benefit inference.",
+    "Only composites fully inside the requested season are included; edge days remain unsupported."
+  ],
+  "assets": [
+    {
+      "path": "/atlas/evidence-raw/modis/bands.json",
+      "sha256": "189bf40decf21b7d6e3373145f4644550260fb4984b0fd2dab67d3eea8696b54"
+    },
+    {
+      "path": "/atlas/evidence-raw/modis/dates.json",
+      "sha256": "69f2199f0bbf285bdb88095813704ae2c9297968a94be0e3cb85a54e2a6e48d4"
+    },
+    {
+      "path": "/atlas/evidence-raw/modis/subset-A2024065-A2024209.json",
+      "sha256": "13b5ae77563e8fbb13188520be0eea7c0035bee1d64b2e83946ab3f9ffa6fd23"
+    },
+    {
+      "path": "/atlas/evidence-raw/modis/subset-A2024065-A2024209.csv",
+      "sha256": "8f9edada984e3631c29b857176e34638cafaf5d4dbbee79b6cffb856c57eda21"
+    },
+    {
+      "path": "/atlas/evidence-raw/modis/subset-A2024225-A2024305.json",
+      "sha256": "7ab2304843f81eedb5d9c9cbd97bc1d4f4e1f93f7e0f3064ed1df20e3ae7f727"
+    },
+    {
+      "path": "/atlas/evidence-raw/modis/subset-A2024225-A2024305.csv",
+      "sha256": "d5b1e0abca0bf5c6badd1dbd67f78ad0421ee11357cbaff7ae97d907fb5ec141"
+    }
+  ],
+  "provenance": {
+    "pipeline": "backend/atlas/modis_capture.py",
+    "pipelineSha256": "ec90eb788c2c65dcf7bd89178af8729baff64f5496b7ac175af5cdad325dd9a8",
+    "verificationDate": "2026-11-08",
+    "primaryReferences": [
+      "https://modis.ornl.gov/data/modis_webservice.html",
+      "https://lpdaac.usgs.gov/documents/103/MOD13_User_Guide_V6.pdf",
+      "https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod13q1-061",
+      "https://modis.gsfc.nasa.gov/data/dataprod/mod13.php"
+    ],
+    "authentication": "Public ORNL DAAC TESViS REST API; no credentials supplied."
+  }
+}

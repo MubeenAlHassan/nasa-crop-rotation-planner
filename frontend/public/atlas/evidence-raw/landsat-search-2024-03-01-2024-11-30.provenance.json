@@ -1,0 +1,12 @@
+{
+  "url": "https://planetarycomputer.microsoft.com/api/stac/v1/search",
+  "params": {
+    "collections": "landsat-c2-l2",
+    "bbox": "-93.654,42.022,-93.646,42.028",
+    "datetime": "2024-03-01T00:00:00Z/2024-11-30T23:59:59Z",
+    "limit": 100
+  },
+  "query": null,
+  "retrievedAt": "2026-11-08T04:46:09.448878+00:00",
+  "sha256": "4bf87b807bc661a072e57f23a4ae3269f8972c05bc8af25863394df7c3b32917"
+}

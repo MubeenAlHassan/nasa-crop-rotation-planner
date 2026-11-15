@@ -1,0 +1,11 @@
+{
+  "url": "https://cmr.earthdata.nasa.gov/search/collections.json",
+  "params": {
+    "short_name": "ECO_L2T_LSTE",
+    "version": "003",
+    "page_size": 20
+  },
+  "query": null,
+  "retrievedAt": "2026-11-08T04:36:22.597616+00:00",
+  "sha256": "ddc337679f796813a3c1b96ab2ad4237448f6b2070ffa45cf4b6a54d879b3900"
+}

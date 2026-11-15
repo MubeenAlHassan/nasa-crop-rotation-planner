@@ -1,0 +1,11 @@
+{
+  "url": "https://cmr.earthdata.nasa.gov/search/collections.json",
+  "params": {
+    "short_name": "ECO_L3T_JET",
+    "version": "003",
+    "page_size": 20
+  },
+  "query": null,
+  "retrievedAt": "2026-11-08T04:38:31.923790+00:00",
+  "sha256": "48e5d734f1304613f708e620220d2e748eb03d5047f59f304629a7a439c09b0f"
+}

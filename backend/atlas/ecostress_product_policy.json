@@ -1,0 +1,41 @@
+{
+  "policy": "ecostress-c2-conservative-v1",
+  "verifiedAt": "2026-11-13",
+  "collection": "002",
+  "nativePostingM": 70,
+  "docs": [
+    {
+      "url": "https://github.com/ECOSTRESS-Collection-2/ECOv002-L3T-L4T-JET/blob/main/documentation/ECOSTRESS_User_Guide_V2.md",
+      "sha256": "68c265236276934d6c295fdf1dda05c447618e83a5afcaaa3286a519c472377d"
+    },
+    {
+      "url": "https://lpdaac.usgs.gov/documents/1574/ECOL2_User_Guide_V2.pdf"
+    },
+    {
+      "url": "https://lpdaac.usgs.gov/documents/1655/ECO_L1C-4_Grid_Tile_User_Guide_V2.pdf"
+    }
+  ],
+  "qa": "Separate cloud=0 and water=0; QC bits 0\u20133=0; finite LST_err <=2 K; granule PASS and no FOV obstruction. Application screening, not calibrated acceptance probability.",
+  "unitsCaveat": "COGs omit embedded unit tags. Collection 2 PDF Table 10 conflicts with its prose for ETdaily. Producer guide Table 10 explicitly confirms mm/day, sunrise-to-sunset; ETinstUncertainty is instantaneous W/m2 dispersion.",
+  "fill": "Science float32 NaN, masks uint8 without nodata tag, QC uint16 without nodata tag. Missing science remains null; never infer validity from QC alone.",
+  "juneDiscovery": {
+    "bbox": [
+      -93.66,
+      42.015,
+      -93.64,
+      42.035
+    ],
+    "start": "2024-06-01",
+    "end": "2024-06-30",
+    "002": {
+      "ECO_L2T_LSTE": 17,
+      "ECO_L3T_JET": 2,
+      "ECO_L4T_ESI": 2
+    },
+    "003": {
+      "ECO_L2T_LSTE": 0,
+      "ECO_L3T_JET": 0,
+      "ECO_L4T_ESI": 0
+    }
+  }
+}

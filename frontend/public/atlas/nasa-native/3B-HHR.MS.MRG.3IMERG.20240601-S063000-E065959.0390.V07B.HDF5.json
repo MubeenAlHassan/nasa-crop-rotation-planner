@@ -1,0 +1,523 @@
+{
+  "source": {
+    "id": "G3290983346-GES_DISC",
+    "file": "3B-HHR.MS.MRG.3IMERG.20240601-S063000-E065959.0390.V07B.HDF5",
+    "sourceUrl": "https://data.gesdisc.earthdata.nasa.gov/data/GPM_L3/GPM_3IMERGHH.07/2024/153/3B-HHR.MS.MRG.3IMERG.20240601-S063000-E065959.0390.V07B.HDF5",
+    "sha256": "0b7caa1e9fa479310c55872e2f8ab09079b99bb7f217e1efcd9e8818d43afb13",
+    "bytes": 8407417,
+    "start": "2024-06-01T06:30:00.000Z",
+    "end": "2024-06-01T06:59:59.999Z"
+  },
+  "schema": {
+    "precipitation": {
+      "shape": [
+        1,
+        3600,
+        1800
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DimensionNames": "time,lon,lat",
+        "Units": "mm/hr",
+        "units": "mm/hr",
+        "coordinates": "time lon lat",
+        "_FillValue": -9999.900390625,
+        "CodeMissingValue": "-9999.9",
+        "LongName": "\nComplete merged microwave-infrared (gauge-adjusted)\n                        precipitation estimate;  formerly precipitationCal\n"
+      }
+    },
+    "randomError": {
+      "shape": [
+        1,
+        3600,
+        1800
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DimensionNames": "time,lon,lat",
+        "Units": "mm/hr",
+        "units": "mm/hr",
+        "coordinates": "time lon lat",
+        "_FillValue": -9999.900390625,
+        "CodeMissingValue": "-9999.9",
+        "LongName": "\nRoot-mean-square error estimate for \n                        complete merged microwave-infrared (gauge-adjusted)\n                        precipitation\n"
+      }
+    },
+    "precipitationQualityIndex": {
+      "shape": [
+        1,
+        3600,
+        1800
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DimensionNames": "time,lon,lat",
+        "coordinates": "time lon lat",
+        "_FillValue": -9999.900390625,
+        "CodeMissingValue": "-9999.9",
+        "LongName": "\nPrecipitation quality index; qualitative indicator\n                        of skill based on the microwave-infrared merging process\n"
+      }
+    },
+    "time": {
+      "shape": [
+        1
+      ],
+      "dtype": "int32",
+      "attributes": {
+        "DimensionNames": "time",
+        "Units": "seconds since 1980-01-06 00:00:00 UTC",
+        "units": "seconds since 1980-01-06 00:00:00 UTC",
+        "standard_name": "time",
+        "LongName": "\nRepresentative time of data in \n\t\t\tseconds since 1980-01-06 00:00:00 UTC.\n\t\t\tThe calculation of time does not add leap seconds.\n\t\t\tThe difference due to leap seconds grows with time \n\t\t\tand in 2019 is less than 30 seconds.\n",
+        "bounds": "time_bnds",
+        "axis": "T",
+        "calendar": "julian",
+        "CLASS": "DIMENSION_SCALE"
+      }
+    },
+    "time_bnds": {
+      "shape": [
+        1,
+        2
+      ],
+      "dtype": "int32",
+      "attributes": {
+        "DimensionNames": "time,nv",
+        "Units": "seconds since 1980-01-06 00:00:00 UTC",
+        "units": "seconds since 1980-01-06 00:00:00 UTC",
+        "coordinates": "time nv"
+      }
+    },
+    "lon": {
+      "shape": [
+        3600
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DimensionNames": "lon",
+        "Units": "degrees_east",
+        "units": "degrees_east",
+        "standard_name": "longitude",
+        "LongName": "Longitude at the center of\n\t\t\t0.10 degree grid intervals of longitude \n\t\t\tfrom -180 to 180.",
+        "bounds": "lon_bnds",
+        "axis": "X",
+        "CLASS": "DIMENSION_SCALE"
+      }
+    },
+    "lat": {
+      "shape": [
+        1800
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DimensionNames": "lat",
+        "Units": "degrees_north",
+        "units": "degrees_north",
+        "standard_name": "latitude",
+        "LongName": "Latitude at the center of\n\t\t\t0.10 degree grid intervals of latitude\n\t\t\tfrom -90 to 90.",
+        "bounds": "lat_bnds",
+        "axis": "Y",
+        "CLASS": "DIMENSION_SCALE"
+      }
+    },
+    "lon_bnds": {
+      "shape": [
+        3600,
+        2
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DimensionNames": "lon,lonv",
+        "Units": "degrees_east",
+        "units": "degrees_east",
+        "coordinates": "lon lonv"
+      }
+    },
+    "lat_bnds": {
+      "shape": [
+        1800,
+        2
+      ],
+      "dtype": "float32",
+      "attributes": {
+        "DimensionNames": "lat,latv",
+        "Units": "degrees_north",
+        "units": "degrees_north",
+        "coordinates": "lat latv"
+      }
+    }
+  },
+  "cells": [
+    {
+      "id": "862:1319",
+      "center": [
+        -93.75,
+        41.95000076293945
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.80000305175781,
+              41.900001525878906
+            ],
+            [
+              -93.69999694824219,
+              41.900001525878906
+            ],
+            [
+              -93.69999694824219,
+              42.0
+            ],
+            [
+              -93.80000305175781,
+              42.0
+            ],
+            [
+              -93.80000305175781,
+              41.900001525878906
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "862:1320",
+      "center": [
+        -93.75,
+        42.04999923706055
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.80000305175781,
+              42.0
+            ],
+            [
+              -93.69999694824219,
+              42.0
+            ],
+            [
+              -93.69999694824219,
+              42.099998474121094
+            ],
+            [
+              -93.80000305175781,
+              42.099998474121094
+            ],
+            [
+              -93.80000305175781,
+              42.0
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "862:1321",
+      "center": [
+        -93.75,
+        42.14999771118164
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.80000305175781,
+              42.099998474121094
+            ],
+            [
+              -93.69999694824219,
+              42.099998474121094
+            ],
+            [
+              -93.69999694824219,
+              42.19999694824219
+            ],
+            [
+              -93.80000305175781,
+              42.19999694824219
+            ],
+            [
+              -93.80000305175781,
+              42.099998474121094
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "863:1319",
+      "center": [
+        -93.6500015258789,
+        41.95000076293945
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.70000457763672,
+              41.900001525878906
+            ],
+            [
+              -93.5999984741211,
+              41.900001525878906
+            ],
+            [
+              -93.5999984741211,
+              42.0
+            ],
+            [
+              -93.70000457763672,
+              42.0
+            ],
+            [
+              -93.70000457763672,
+              41.900001525878906
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "863:1320",
+      "center": [
+        -93.6500015258789,
+        42.04999923706055
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.70000457763672,
+              42.0
+            ],
+            [
+              -93.5999984741211,
+              42.0
+            ],
+            [
+              -93.5999984741211,
+              42.099998474121094
+            ],
+            [
+              -93.70000457763672,
+              42.099998474121094
+            ],
+            [
+              -93.70000457763672,
+              42.0
+            ]
+          ]
+        ]
+      },
+      "pilot": true
+    },
+    {
+      "id": "863:1321",
+      "center": [
+        -93.6500015258789,
+        42.14999771118164
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.70000457763672,
+              42.099998474121094
+            ],
+            [
+              -93.5999984741211,
+              42.099998474121094
+            ],
+            [
+              -93.5999984741211,
+              42.19999694824219
+            ],
+            [
+              -93.70000457763672,
+              42.19999694824219
+            ],
+            [
+              -93.70000457763672,
+              42.099998474121094
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "864:1319",
+      "center": [
+        -93.54999542236328,
+        41.95000076293945
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.5999984741211,
+              41.900001525878906
+            ],
+            [
+              -93.49999237060547,
+              41.900001525878906
+            ],
+            [
+              -93.49999237060547,
+              42.0
+            ],
+            [
+              -93.5999984741211,
+              42.0
+            ],
+            [
+              -93.5999984741211,
+              41.900001525878906
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "864:1320",
+      "center": [
+        -93.54999542236328,
+        42.04999923706055
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.5999984741211,
+              42.0
+            ],
+            [
+              -93.49999237060547,
+              42.0
+            ],
+            [
+              -93.49999237060547,
+              42.099998474121094
+            ],
+            [
+              -93.5999984741211,
+              42.099998474121094
+            ],
+            [
+              -93.5999984741211,
+              42.0
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "864:1321",
+      "center": [
+        -93.54999542236328,
+        42.14999771118164
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.5999984741211,
+              42.099998474121094
+            ],
+            [
+              -93.49999237060547,
+              42.099998474121094
+            ],
+            [
+              -93.49999237060547,
+              42.19999694824219
+            ],
+            [
+              -93.5999984741211,
+              42.19999694824219
+            ],
+            [
+              -93.5999984741211,
+              42.099998474121094
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    }
+  ],
+  "values": [
+    {
+      "cell": "862:1319",
+      "precipitation": 0.0,
+      "randomError": 0.23999999463558197,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "862:1320",
+      "precipitation": 0.0,
+      "randomError": 0.23999999463558197,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "862:1321",
+      "precipitation": 0.019999999552965164,
+      "randomError": 0.5099999904632568,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "863:1319",
+      "precipitation": 0.0,
+      "randomError": 0.23999999463558197,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "863:1320",
+      "precipitation": 0.009999999776482582,
+      "randomError": 0.4099999964237213,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "863:1321",
+      "precipitation": 0.019999999552965164,
+      "randomError": 0.5199999809265137,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "864:1319",
+      "precipitation": 0.0,
+      "randomError": 0.23999999463558197,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "864:1320",
+      "precipitation": 0.0,
+      "randomError": 0.23999999463558197,
+      "precipitationQualityIndex": 0.47200003266334534
+    },
+    {
+      "cell": "864:1321",
+      "precipitation": 0.029999999329447746,
+      "randomError": 0.6399999856948853,
+      "precipitationQualityIndex": 0.47200003266334534
+    }
+  ]
+}

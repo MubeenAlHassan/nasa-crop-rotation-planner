@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, Globe2, Leaf, Satellite, Sprout, Wheat } from 'lucide-react';
 
 const steps = [
@@ -53,7 +54,7 @@ export default function Landing() {
   return (
     <div className="ra-app ra-landing">
       <header className="ra-landing-header">
-        <a href="/" className="ra-brand">
+        <Link href="/" className="ra-brand">
           <span className="ra-brand-icon">
             <Sprout size={28} />
           </span>
@@ -61,14 +62,14 @@ export default function Landing() {
             rotation<span className="ra-brand-light">atlas</span>
             <small>ROOTED IN EARTH. INFORMED BY SPACE.</small>
           </span>
-        </a>
+        </Link>
         <nav>
           <a href="#approach">Our approach</a>
-          <a href="/atlas">Explore the evidence</a>
+          <Link href="/atlas">Explore the evidence</Link>
         </nav>
-        <a href="/atlas" className="ra-button ra-button-primary ra-button-motion">
+        <Link href="/atlas" className="ra-button ra-button-primary ra-button-motion">
           Enter the field <ArrowUpRight size={16} />
-        </a>
+        </Link>
       </header>
 
       <main>
@@ -89,9 +90,9 @@ export default function Landing() {
               your livelihood—with the evidence in view.
             </p>
             <div className="ra-landing-actions ra-anim ra-anim-4">
-              <a className="ra-button ra-button-primary ra-button-motion" href="/atlas">
+              <Link className="ra-button ra-button-primary ra-button-motion" href="/atlas">
                 Explore the Iowa demonstration <ArrowRight size={18} />
-              </a>
+              </Link>
               <span>One field. Four possibilities.</span>
             </div>
             <div className="ra-landing-proof ra-anim ra-anim-5">
@@ -143,7 +144,8 @@ export default function Landing() {
                   <path d="M-30 -1 h4 M26 -1 h4" stroke="#8aa576" strokeWidth="2.5" strokeLinecap="round" />
                 </g>
               </g>
-              <text x="30" y="608" fontSize="11" fill="#eff3dc" letterSpacing="2.2" className="ra-landscape-caption">
+              <rect x="16" y="584" width="568" height="40" rx="8" fill="#f6f5ef" />
+              <text x="30" y="608" fontSize="12.8" fill="#243b30" letterSpacing=".8" className="ra-landscape-caption">
                 A GLOBAL PERSPECTIVE. A LOCAL DECISION.
               </text>
             </svg>
@@ -157,9 +159,9 @@ export default function Landing() {
                 your recommendation?
               </strong>
               <p>Explore the conditions where another rotation becomes the better fit.</p>
-              <a href="/atlas">
+              <Link href="/atlas">
                 See the possibilities <ArrowUpRight size={16} />
-              </a>
+              </Link>
             </div>
             <span className="ra-landscape-label">Concept illustration · not observed field imagery</span>
           </div>
@@ -203,9 +205,9 @@ export default function Landing() {
               when available. No invented field measurements or promises about your harvest.
             </p>
           </div>
-          <a href="/atlas" className="ra-button ra-button-light ra-button-motion">
+          <Link href="/atlas" className="ra-button ra-button-light ra-button-motion">
             Open the workspace <ArrowRight size={18} />
-          </a>
+          </Link>
         </section>
       </main>
 

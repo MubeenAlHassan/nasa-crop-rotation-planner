@@ -1,0 +1,20 @@
+{
+  "sourceUrl": "https://nasademeuwest.blob.core.windows.net/nasadem-cog/v001/NASADEM_HGT_n42w094.tif",
+  "granuleId": "NASADEM_HGT_n42w094",
+  "sourceDtype": "int16",
+  "sourceNoData": -32768.0,
+  "nativeCrs": "EPSG:4326",
+  "nativeResolution": [
+    0.0002777777777777778,
+    0.0002777777777777778
+  ],
+  "sourceWindow": {
+    "col_off": 1246,
+    "row_off": 3499,
+    "width": 29,
+    "height": 23
+  },
+  "retrievedAt": "2026-11-07T10:16:20.752410+00:00",
+  "processing": "Unresampled native-grid window; integer metre heights retained",
+  "sha256": "4d37f10148546f9248ab4ccea76c415378c1ff6e053a7234d41902ee48755597"
+}

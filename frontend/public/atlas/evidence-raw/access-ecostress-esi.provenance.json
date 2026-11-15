@@ -1,0 +1,11 @@
+{
+  "url": "https://cmr.earthdata.nasa.gov/search/collections.json",
+  "params": {
+    "short_name": "ECO_L4T_ESI",
+    "version": "003",
+    "page_size": 20
+  },
+  "query": null,
+  "retrievedAt": "2026-11-08T04:36:23.698652+00:00",
+  "sha256": "9dbecdec7cc0f483ccfc0da32d29434ad2ff476793f6511beef4db02b4f4d17a"
+}

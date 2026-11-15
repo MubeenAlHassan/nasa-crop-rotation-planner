@@ -1,0 +1,11 @@
+{
+  "url": "https://cmr.earthdata.nasa.gov/search/collections.json",
+  "params": {
+    "short_name": "SPL4SMGP",
+    "version": "008",
+    "page_size": 20
+  },
+  "query": null,
+  "retrievedAt": "2026-11-08T04:36:21.596144+00:00",
+  "sha256": "2583e2e0a7b08a05ffa661416064a013e367a6b1247588a5f23a98a7cb1c1d5c"
+}

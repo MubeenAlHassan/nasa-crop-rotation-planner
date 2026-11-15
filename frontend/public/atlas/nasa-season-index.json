@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "nasa-season-index-v1",
+  "months": [
+    {
+      "month": "2024-03",
+      "path": "/atlas/nasa-season/2024-03.json",
+      "sha256": "f7e2074d5e854f8b0d11c4b9ee41320efd7f454d13105593a7a7efa236dbbc6b",
+      "bytes": 3474181,
+      "coverage": {
+        "expected": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "acquired": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "smapAccepted": 67
+      }
+    },
+    {
+      "month": "2024-04",
+      "path": "/atlas/nasa-season/2024-04.json",
+      "sha256": "a8caa2161bad9964193f67a277fd158cfbd043779422f09b5d244b39e716b7b0",
+      "bytes": 3372065,
+      "coverage": {
+        "expected": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "acquired": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "smapAccepted": 76
+      }
+    },
+    {
+      "month": "2024-05",
+      "path": "/atlas/nasa-season/2024-05.json",
+      "sha256": "7eb5893b09df42953cb20eb623a08164344947ae46861e1eb473b91d04427fd5",
+      "bytes": 3490003,
+      "coverage": {
+        "expected": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "acquired": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "smapAccepted": 54
+      }
+    },
+    {
+      "month": "2024-06",
+      "path": "/atlas/nasa-season/2024-06.json",
+      "sha256": "233cf3585ae0a47417ab17413059036d66aebbd0fe8369fc7d1be455f5d5b7de",
+      "bytes": 3367534,
+      "coverage": {
+        "expected": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "acquired": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "smapAccepted": 87
+      }
+    },
+    {
+      "month": "2024-07",
+      "path": "/atlas/nasa-season/2024-07.json",
+      "sha256": "e447092313fa8654ab6834e1a405173be2e180fbbe5896eca68677b7c338d2dc",
+      "bytes": 3479846,
+      "coverage": {
+        "expected": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "acquired": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "smapAccepted": 90
+      }
+    },
+    {
+      "month": "2024-08",
+      "path": "/atlas/nasa-season/2024-08.json",
+      "sha256": "38103fc2b9ca5dc19fa45fc4e7eaf97e983a60e7d7ddcf2874f1be025cf46acc",
+      "bytes": 3472778,
+      "coverage": {
+        "expected": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "acquired": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "smapAccepted": 93
+      }
+    },
+    {
+      "month": "2024-09",
+      "path": "/atlas/nasa-season/2024-09.json",
+      "sha256": "3c57a2ee486b26e95b0dc1827f3c96a5589ed1908bbbf2ff51906057f0620be5",
+      "bytes": 3359602,
+      "coverage": {
+        "expected": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "acquired": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "smapAccepted": 81
+      }
+    },
+    {
+      "month": "2024-10",
+      "path": "/atlas/nasa-season/2024-10.json",
+      "sha256": "cc293eaf9a56cf20a8c5f864321dc3238c92ef1cd496d9178fcf296d157baa25",
+      "bytes": 3470368,
+      "coverage": {
+        "expected": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "acquired": {
+          "smap": 62,
+          "imerg": 1488,
+          "rootZone": 248,
+          "diagnostics": 248
+        },
+        "smapAccepted": 92
+      }
+    },
+    {
+      "month": "2024-11",
+      "path": "/atlas/nasa-season/2024-11.json",
+      "sha256": "c1ac94bfc791b873ae3cd1f383c2667eec572d04c21dfe36b3b4e67f2a3695cd",
+      "bytes": 3368039,
+      "coverage": {
+        "expected": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "acquired": {
+          "smap": 60,
+          "imerg": 1440,
+          "rootZone": 240,
+          "diagnostics": 240
+        },
+        "smapAccepted": 83
+      }
+    }
+  ]
+}

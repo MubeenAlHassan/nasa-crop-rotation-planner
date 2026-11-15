@@ -1,0 +1,161 @@
+{
+  "feed": {
+    "updated": "2026-11-08T04:36:23.550Z",
+    "id": "https://cmr.earthdata.nasa.gov:443/search/collections.json?short_name=ECO_L4T_ESI&version=003&page_size=20",
+    "title": "ECHO dataset metadata",
+    "entry": [
+      {
+        "processing_level_id": "4",
+        "cloud_hosted": true,
+        "boxes": [
+          "-54 -180 54 180"
+        ],
+        "has_combine": false,
+        "time_start": "2018-07-09T00:00:00.000Z",
+        "version_id": "003",
+        "updated": "2026-05-21T00:00:00.000Z",
+        "dataset_id": "ECOSTRESS Tiled Evaporative Stress Index PT-JPL Instantaneous L4 Global 70 m v003",
+        "entry_id": "ECO_L4T_ESI_003",
+        "has_spatial_subsetting": false,
+        "has_transforms": true,
+        "associations": {
+          "variables": [
+            "V4179523335-LPCLOUD",
+            "V4179523330-LPCLOUD",
+            "V4179523343-LPCLOUD",
+            "V4179523337-LPCLOUD"
+          ],
+          "services": [
+            "S2697183066-XYZ_PROV"
+          ]
+        },
+        "has_variables": true,
+        "data_center": "LPCLOUD",
+        "short_name": "ECO_L4T_ESI",
+        "organizations": [
+          "LP DAAC",
+          "NASA/JPL/ECOSTRESS"
+        ],
+        "title": "ECOSTRESS Tiled Evaporative Stress Index PT-JPL Instantaneous L4 Global 70 m v003",
+        "coordinate_system": "CARTESIAN",
+        "summary": "The ECOsystem Spaceborne Thermal Radiometer Experiment on Space Station (ECOSTRESS) mission measures the temperature of plants to better understand how much water plants need and how they respond to stress. ECOSTRESS is attached to the International Space Station (ISS) and collects data globally between 52\u00b0 N and 52\u00b0 S latitudes.\n\nThe ECOSTRESS Tiled Evaporative Stress Index PT-JPL Instantaneous Level 4 Global 70 m (ECO_L4T_ESI) Version 3 data product uses the Priestley-Taylor Jet Propulsion Laboratory Soil Moisture (PT-JPL-SM) model to generate estimates of both actual and potential instantaneous evapotranspiration (ET). The potential evapotranspiration (PET) estimate represents the maximum expected ET if there were no water stress to plants on the ground. The ratio of the actual ET estimate to the PET estimate forms an index representing the water stress of plants. This tiled data product uses a modified version of the Military Grid Reference System ([MGRS](https://hls.gsfc.nasa.gov/products-description/tiling-system/)), which divides Universal Transverse Mercator (UTM) zones into square tiles that are 109.8 km by 109.8 km with a 70 meter (m) spatial resolution.\n\nThe ECO_L4T_ESI Version 3 data product is provided in Cloud Optimized GeoTIFF (COG) format, and each variable is distributed as a separate COG. This product contains four variables including Evaporative Stress Index (ESI), PET, cloud mask, and water mask.\n\nKnown Issues\n\n* Solar Array Obstruction: Some ECOSTRESS scenes may be affected by solar array obstructions from the ISS, potentially impacting data quality in obstructed pixels. The 'FieldOfViewObstruction' metadata field is reliably populated and accurate for all products generated on or after October 2024, following fixes to the Product Generation Executive (PGE) docker configuration and updates to the L1A_RAW_PIX software. Prior to October 2024, the field was not reliably populated; a separate [list of confirmed affected scenes](https://lpdaac.usgs.gov/documents/2249/obst_all_sort.txt) was maintained and is recommended for verifying historical data.\n* Historical acquisition gaps and anomalies (2018\u20132023): Irrecoverable data loss occurred due to Mass Storage Unit (MSU) failures, resulting in permanent gaps in the observational record where no ECOSTRESS data was acquired during the following periods:\n    - September 29, 2018 \u2013 December 4, 2018 (primary MSU failure)\n    - March 14, 2019 \u2013 May 14, 2019 (secondary MSU failure)\n    - February 17, 2020 (instrument in SAFEHOLD mode)\n    - Other early issues, including band 4 striping (February 8\u201316, 2020), 3-band mode limitations (May 15, 2019\u2013April 28, 2023), and noisy data periods (e.g., May\u2013July 2025), have been mitigated through reprocessing, firmware updates, and instrument recovery. Version 3 products incorporate these improvements where data exists and are unaffected by ongoing issues, but the permanent historical gaps remain, and caution is advised for time-series analyses spanning affected periods.\n* Geolocation considerations: While geolocation is improved in Version 3 tiled products (fixed MGRS grid), gridded products may reference legacy \"GeolocationAccuracyQA\" flags. Use \"best\" and \"good\" scenes for applications sensitive to precise positioning.\n",
+        "service_features": {
+          "harmony": {
+            "has_formats": true,
+            "has_variables": true,
+            "has_transforms": true,
+            "has_combine": false,
+            "has_spatial_subsetting": false,
+            "has_temporal_subsetting": false
+          },
+          "opendap": {
+            "has_formats": false,
+            "has_variables": false,
+            "has_transforms": false,
+            "has_combine": false,
+            "has_spatial_subsetting": false,
+            "has_temporal_subsetting": false
+          },
+          "esi": {
+            "has_formats": false,
+            "has_variables": false,
+            "has_transforms": false,
+            "has_combine": false,
+            "has_spatial_subsetting": false,
+            "has_temporal_subsetting": false
+          }
+        },
+        "orbit_parameters": {},
+        "id": "C4057232495-LPCLOUD",
+        "has_formats": true,
+        "consortiums": [
+          "GEOSS",
+          "EOSDIS"
+        ],
+        "original_format": "UMM_JSON",
+        "collection_data_type": "SCIENCE_QUALITY",
+        "archive_center": "LP DAAC",
+        "has_temporal_subsetting": false,
+        "browse_flag": true,
+        "platforms": [
+          "ISS"
+        ],
+        "association_details": {
+          "variables": [
+            {
+              "concept_id": "V4179523335-LPCLOUD"
+            },
+            {
+              "concept_id": "V4179523330-LPCLOUD"
+            },
+            {
+              "concept_id": "V4179523343-LPCLOUD"
+            },
+            {
+              "concept_id": "V4179523337-LPCLOUD"
+            }
+          ],
+          "services": [
+            {
+              "concept_id": "S2697183066-XYZ_PROV"
+            }
+          ]
+        },
+        "online_access_flag": true,
+        "links": [
+          {
+            "length": "5.89MB",
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+            "hreflang": "en-US",
+            "href": "https://search.earthdata.nasa.gov/search/granules?p=C4057232495-LPCLOUD"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+            "hreflang": "en-US",
+            "href": "https://doi.org/10.5067/ECOSTRESS/ECO_L4T_ESI.003"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+            "hreflang": "en-US",
+            "href": "https://www.earthdata.nasa.gov/centers/lp-daac"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://github.com/ECOSTRESS-Collection-3/ECOv003-L3T-L4T-JET/blob/main/documentation/ECOv003_L3_L4_JET_User_Guide.md"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://github.com/ECOSTRESS-Collection-3/ECOv003-L3T-L4T-JET/blob/main/documentation/ECOv003_L3_L4_JET_ATBD.md"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+            "hreflang": "en-US",
+            "href": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-public/ECO_L4T_ESI.003/ECOv003_L4T_ESI_43158_011_13SFR_20260214T194022_02/ECOv003_L4T_ESI_43158_011_13SFR_20260214T194022_02.png"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+            "hreflang": "en-US",
+            "href": "https://ecostress.jpl.nasa.gov/science"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://github.com/nasa/ECOSTRESS-Data-Resources"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://lpdaac.usgs.gov/documents/2249/obst_all_sort.txt"
+          },
+          {
+            "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+            "hreflang": "en-US",
+            "href": "https://lpdaac.usgs.gov/documents/2253/qa_20250423-present.txt"
+          }
+        ]
+      }
+    ]
+  }
+}

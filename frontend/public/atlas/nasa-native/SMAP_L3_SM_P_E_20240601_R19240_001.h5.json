@@ -1,0 +1,707 @@
+{
+  "source": {
+    "file": "SMAP_L3_SM_P_E_20240601_R19240_001.h5",
+    "sha256": "60cd18d244a9ece3359524c15f7318427ee8f9079eafe7db400508e9f3a6dfc3",
+    "bytes": 690081639,
+    "sourceUrl": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2024/06/01/SMAP_L3_SM_P_E_20240601_R19240_001.h5"
+  },
+  "schema": {
+    "AM": {
+      "soil_moisture": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "_FillValue": -9999.0,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Representative DCA soil moisture measurement for the Earth based grid cell.",
+          "units": "cm**3/cm**3",
+          "valid_max": 0.5,
+          "valid_min": 0.019999999552965164
+        }
+      },
+      "soil_moisture_error": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "_FillValue": -9999.0,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Net uncertainty measure of soil moisture measure for the Earth based grid cell. - Calculation method is TBD.",
+          "units": "cm**3/cm**3",
+          "valid_max": 0.20000000298023224,
+          "valid_min": 0.0
+        }
+      },
+      "retrieval_qual_flag": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "uint16",
+        "attributes": {
+          "_FillValue": 65534,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "flag_masks": "1s, 2s, 4s, 8s",
+          "flag_meanings": "Retrieval_recommended Retrieval_attempted Retrieval_success FT_retrieval_success",
+          "long_name": "Bit flags that record the conditions and the quality of the DCA retrieval algorithms that generate soil moisture for the grid cell."
+        }
+      },
+      "surface_flag": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "uint16",
+        "attributes": {
+          "_FillValue": 65534,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "flag_masks": "1s, 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s, 1024s, 2048s",
+          "flag_meanings": "9_km_static_water_body 9_km_radar_water_body_detection 9_km_coastal_proximity 9_km_urban_area 9_km_precipitation 9_km_snow_or_ice 9_km_permanent_snow_or_ice 9_km_radiometer_frozen_ground 9_km_model_frozen_ground 9_km_mountainous_terrain 9_km_dense_vegetation 9_km_nadir_region",
+          "long_name": "Bit flags that record ambient surface conditions for the grid cell"
+        }
+      },
+      "latitude": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "long_name": "Latitude of the center of the Earth based grid cell.",
+          "units": "degrees_north"
+        }
+      },
+      "longitude": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "long_name": "Longitude of the center of the Earth based grid cell.",
+          "units": "degrees_east"
+        }
+      },
+      "tb_time_utc": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "|S24",
+        "attributes": {
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Arithmetic average of the acquisition time of all of the brightness temperature footprints with a center that falls within the EASE grid cell in UTC."
+        }
+      }
+    },
+    "PM": {
+      "soil_moisture": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "_FillValue": -9999.0,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Representative DCA soil moisture measurement for the Earth based grid cell.",
+          "units": "cm**3/cm**3",
+          "valid_max": 0.5,
+          "valid_min": 0.019999999552965164
+        }
+      },
+      "soil_moisture_error": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "_FillValue": -9999.0,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Net uncertainty measure of soil moisture measure for the Earth based grid cell. - Calculation method is TBD.",
+          "units": "cm**3/cm**3",
+          "valid_max": 0.20000000298023224,
+          "valid_min": 0.0
+        }
+      },
+      "retrieval_qual_flag": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "uint16",
+        "attributes": {
+          "_FillValue": 65534,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "flag_masks": "1s, 2s, 4s, 8s",
+          "flag_meanings": "Retrieval_recommended Retrieval_attempted Retrieval_success FT_retrieval_success",
+          "long_name": "Bit flags that record the conditions and the quality of the DCA retrieval algorithms that generate soil moisture for the grid cell."
+        }
+      },
+      "surface_flag": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "uint16",
+        "attributes": {
+          "_FillValue": 65534,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "flag_masks": "1s, 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s, 1024s, 2048s",
+          "flag_meanings": "9_km_static_water_body 9_km_radar_water_body_detection 9_km_coastal_proximity 9_km_urban_area 9_km_precipitation 9_km_snow_or_ice 9_km_permanent_snow_or_ice 9_km_radar_frozen_ground 9_km_model_frozen_ground 9_km_mountainous_terrain 9_km_dense_vegetation 9_km_nadir_region",
+          "long_name": "Bit flags that record ambient surface conditions for the grid cell"
+        }
+      },
+      "latitude": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "_FillValue": -9999.0,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Latitude of the center of the Earth based grid cell.",
+          "units": "degrees_north",
+          "valid_max": 90.0,
+          "valid_min": -90.0
+        }
+      },
+      "longitude": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "_FillValue": -9999.0,
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Longitude of the center of the Earth based grid cell.",
+          "units": "degrees_east",
+          "valid_max": 179.99899291992188,
+          "valid_min": -180.0
+        }
+      },
+      "tb_time_utc": {
+        "shape": [
+          1624,
+          3856
+        ],
+        "dtype": "|S24",
+        "attributes": {
+          "coordinates": "/Soil_Moisture_Retrieval_Data_AM/latitude /Soil_Moisture_Retrieval_Data_AM/longitude",
+          "long_name": "Arithmetic average of the acquisition time of all of the brightness temperature footprints with a center that falls within the EASE grid cell in UTC."
+        }
+      }
+    }
+  },
+  "cells": [
+    {
+      "id": "266:923",
+      "center": [
+        -93.78112030029297,
+        42.13795852661133
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.82780456542969,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              42.18531799316406
+            ],
+            [
+              -93.82780456542969,
+              42.18531799316406
+            ],
+            [
+              -93.82780456542969,
+              42.090667724609375
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "266:924",
+      "center": [
+        -93.68775939941406,
+        42.13795852661133
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              42.18531799316406
+            ],
+            [
+              -93.73443603515625,
+              42.18531799316406
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "266:925",
+      "center": [
+        -93.59439849853516,
+        42.13795852661133
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.54771423339844,
+              42.090667724609375
+            ],
+            [
+              -93.54771423339844,
+              42.18531799316406
+            ],
+            [
+              -93.64108276367188,
+              42.18531799316406
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "267:923",
+      "center": [
+        -93.78112030029297,
+        42.04337692260742
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.82780456542969,
+              41.99615478515625
+            ],
+            [
+              -93.73443603515625,
+              41.99615478515625
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.82780456542969,
+              42.090667724609375
+            ],
+            [
+              -93.82780456542969,
+              41.99615478515625
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "267:924",
+      "center": [
+        -93.68775939941406,
+        42.04337692260742
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.73443603515625,
+              41.99615478515625
+            ],
+            [
+              -93.64108276367188,
+              41.99615478515625
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              42.090667724609375
+            ],
+            [
+              -93.73443603515625,
+              41.99615478515625
+            ]
+          ]
+        ]
+      },
+      "pilot": true
+    },
+    {
+      "id": "267:925",
+      "center": [
+        -93.59439849853516,
+        42.04337692260742
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.64108276367188,
+              41.99615478515625
+            ],
+            [
+              -93.54771423339844,
+              41.99615478515625
+            ],
+            [
+              -93.54771423339844,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              42.090667724609375
+            ],
+            [
+              -93.64108276367188,
+              41.99615478515625
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "268:923",
+      "center": [
+        -93.78112030029297,
+        41.948936462402344
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.82780456542969,
+              41.90178680419922
+            ],
+            [
+              -93.73443603515625,
+              41.90178680419922
+            ],
+            [
+              -93.73443603515625,
+              41.99615478515625
+            ],
+            [
+              -93.82780456542969,
+              41.99615478515625
+            ],
+            [
+              -93.82780456542969,
+              41.90178680419922
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "268:924",
+      "center": [
+        -93.68775939941406,
+        41.948936462402344
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.73443603515625,
+              41.90178680419922
+            ],
+            [
+              -93.64108276367188,
+              41.90178680419922
+            ],
+            [
+              -93.64108276367188,
+              41.99615478515625
+            ],
+            [
+              -93.73443603515625,
+              41.99615478515625
+            ],
+            [
+              -93.73443603515625,
+              41.90178680419922
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    },
+    {
+      "id": "268:925",
+      "center": [
+        -93.59439849853516,
+        41.948936462402344
+      ],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -93.64108276367188,
+              41.90178680419922
+            ],
+            [
+              -93.54771423339844,
+              41.90178680419922
+            ],
+            [
+              -93.54771423339844,
+              41.99615478515625
+            ],
+            [
+              -93.64108276367188,
+              41.99615478515625
+            ],
+            [
+              -93.64108276367188,
+              41.90178680419922
+            ]
+          ]
+        ]
+      },
+      "pilot": false
+    }
+  ],
+  "values": {
+    "AM": [
+      {
+        "cell": "266:923",
+        "soil_moisture": 0.2692476809024811,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 0,
+        "surface_flag": 0,
+        "latitude": 42.13795852661133,
+        "longitude": -93.78112030029297,
+        "tb_time_utc": "2024-06-01T12:48:01.683Z"
+      },
+      {
+        "cell": "266:924",
+        "soil_moisture": 0.25328850746154785,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.13795852661133,
+        "longitude": -93.68775939941406,
+        "tb_time_utc": "2024-06-01T12:48:01.498Z"
+      },
+      {
+        "cell": "266:925",
+        "soil_moisture": 0.22662325203418732,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.13795852661133,
+        "longitude": -93.59439849853516,
+        "tb_time_utc": "2024-06-01T12:48:01.154Z"
+      },
+      {
+        "cell": "267:923",
+        "soil_moisture": 0.25693777203559875,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 0,
+        "surface_flag": 0,
+        "latitude": 42.04337692260742,
+        "longitude": -93.78112030029297,
+        "tb_time_utc": "2024-06-01T12:48:03.252Z"
+      },
+      {
+        "cell": "267:924",
+        "soil_moisture": 0.23144634068012238,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.04337692260742,
+        "longitude": -93.68775939941406,
+        "tb_time_utc": "2024-06-01T12:48:02.940Z"
+      },
+      {
+        "cell": "267:925",
+        "soil_moisture": 0.21284987032413483,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.04337692260742,
+        "longitude": -93.59439849853516,
+        "tb_time_utc": "2024-06-01T12:48:02.771Z"
+      },
+      {
+        "cell": "268:923",
+        "soil_moisture": 0.246639683842659,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 0,
+        "surface_flag": 0,
+        "latitude": 41.948936462402344,
+        "longitude": -93.78112030029297,
+        "tb_time_utc": "2024-06-01T12:48:04.697Z"
+      },
+      {
+        "cell": "268:924",
+        "soil_moisture": 0.22260074317455292,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 41.948936462402344,
+        "longitude": -93.68775939941406,
+        "tb_time_utc": "2024-06-01T12:48:04.430Z"
+      },
+      {
+        "cell": "268:925",
+        "soil_moisture": 0.208282932639122,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 41.948936462402344,
+        "longitude": -93.59439849853516,
+        "tb_time_utc": "2024-06-01T12:48:04.162Z"
+      }
+    ],
+    "PM": [
+      {
+        "cell": "266:923",
+        "soil_moisture": 0.1914086490869522,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 0,
+        "surface_flag": 0,
+        "latitude": 42.13795852661133,
+        "longitude": -93.78112030029297,
+        "tb_time_utc": "2024-06-01T23:51:17.545Z"
+      },
+      {
+        "cell": "266:924",
+        "soil_moisture": 0.1780845820903778,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.13795852661133,
+        "longitude": -93.68775939941406,
+        "tb_time_utc": "2024-06-01T23:51:17.319Z"
+      },
+      {
+        "cell": "266:925",
+        "soil_moisture": 0.1769876927137375,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.13795852661133,
+        "longitude": -93.59439849853516,
+        "tb_time_utc": "2024-06-01T23:51:17.113Z"
+      },
+      {
+        "cell": "267:923",
+        "soil_moisture": 0.19014671444892883,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 0,
+        "surface_flag": 0,
+        "latitude": 42.04337692260742,
+        "longitude": -93.78112030029297,
+        "tb_time_utc": "2024-06-01T23:51:16.110Z"
+      },
+      {
+        "cell": "267:924",
+        "soil_moisture": 0.17906810343265533,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.04337692260742,
+        "longitude": -93.68775939941406,
+        "tb_time_utc": "2024-06-01T23:51:15.877Z"
+      },
+      {
+        "cell": "267:925",
+        "soil_moisture": 0.17309151589870453,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 42.04337692260742,
+        "longitude": -93.59439849853516,
+        "tb_time_utc": "2024-06-01T23:51:15.643Z"
+      },
+      {
+        "cell": "268:923",
+        "soil_moisture": 0.18616096675395966,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 0,
+        "surface_flag": 0,
+        "latitude": 41.948936462402344,
+        "longitude": -93.78112030029297,
+        "tb_time_utc": "2024-06-01T23:51:14.627Z"
+      },
+      {
+        "cell": "268:924",
+        "soil_moisture": 0.17943783104419708,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 41.948936462402344,
+        "longitude": -93.68775939941406,
+        "tb_time_utc": "2024-06-01T23:51:14.400Z"
+      },
+      {
+        "cell": "268:925",
+        "soil_moisture": 0.16849319636821747,
+        "soil_moisture_error": -9999.0,
+        "retrieval_qual_flag": 1,
+        "surface_flag": 8,
+        "latitude": 41.948936462402344,
+        "longitude": -93.59439849853516,
+        "tb_time_utc": "2024-06-01T23:51:14.119Z"
+      }
+    ]
+  }
+}

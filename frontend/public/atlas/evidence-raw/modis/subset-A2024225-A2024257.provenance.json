@@ -1,0 +1,14 @@
+{
+  "url": "https://modis.ornl.gov/rst/api/v1/MOD13Q1/subset",
+  "params": {
+    "latitude": 42.025,
+    "longitude": -93.65,
+    "startDate": "A2024225",
+    "endDate": "A2024257",
+    "kmAboveBelow": 1,
+    "kmLeftRight": 1
+  },
+  "query": null,
+  "retrievedAt": "2026-11-08T04:39:27.982863+00:00",
+  "sha256": "339a0534f921881ea76aa2c361e1bdda4e6a3e3d6fc0db04e5a458a5ed69e74e"
+}

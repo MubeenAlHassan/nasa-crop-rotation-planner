@@ -1,0 +1,11 @@
+{
+  "url": "https://cmr.earthdata.nasa.gov/search/collections.json",
+  "params": {
+    "short_name": "TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4",
+    "version": "RL06.3Mv04",
+    "page_size": 20
+  },
+  "query": null,
+  "retrievedAt": "2026-11-08T04:38:32.517068+00:00",
+  "sha256": "e269dfd9359e15436362391219392f2ad2d424af6aedb91b7bff9a96b996a5d3"
+}

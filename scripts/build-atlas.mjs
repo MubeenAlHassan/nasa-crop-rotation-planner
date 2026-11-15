@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { mkdir, writeFile, copyFile, cp, readFile } from 'node:fs/promises';
+import { mkdir, writeFile, copyFile, cp, readFile, access } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,10 +12,12 @@ await build({entryPoints:[path.join(root,'frontend/src/app/atlas/standalone.tsx'
 const html='<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#203d31"><meta name="description" content="Rotation Atlas: compare crop rotations using historical NASA weather and transparent farm assumptions."><title>Rotation Atlas · Iowa field workspace</title><link rel="stylesheet" href="/atlas/app.css"><style>body{margin:0}button,input,select{font:inherit}</style></head><body><div id="root"></div><script src="/atlas/app.js" defer></script></body></html>';
 await writeFile(path.join(out,'offline.html'),html);
 const hash=createHash('sha256');
-for(const name of ['app.js','app.css','iowa.json','offline.html'])hash.update(await readFile(path.join(out,name)));
+const core=['app.js','app.css','iowa.json','field-evidence.json','field-evidence.geojson','offline.html'];
+for(const name of ['modis-context.json','access-status.json','access-attempt.json','power-history.json','landsat-seasons.json','nasa-context.json','nasa-season-index.json','ecostress-index.json','grace-index.json']){try{await access(path.join(out,name));core.push(name);}catch{/* Optional integrations must not block offline installation. */}}
+for(const name of core)hash.update(await readFile(path.join(out,name)));
 const revision=hash.digest('hex').slice(0,16);
 const swPath=path.join(root,'frontend/public/atlas-sw.js');
-const sw=(await readFile(swPath,'utf8')).replace(/const CACHE='rotation-atlas-[^']+';/,`const CACHE='rotation-atlas-${revision}';`);
+const sw=(await readFile(swPath,'utf8')).replace(/const CACHE='rotation-atlas-[^']+';/,`const CACHE='rotation-atlas-${revision}';`).replace(/const CORE=\[[^;]+\];/,`const CORE=${JSON.stringify(core.map(name=>'/atlas/'+name))};`);
 await writeFile(swPath,sw);
 const dist=path.join(root,'dist-atlas');
 await mkdir(path.join(dist,'atlas'),{recursive:true});
