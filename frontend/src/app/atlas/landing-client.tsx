@@ -213,7 +213,7 @@ export default function Landing() {
 
       <footer>
         <span>Rotation Atlas · NASA Space Apps research prototype</span>
-        <span>AI-assisted software · Independent project, not a NASA endorsement.</span>
+        <span>Better questions. More resilient rotations.</span>
       </footer>
     </div>
   );
