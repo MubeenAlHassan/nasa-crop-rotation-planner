@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import {readFileSync} from 'node:fs';
 import {parseEco} from './ecostress';
 import {parseSeason} from './nasa-season';
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
@@ -9,6 +8,8 @@ beforeEach(()=>{localStorage.clear();vi.restoreAllMocks();});
 afterEach(()=>{vi.unstubAllGlobals();});
 describe('Device decision queue',()=>{
  it('exports retained historical records when weather and modeled results are unavailable',async()=>{
+   // Load Node's fixture reader directly; jsdom's Vite transform stubs node:fs.
+   const {readFileSync}=await vi.importActual<typeof import('node:fs')>('node:fs');
    const request=structuredClone(DEFAULT_REQUEST);
    request.history.boundary=structuredClone(request.field.boundary);
    request.history.windows=[{id:'missing-weather',start:'2024-04-01',end:'2024-04-02',status:'uncertain',cover:'unknown',note:'Test fixture: no observations claimed.',observationIds:[],updatedAt:'2026-11-09T00:00:00Z'}];
