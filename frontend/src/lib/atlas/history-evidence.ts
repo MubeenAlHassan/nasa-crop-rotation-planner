@@ -1,4 +1,5 @@
 import type {EvidenceSeries} from './types';
+import {readEvidenceJson} from './evidence-fetch';
 export function parseHistoricalWeather(value:unknown):EvidenceSeries {
  const d=value as EvidenceSeries;
  if(d?.schemaVersion!=='atlas-evidence-1'||d.id!=='iowa-power-history-2005-2024'||d.start!=='2005-01-01'||d.end!=='2024-12-31'||d.timeStandard!=='UTC'||d.latitude!==42.025||d.longitude!==-93.65||!Array.isArray(d.weather)||d.weather.length!==7305||!Array.isArray(d.sources)||d.sources.length!==20)throw Error('Extended POWER history has incompatible coverage, support or time metadata.');
@@ -16,7 +17,7 @@ export function seasonalWeatherSummary(weather:EvidenceSeries,start:string,end:s
  return {rows,rainCompleteYears:complete.length,rainMeanMm:complete.length?complete.reduce((s,r)=>s+r.exposure!.rainTotalMm!,0)/complete.length:null,referenceStart:weather.start,referenceEnd:weather.end};
 }
 export async function loadHistoricalWeather(signal:AbortSignal,online:boolean):Promise<EvidenceSeries> {
- const read=async(url:string,s:AbortSignal)=>{const r=await fetch(url,{signal:s});if(!r.ok)throw Error('Extended history unavailable');return parseHistoricalWeather(await r.json());};
- if(online){try{return await read('/api/atlas/history',AbortSignal.any([signal,AbortSignal.timeout(3000)]));}catch{if(signal.aborted)throw Error('History load cancelled');}}
- return read('/atlas/power-history.json',signal);
+ try{return parseHistoricalWeather(await readEvidenceJson('/atlas/power-history.json',signal));}
+ catch(error){signal.throwIfAborted();if(!online)throw error;}
+ return parseHistoricalWeather(await readEvidenceJson('/api/atlas/history',signal));
 }

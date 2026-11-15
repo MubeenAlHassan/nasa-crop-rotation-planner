@@ -1,4 +1,5 @@
 import {parseNasaContext, type NasaContext} from './nasa-context';
+import {readEvidenceJson} from './evidence-fetch';
 import type { FieldContext } from './types';
 export type PolygonGeometry = {type:'Polygon';coordinates:number[][][]} | {type:'MultiPolygon';coordinates:number[][][][]};
 export interface EvidenceAsset {path:string;sha256:string;variable?:string;sourceUrl?:string}
@@ -61,11 +62,31 @@ export function withNasaContext(base:FieldEvidence,value:unknown):FieldEvidence 
  return {...base,nasaContext,datasets:[...datasets.filter(d=>d.id!=='smap-rootzone'),root]};
 }
 
-/** Server API when connected, immutable local pack when offline or the API is unavailable. */
-export async function loadFieldEvidence(signal:AbortSignal,online:boolean):Promise<FieldEvidence> {
-  const read=async(url:string,requestSignal:AbortSignal)=>{const response=await fetch(url,{signal:requestSignal});if(!response.ok)throw new Error(`Field evidence unavailable (HTTP ${response.status}).`);return parseFieldEvidence(await response.json());};
-  if(online){try{return await read('/api/atlas/evidence',AbortSignal.any([signal,AbortSignal.timeout(3000)]));}catch{if(signal.aborted)throw new Error('Field evidence download timed out.');}}
-  let base=await read('/atlas/field-evidence.json',signal);
-  try{const r=await fetch('/atlas/nasa-context.json',{signal});if(r.ok)base=withNasaContext(base,await r.json());}catch{/* Optional regional context never removes existing field evidence. */}
-  try{const r=await fetch('/atlas/landsat-seasons.json',{signal});if(r.status===404)return base;if(!r.ok)throw Error('Additional season unavailable');return mergeSeasons(base,await r.json());}catch{return {...base,provenance:{...base.provenance,additionalSeasonStatus:'unavailable or invalid; original season retained'}};}
+/** Prefer CDN/offline archives; publish usable pixels before optional context finishes. */
+export async function loadFieldEvidence(signal:AbortSignal,online:boolean,onBase?:(data:FieldEvidence)=>void):Promise<FieldEvidence> {
+  let base:FieldEvidence;
+  try{base=parseFieldEvidence(await readEvidenceJson('/atlas/field-evidence.json',signal));}
+  catch(error){
+    signal.throwIfAborted();
+    if(!online)throw error;
+    base=parseFieldEvidence(await readEvidenceJson('/api/atlas/evidence',signal));
+    signal.throwIfAborted();
+    onBase?.(base);
+    // The API already merges the optional context and extra season.
+    return base;
+  }
+  signal.throwIfAborted();
+  onBase?.(base);
+  const [context,season]=await Promise.allSettled([
+    readEvidenceJson('/atlas/nasa-context.json',signal),
+    readEvidenceJson('/atlas/landsat-seasons.json',signal),
+  ]);
+  signal.throwIfAborted();
+  if(context.status==='fulfilled'){
+    try{base=withNasaContext(base,context.value);}catch{/* Invalid regional context never removes field observations. */}
+  }
+  if(season.status==='fulfilled'){
+    try{return mergeSeasons(base,season.value);}catch{/* Retain the verified base archive. */}
+  }
+  return {...base,provenance:{...base.provenance,additionalSeasonStatus:'unavailable or invalid; original season retained'}};
 }

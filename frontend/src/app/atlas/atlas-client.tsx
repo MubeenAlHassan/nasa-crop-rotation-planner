@@ -20,6 +20,7 @@ import type {EcoEvidence} from '@/lib/atlas/ecostress';
 import type {NasaSeason} from '@/lib/atlas/nasa-season';
 import { HistoryPanel } from './history-panel';
 import { FieldEvidencePanel } from './field-evidence-panel';
+import {readEvidenceJson} from '@/lib/atlas/evidence-fetch';
 import {loadHistoricalWeather} from '@/lib/atlas/history-evidence';
 import { loadFieldEvidence, type FieldEvidence } from '@/lib/atlas/field-evidence';
 const number=(n:number,digits=0)=>n.toLocaleString('en-US',{maximumFractionDigits:digits});
@@ -49,24 +50,29 @@ function AtlasWorkspace({ NavigationLink = BrowserLink }: AtlasProps) {
   const [nasaPackages,setNasaPackages]=useState<NasaSeason[]>([]);
   const [nasaSeason,setNasaSeason]=useState<NasaSeason|null>(null);
   const [historyWeather,setHistoryWeather]=useState<EvidenceSeries|null>(null);
-  useEffect(()=>{const controller=new AbortController();loadHistoricalWeather(AbortSignal.any([controller.signal,AbortSignal.timeout(15000)]),navigator.onLine).then(setHistoryWeather).catch(()=>{});return()=>controller.abort();},[]);
+  const [historyRetry,setHistoryRetry]=useState(0),[historyError,setHistoryError]=useState('');
+  useEffect(()=>{
+    const controller=new AbortController();
+    loadHistoricalWeather(controller.signal,navigator.onLine).then(value=>{if(!controller.signal.aborted)setHistoryWeather(value);}).catch(e=>{if(!controller.signal.aborted)setHistoryError(e instanceof Error?e.message:'Historical context unavailable.');});
+    return()=>controller.abort();
+  },[historyRetry]);
   const [fieldEvidence,setFieldEvidence]=useState<FieldEvidence|null>(null),[fieldError,setFieldError]=useState(''),[fieldRetry,setFieldRetry]=useState(0);
+  const [fieldLoading,setFieldLoading]=useState(true);
   const [offlineReady,setOfflineReady]=useState(false),[sensitivityResult,setSensitivity]=useState<SensitivityResult|null>(null),[analyzing,setAnalyzing]=useState(false),[retry,setRetry]=useState(0);
   useEffect(() => {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(new DOMException('Evidence download timed out. Please retry.', 'TimeoutError')), 15000);
-    fetch('/atlas/iowa.json', { signal: controller.signal })
-      .then(r => { if (!r.ok) throw new Error(`Weather package could not be loaded (HTTP ${r.status}).`); return r.json(); })
-      .then(d => { if (!controller.signal.aborted) setData(d); })
-      .catch(e => { if (controller.signal.reason?.name !== 'AbortError') setError(e instanceof Error ? e.message : 'Weather package could not be loaded.'); })
-      .finally(() => clearTimeout(timeout));
-    return () => { clearTimeout(timeout); controller.abort(); };
+    readEvidenceJson('/atlas/iowa.json',controller.signal)
+      .then(d => { if (!controller.signal.aborted) setData(d as EvidenceSeries); })
+      .catch(e => { if (!controller.signal.aborted) setError(e instanceof Error ? e.message : 'Weather package could not be loaded.'); });
+    return () => controller.abort();
   }, [retry]);
   useEffect(()=>{
     const controller=new AbortController();let disposed=false;
-    const timer=setTimeout(()=>controller.abort(),15000);
-    loadFieldEvidence(controller.signal,navigator.onLine).then(d=>{if(!disposed)setFieldEvidence(d);}).catch(e=>{if(!disposed)setFieldError(e instanceof Error?e.message:'Field evidence unavailable. Weather scenarios can continue.');}).finally(()=>clearTimeout(timer));
-    return()=>{disposed=true;clearTimeout(timer);controller.abort();};
+    loadFieldEvidence(controller.signal,navigator.onLine,d=>{if(!disposed)setFieldEvidence(d);})
+      .then(d=>{if(!disposed)setFieldEvidence(d);})
+      .catch(e=>{if(!disposed)setFieldError(e instanceof Error?e.message:'Field evidence unavailable. Weather scenarios can continue.');})
+      .finally(()=>{if(!disposed)setFieldLoading(false);});
+    return()=>{disposed=true;controller.abort();};
   },[fieldRetry]);
   useEffect(() => {
     let disposed = false;
@@ -134,14 +140,16 @@ function AtlasWorkspace({ NavigationLink = BrowserLink }: AtlasProps) {
           <li><button type="button" className="ra-workflow-step" onClick={()=>{setTab('compare');setTimeout(()=>document.getElementById('decision-review')?.scrollIntoView({behavior:'smooth'}),60);}}><span className="ra-workflow-num">5</span><span className="ra-workflow-label">Review &amp; save</span></button></li>
         </ol>
       </nav>
+      {(fieldLoading||fieldError)&&<div className="ra-notice" role={fieldError?'alert':'status'}><span>{fieldError?`Field evidence download failed: ${fieldError}`:fieldEvidence?'Field pixels are ready. Downloading optional regional and additional-season context…':'Downloading field evidence. Slow connections may take up to two minutes per file; comparisons remain available.'}</span><button className="ra-button ra-button-outline" onClick={()=>{setFieldError('');setFieldLoading(true);setFieldRetry(x=>x+1);}}>{fieldError?'Retry field evidence':'Restart field download'}</button></div>}
+      {historyError&&<div className="ra-notice" role="alert"><span>Extended historical context unavailable: {historyError} Original model forcing remains separate.</span><button className="ra-button ra-button-outline" onClick={()=>{setHistoryError('');setHistoryRetry(x=>x+1);}}>Retry historical context</button></div>}
       {notice&&<div className="ra-notice" role="status">{notice}<button aria-label="Dismiss notification" onClick={()=>setNotice('')}><X size={15}/></button></div>}
       {tab==='history'&&<HistoryPanel onGraceLoaded={setGraceEvidence} season={nasaSeason} onEcoLoaded={setEcoEvidence} packages={nasaPackages} onSeasonLoaded={(selected,all)=>{setNasaSeason(selected);setNasaPackages(all);}} request={request} update={update} evidence={fieldEvidence} weather={historyWeather??data}/>}
-      {tab==='evidence'&&!data&&<FieldEvidencePanel data={fieldEvidence} error={fieldError} field={request.field} onRetry={()=>{setFieldError('');setFieldRetry(x=>x+1);}}/>}
+      {tab==='evidence'&&!data&&<FieldEvidencePanel data={fieldEvidence} error={fieldError} field={request.field} onRetry={()=>{setFieldError('');setFieldLoading(true);setFieldRetry(x=>x+1);}}/>}
       {error?<div className="ra-empty" role="alert"><CloudRain size={36}/><h2>We couldn’t load the weather record.</h2><p>{error}</p><button className="ra-button ra-button-primary" onClick={()=>{setError('');setRetry(x=>x+1);}}>Retry evidence download</button></div>:!data?<div className="ra-loading" role="status"><span/><h2>Bringing twelve seasons into focus…</h2><p>Loading the cached NASA weather record.</p></div>:<>
       {result?.status==='insufficient-information'&&<div className="ra-empty" role="alert"><CircleHelp size={30}/><h2>One more detail before we compare.</h2><p>{result.reason}</p><button className="ra-button ra-button-primary" onClick={()=>setSettings(true)}>Review field inputs</button></div>}
       {tab==='overview'&&<>
         <div className="ra-stat-grid"><Stat icon={<CloudRain/>} label="HISTORICAL RAINFALL" value={yearlyRain===null?'Withheld':number(yearlyRain)} unit="mm / year" detail="NASA POWER · 12-year mean"/><Stat icon={<Leaf/>} label="BASELINE LIVING COVER" value={baseline?number(baseline.coverDays):'—'} unit="days / year" detail="Modeled crop calendar"/><Stat icon={<Droplets/>} label="BASELINE WATER SHORTFALL" value={baseline?number(baseline.deficit):'—'} unit="mm / year" detail="Modeled unmet crop demand"/><Stat icon={<TrendingUp/>} label="BASELINE GROSS MARGIN" value={baseline?money(baseline.margin):'—'} unit="/ ha / year" detail="Scenario estimate · before land costs"/></div>
-        <div className="ra-overview-grid"><div><div className="ra-section-heading"><h2>Your field, in context</h2><span className="ra-badge">DEMO FIELD</span></div><FieldMap field={request.field} evidence={fieldEvidence} initialLayer="landsat" onBoundary={boundary=>{try{const next={...request,field:{...request.field,boundary,boundaryConfirmed:null,baselineConfirmed:null}};validateRequest(next);update(next);}catch(e){setNotice(e instanceof Error?e.message:'Invalid boundary.');}}}/></div><section className="ra-card ra-season-card"><div className="ra-section-heading"><h2>The rhythm of your rainfall</h2><CloudRain size={18}/></div><p className="ra-muted">A seasonal view of the weather your rotation has to work with.</p><RainChart data={data} adjustment={request.rainfall}/><div className="ra-insight"><Droplets size={18}/><p><strong>Water demand doesn’t follow the rain.</strong> Explore planting windows and cover-crop termination before assuming a greener field uses less water.</p></div><button className="ra-text-link" onClick={()=>{setTab('compare');}}>Test a drier season <ArrowRight size={16}/></button></section></div>
+        <div className="ra-overview-grid"><div><div className="ra-section-heading"><h2>Your field, in context</h2><span className="ra-badge">DEMO FIELD</span></div><FieldMap evidenceError={fieldError} field={request.field} evidence={fieldEvidence} initialLayer="landsat" onBoundary={boundary=>{try{const next={...request,field:{...request.field,boundary,boundaryConfirmed:null,baselineConfirmed:null}};validateRequest(next);update(next);}catch(e){setNotice(e instanceof Error?e.message:'Invalid boundary.');}}}/></div><section className="ra-card ra-season-card"><div className="ra-section-heading"><h2>The rhythm of your rainfall</h2><CloudRain size={18}/></div><p className="ra-muted">A seasonal view of the weather your rotation has to work with.</p><RainChart data={data} adjustment={request.rainfall}/><div className="ra-insight"><Droplets size={18}/><p><strong>Water demand doesn’t follow the rain.</strong> Explore planting windows and cover-crop termination before assuming a greener field uses less water.</p></div><button className="ra-text-link" onClick={()=>{setTab('compare');}}>Test a drier season <ArrowRight size={16}/></button></section></div>
         <div className="ra-bottom-grid"><section className="ra-card"><div className="ra-section-heading"><h2>Look between the growing seasons</h2><span className="ra-label">2027–2030</span></div>{baseline&&<Timeline result={baseline}/>}<label className="ra-check"><input type="checkbox" checked={request.field.residueRetained} onChange={e=>updateField({residueRetained:e.target.checked})}/>Crop residue or mulch stays on the field after harvest</label><p className="ra-small">{request.field.residueRetained?'Retained residue may protect gaps in living cover.':'Without residue, gaps may leave soil exposed.'} Residue evaporation effects are illustrative. Soil survey slopes do not establish calibrated erosion loss.</p></section><section className="ra-callout"><span className="ra-eyebrow">EXPLORE YOUR OPTIONS</span><h2>What could a different<br/>rotation make possible?</h2><p>Compare modeled water shortfall, calendar cover and illustrative economics. These are fixed rotation templates; satellite evidence supports historical exploration and does not generate or rank options.</p><div className="ra-crop-circles"><span><Wheat/></span><span><Leaf/></span><span><Sprout/></span><span>+3</span></div><button className="ra-button ra-button-light" onClick={()=>setTab('compare')}>Compare four rotations <ArrowRight size={16}/></button></section></div>
       </>}
       {tab==='compare'&&<>
@@ -154,7 +162,7 @@ function AtlasWorkspace({ NavigationLink = BrowserLink }: AtlasProps) {
         <section className="ra-card ra-thresholds"><div className="ra-section-heading"><div><span className="ra-eyebrow">KNOW WHEN THE ANSWER CHANGES</span><h2>A comparison with its limits attached.</h2></div><button className="ra-button ra-button-primary" onClick={analyze} disabled={analyzing||result?.status!=='ready'}>{analyzing?'Testing 34 scenarios…':'Find the turning points'}<ArrowRight size={15}/></button></div>{sensitivityResult?<><SensitivityChart result={sensitivityResult}/><div className="ra-threshold-grid">{(['rainfall','price','soil'] as const).map(variable=>{const change=sensitivityResult.changes.find(c=>c.variable===variable);return <div key={variable}><span>{variable==='soil'?'SOIL WATER CAPACITY':variable.toUpperCase()}</span><h3>{change?`${change.value}${variable==='soil'?' mm/m':'%'}`:'No switch found'}</h3><p>{change?`Nearest tested change favors ${change.preferred?shortNames[change.preferred]:'a withheld preference'}.`:sensitivityResult.reference?'The preferred option stays the same within this tested range.':'Preference is withheld; resolve constraints before interpreting stability.'}</p></div>;})}</div><div className="ra-insight"><CircleHelp size={20}/><p><strong>Your most useful next check</strong>{sensitivityResult.nextObservation}</p></div><p className="ra-small">{sensitivityResult.reference?`${shortNames[sensitivityResult.reference]} leads in ${sensitivityResult.favored[sensitivityResult.reference]} of ${sensitivityResult.tested} tested cases.`:''} One variable changes at a time. These are sampled sensitivity bounds, not exact break-even values or probabilities of success.</p><details className="ra-method"><summary>Margin ranges across the tested cases</summary>{STRATEGIES.map(s=><p key={s.id}>{s.name}: {money(sensitivityResult.ranges[s.id][0])} to {money(sensitivityResult.ranges[s.id][1])} / ha / year.</p>)}</details></>:<p className="ra-muted">Test rainfall, crop prices and soil-water capacity against the same historical weather sequence. No random weather or invented confidence scores.</p>}</section>
         {result&&<DecisionReview request={request} result={result} update={update} onSave={save} onExport={exportReport}/>}
       </>}
-      {tab==='evidence'&&<><FieldEvidencePanel data={fieldEvidence} error={fieldError} field={request.field} onRetry={()=>{setFieldError('');setFieldRetry(x=>x+1);}}/><Evidence data={data} request={request}/></>}
+      {tab==='evidence'&&<><FieldEvidencePanel data={fieldEvidence} error={fieldError} field={request.field} onRetry={()=>{setFieldError('');setFieldLoading(true);setFieldRetry(x=>x+1);}}/><Evidence data={data} request={request}/></>}
       </>}
       <footer className="ra-footer"><span><Sprout size={15}/> Better questions. More resilient rotations.</span><button onClick={()=>setTab('evidence')}>Evidence before certainty <ArrowUpRight size={13}/></button><small>AI-assisted research prototype · Supports local expertise.</small></footer>
       </main>

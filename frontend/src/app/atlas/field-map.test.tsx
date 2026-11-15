@@ -54,4 +54,36 @@ describe('Field map evidence layers',()=>{
     expect(select.value).toBe('field');
     expect(host.textContent).toMatch(/No aerial basemap underneath/);
   });
+
+  it('draws and closes a new boundary, clears points, and cancels drawing',async()=>{
+    const onBoundary=vi.fn();
+    await act(async()=>root.render(<FieldMap field={DEFAULT_FIELD} evidence={evidence} onBoundary={onBoundary}/>));
+    const button=(text:string)=>Array.from(host.querySelectorAll('button')).find(b=>b.textContent?.includes(text))!;
+    await act(async()=>button('Draw field').click());
+    expect(button('Cancel drawing').getAttribute('aria-pressed')).toBe('true');
+    const svg=host.querySelector<SVGSVGElement>('svg[role="img"]')!;
+    vi.spyOn(svg,'getBoundingClientRect').mockReturnValue({left:0,top:0,width:800,height:460} as DOMRect);
+    const place=async(x:number,y:number)=>act(async()=>{svg.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:x,clientY:y}));});
+    await place(300,150);await place(500,150);
+    expect((button('Use boundary') as HTMLButtonElement).disabled).toBe(true);
+    await act(async()=>button('Clear').click());
+    expect(host.textContent).toContain('0 placed');
+    await place(300,150);await place(500,150);await place(400,300);
+    await act(async()=>button('Use boundary').click());
+    const ring=onBoundary.mock.calls[0][0];
+    expect(ring).toHaveLength(4);expect(ring[0]).toEqual(ring[3]);
+    expect(ring.flat().every(Number.isFinite)).toBe(true);
+    expect(host.querySelector('.ra-draw-actions')).toBeNull();
+    await act(async()=>button('Draw field').click());
+    await act(async()=>button('Cancel drawing').click());
+    expect(host.querySelector('.ra-draw-actions')).toBeNull();
+    expect(onBoundary).toHaveBeenCalledTimes(1);
+  });
+
+  it('distinguishes failed downloads from a still-loading field',async()=>{
+    await act(async()=>root.render(<FieldMap field={DEFAULT_FIELD} evidence={null} evidenceError="Network unavailable" onBoundary={()=>{}}/>));
+    expect(host.textContent).toContain('Field evidence unavailable');
+    expect(host.textContent).not.toContain('Field evidence is still loading');
+    expect(host.querySelector('option[value="landsat"]')?.textContent).toContain('unavailable');
+  });
 });

@@ -60,6 +60,23 @@ describe('Workspace bootstrap and evidence retries', () => {
     await act(async () => window.dispatchEvent(new Event('offline')));
     expect(host.querySelector('.ra-connection')?.textContent).toContain('Offline');
   });
+  it('shows a failed field download on the overview and retries without losing farm inputs',async()=>{
+    saveDecision({...DEFAULT_REQUEST,field:{...DEFAULT_REQUEST.field,name:'Retained farm'}});
+    vi.spyOn(window.navigator,'onLine','get').mockReturnValue(false);
+    let fieldCalls=0;
+    vi.stubGlobal('fetch',vi.fn(async(url:string)=>{
+      if(url==='/atlas/iowa.json')return {ok:true,json:async()=>data};
+      if(url==='/atlas/field-evidence.json'&&++fieldCalls>1)return {ok:true,json:async()=>fieldData};
+      return {ok:false,status:503};
+    }));
+    await act(async()=>root.render(<Atlas/>));
+    expect(host.querySelector('.ra-map')?.textContent).toContain('Field evidence unavailable');
+    expect(host.querySelector('.ra-map')?.textContent).not.toContain('Field evidence is still loading');
+    await click('Retry field evidence');
+    expect(host.querySelector('.ra-map')?.textContent).toContain('Captured field evidence');
+    expect(host.textContent).toContain('Retained farm');
+    expect(fieldCalls).toBe(2);
+  });
   it('restores old pending drafts and saves offline/reconnect without server requests', async () => {
     localStorage.setItem('rotation-atlas-decision-v1', JSON.stringify({schema:1, updatedAt:'2026-11-14T00:00:00Z', request:DEFAULT_REQUEST, pending:true}));
     let online=true;
