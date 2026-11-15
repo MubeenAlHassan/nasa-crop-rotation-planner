@@ -1,5 +1,48 @@
 # Field Shift implementation — updated 14 November 2026
 
+## Seasonal loading recovery and complete offline regression — 15 November 2026
+
+Resolved the previously unverified full-season browser milestone. The old test
+allowed about 60 seconds for nine sequential scientific packages; the live archive
+could load correctly after that cutoff. The runner now allows a ten-minute maximum
+for the seasonal batch and fails after 260 seconds without changed status/coverage.
+It also waits for the batch to finish before saving individual months. Ordinary
+non-seasonal waits remain bounded at 60 seconds; no scientific assertions removed.
+
+Seasonal UI now shows the current month and batch count, publishes each verified
+month to comparison/export immediately, and offers cancellation and retry. Cancel
+and unmount abort pending requests without discarding completed verified months.
+Scientific text downloads retain original checksum bytes and have a 120-second
+header/body timeout per attempt, with the existing static/API fallback. Corrupt
+cached files are deleted and withheld; missing intervals never become zeros.
+Storage-open failures allow online inspection without implying an offline save.
+Forcing, scores, scientific QA and source archives are unchanged.
+
+Verification completed:
+
+- 126 frontend/API tests across 25 files; ESLint, TypeScript and production build
+  passed. Added stalled-text timeout, incremental partial coverage, cancel/retry,
+  and corrupt-offline-cache component checks.
+- Complete nine-month browser suite **passed on live Vercel, patched local Next.js
+  production, and patched standalone static builds**. Each run verified 6,600-hour
+  complete coverage, nine explicit offline saves and offline replay, April removal,
+  missing-month withholding, deliberate March checksum corruption, deletion of the
+  corrupt entry, partial/corrupt exports, interval arithmetic, rejected L3
+  withholding, edited-boundary gating, 390/1024 px layout and no browser exceptions.
+- Manual patched-production browser cancellation preserved March/April verified
+  coverage, released controls, retained the reviewed window, and retry recovered
+  the full nine-month/6,600-hour comparison without browser errors.
+
+Reports: `artifacts/atlas-full-season-live-verification.json`,
+`artifacts/atlas-full-season-production-verification.json`, and
+`artifacts/atlas-full-season-static-verification.json`. These supersede the
+full-season timeout limitation in `artifacts/aggressive-live-review.md` for this
+specific workflow. That earlier report remains a historical record.
+
+No deployment performed. The live regression passed using the corrected runner;
+the new progress/cancellation UI requires deploying this checkout to Vercel.
+The separately reported stale coordinate-validation alert is outside this fix.
+
 ## Drawing and slow-network recovery — 15 November 2026
 
 Fixed the Draw field state transition: selecting the outline layer no longer
