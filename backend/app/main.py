@@ -10,9 +10,11 @@ from uuid import uuid4
 
 import httpx
 from app.api.v1.recommendations import get_provider_bundle, router
+from app.providers.cache import DiskHttpCache
 from app.providers.fixtures import create_fixture_provider_bundle, load_fixture_manifest
 from app.providers.http import HttpxJsonFetcher
 from app.providers.power import NasaPowerProvider
+from app.providers.smap import SmapArchiveProvider
 from app.providers.soilgrids import IsricSoilProvider
 from app.schemas.contracts import Error, ErrorEnvelope, RecommendationRequest
 from app.schemas.domain import FixtureMismatch, ProviderBundle, RequiredDataUnavailable
@@ -42,6 +44,14 @@ class _UnavailableSmap:
         return None
 
 
+def _smap_provider(data_root: Path):
+    """Prefer a checksum-pinned archive when present; otherwise stay unavailable."""
+    archive = data_root / "backend" / "tests" / "fixtures" / "smap_archive.json"
+    if archive.is_file():
+        return SmapArchiveProvider(archive)
+    return _UnavailableSmap()
+
+
 def _origins() -> list[str]:
     raw = os.getenv("BACKEND_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
     origins = [item.strip() for item in raw.split(",") if item.strip()]
@@ -59,15 +69,21 @@ async def lifespan(application: FastAPI):
     application.state.live_providers = None
     if fixture_enabled:
         load_fixture_manifest(application.state.data_root)
-        yield
-        return
-    async with httpx.AsyncClient() as client:
+
+    # Live providers stay mounted even when demo fixtures are enabled so
+    # data_mode=auto can reach NASA POWER for custom map points.
+    cache_dir = application.state.data_root / "backend" / ".provider_cache"
+    provider_cache = DiskHttpCache(cache_dir)
+    timeout = httpx.Timeout(connect=2.0, read=4.0, write=2.0, pool=1.0)
+    async with httpx.AsyncClient(timeout=timeout) as client:
         application.state.http_client = client
-        fetcher = HttpxJsonFetcher(client, {})
+        fetcher = HttpxJsonFetcher(client, provider_cache)
+        # SoilGrids REST is attempted unless explicitly disabled. Failures stay degraded/unavailable.
+        soilgrids_rest = os.getenv("ENABLE_SOILGRIDS_REST", "true").lower() not in {"0", "false", "no"}
         application.state.live_providers = ProviderBundle(
             power=NasaPowerProvider(fetcher),
-            soil=IsricSoilProvider(fetcher, rest_enabled=os.getenv("ENABLE_SOILGRIDS_REST") == "true"),
-            smap=_UnavailableSmap(),
+            soil=IsricSoilProvider(fetcher, rest_enabled=soilgrids_rest),
+            smap=_smap_provider(application.state.data_root),
         )
         try:
             yield

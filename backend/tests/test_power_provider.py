@@ -59,3 +59,40 @@ def test_rejects_wrong_native_point():
     body["geometry"]["coordinates"][:2] = [0, 0]
     with pytest.raises(ProviderError, match="Invalid NASA POWER response"):
         get(Fetcher(body))
+
+
+def test_multi_year_baseline_chunks_complete_years():
+    body = json.loads(ARCHIVE.read_text())["requests"][0]["payload"]
+
+    class YearFetcher:
+        def __init__(self):
+            self.calls = []
+
+        async def fetch_json(self, **kwargs):
+            self.calls.append(kwargs)
+            start = dict(kwargs["params"])["start"]
+            end = dict(kwargs["params"])["end"]
+            payload = json.loads(json.dumps(body))
+            payload["header"]["start"] = start
+            payload["header"]["end"] = end
+            # Minimal daily maps for the requested year chunk.
+            rain, temp = {}, {}
+            day = date(int(start[:4]), int(start[4:6]), int(start[6:8]))
+            last = date(int(end[:4]), int(end[4:6]), int(end[6:8]))
+            while day <= last:
+                key = day.strftime("%Y%m%d")
+                rain[key] = 1.0
+                temp[key] = 20.0
+                day = date.fromordinal(day.toordinal() + 1)
+            payload["properties"]["parameter"]["PRECTOTCORR"] = rain
+            payload["properties"]["parameter"]["T2M"] = temp
+            return HttpPayload(body=payload, mode="cache", retrieved_at=datetime(2026, 9, 26, tzinfo=UTC))
+
+    fetcher = YearFetcher()
+    series = asyncio.run(
+        NasaPowerProvider(fetcher).get_daily(LOCATION, date(1991, 1, 1), date(1992, 12, 31), deadline=99.0)
+    )
+    assert len(fetcher.calls) == 2
+    assert series.source.observed_start == date(1991, 1, 1)
+    assert series.source.observed_end == date(1992, 12, 31)
+    assert len(series.rows) == 365 + 366

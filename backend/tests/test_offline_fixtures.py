@@ -1,21 +1,31 @@
 """The demo provider must use only the exact, hash-approved farm archives."""
 
 import asyncio
+import hashlib
 import json
-import socket
 import shutil
+import socket
 import time
 from datetime import date
 from pathlib import Path
 
 import pytest
-
 from app.providers.fixtures import create_fixture_provider_bundle, load_fixture_manifest
 from app.schemas.contracts import Location
 from app.schemas.domain import FixtureMismatch, ProviderError, RequiredDataUnavailable
 
 ROOT = Path(__file__).parents[2]
 POINT = Location(latitude=31.4504, longitude=73.135)
+
+
+@pytest.mark.parametrize("filename,digest", [
+    ("manifest.json", "90b3468adcb5eec6379f3b780c86ac7c315bdf56e969027b86b1459115873df4"),
+    ("power_archive.json", "4ac69b0b0d70696c89ef133876885bf186840d4c7c810d25b86904a12409b5de"),
+    ("smap_archive.json", "bb7710d7a85b941c906cae958f5a6a3da6733c0ff539ca1a76637d867edc9bf2"),
+    ("soilgrids_archive.json", "ccadcb07bf42fa19bf92ec7e071d7bce82e513f28e6757904c4182acc1ab9b13"),
+])
+def test_original_release_fixture_bytes_are_unchanged(filename: str, digest: str) -> None:
+    assert hashlib.sha256((ROOT / "backend/tests/fixtures" / filename).read_bytes()).hexdigest() == digest
 
 
 def copied_fixture_root(tmp_path: Path) -> Path:

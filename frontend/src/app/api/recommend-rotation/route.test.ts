@@ -30,7 +30,9 @@ describe("same-origin recommendation proxy", () => {
     expect(fetcher.mock.calls[0][0].toString()).toBe("http://127.0.0.1:8000/api/v1/crops?region_id=punjab_pk_demo_v1");
     expect((await GET(new Request(`${path}?region_id=other`))).status).toBe(422);
     expect((await GET(new Request(`${path}?region_id=punjab_pk_demo_v1&host=evil.example`))).status).toBe(422);
-    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect((await GET(new Request(`${path}?region_id=maryland_usa_demo_v1`))).status).toBe(200);
+    expect(fetcher.mock.calls[1][0].toString()).toBe("http://127.0.0.1:8000/api/v1/crops?region_id=maryland_usa_demo_v1");
+    expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
   it("validates and forwards POST JSON, status, and backend request ID", async () => {

@@ -29,9 +29,25 @@ function base() {
 function submit() { fireEvent.click(screen.getByRole("button", { name: "Get recommendations" })); }
 
 describe("RecommendationForm", () => {
+  it.each([1, 2, 3, 4])("submits exactly %i ordered slots matching the bounded contract", (count) => {
+    const onSubmit = setup();
+    fireEvent.change(screen.getByLabelText("Assessment date"), { target: { value: "2025-10-15" } });
+    for (let index = 0; index < count; index += 1) {
+      if (index > 0) fireEvent.click(screen.getByRole("button", { name: "Add slot" }));
+      const start = new Date(Date.UTC(2025, 10, 1 + index * 40)).toISOString().slice(0, 10);
+      const end = new Date(Date.UTC(2025, 10, 30 + index * 40)).toISOString().slice(0, 10);
+      fireEvent.change(screen.getByLabelText(`Slot ${index + 1} start`), { target: { value: start } });
+      fireEvent.change(screen.getByLabelText(`Slot ${index + 1} end`), { target: { value: end } });
+    }
+    submit();
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0][0].slots).toHaveLength(count);
+    expect(validateRequest?.(onSubmit.mock.calls[0][0])).toBe(true);
+  });
+
   it("emits a contract-shaped request and preserves numeric zero in a partial soil override", () => {
     const onSubmit = setup(); base();
-    fireEvent.click(screen.getByLabelText("Add farmer soil observations"));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Add farmer soil observations (local soil)" }));
     fireEvent.change(screen.getByLabelText("Soil sample date"), { target: { value: "2025-10-01" } });
     fireEvent.change(screen.getByLabelText("pH"), { target: { value: "0" } });
     submit();
@@ -69,7 +85,7 @@ describe("RecommendationForm", () => {
     submit();
     expect(onSubmit).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText("History 1 crop"), { target: { value: "maize" } });
-    fireEvent.click(screen.getByLabelText("Add farmer soil observations"));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Add farmer soil observations (local soil)" }));
     fireEvent.change(screen.getByLabelText("Soil sample date"), { target: { value: "2025-10-01" } });
     fireEvent.change(screen.getByLabelText("Sand (%)"), { target: { value: "50" } });
     submit();
@@ -89,5 +105,30 @@ describe("RecommendationForm", () => {
   it("disables the form while submitting", () => {
     render(<RecommendationForm catalog={catalog} initialLocation={null} submitting={true} onSubmit={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Submitting…" })).toBeDisabled();
+  });
+
+  it("applies pinned demo defaults when demoApplyKey advances", () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(
+      <RecommendationForm catalog={catalog} initialLocation={{ latitude: 31.4504, longitude: 73.135 }}
+        submitting={false} onSubmit={onSubmit} demoApplyKey={0} />,
+    );
+    expect(screen.getByLabelText("Assessment date")).toHaveValue("");
+    rerender(
+      <RecommendationForm catalog={catalog} initialLocation={{ latitude: 31.4504, longitude: 73.135 }}
+        submitting={false} onSubmit={onSubmit} demoApplyKey={1} />,
+    );
+    expect(screen.getByLabelText("Assessment date")).toHaveValue("2025-10-15");
+    expect(screen.getByLabelText("Slot 1 ID")).toHaveValue("rabi_2025");
+    expect(screen.getByLabelText("Data mode")).toHaveValue("fixture");
+    expect(screen.getByLabelText("History 1 crop")).toHaveValue("maize");
+    submit();
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      assessment_end: "2025-10-15",
+      slots: [{ slot_id: "rabi_2025", start_date: "2025-11-01", end_date: "2026-03-31" }],
+      crop_history: [{ crop_id: "maize", start_date: "2025-05-01", end_date: "2025-09-30", residue_management: "retained" }],
+      data_mode: "fixture",
+    });
   });
 });

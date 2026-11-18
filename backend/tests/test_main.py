@@ -54,22 +54,87 @@ def test_live_lifespan_mounts_routes_closes_client_and_disables_fixtures(monkeyp
     asyncio.run(check())
 
 
-def test_fixture_mode_uses_no_http_client_and_returns_pinned_sources(monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize(
+    "irrigation,feasible_count,status",
+    [("rainfed", 0, "no_feasible_rotation"), ("available", 1, "degraded")],
+)
+def test_fixture_mode_keeps_live_providers_and_returns_pinned_sources(
+    monkeypatch: pytest.MonkeyPatch, irrigation: str, feasible_count: int, status: str,
+) -> None:
     monkeypatch.setenv("ENABLE_DEMO_FIXTURES", "true")
     monkeypatch.setenv("BACKEND_DATA_DIR", str(ROOT))
     async def check() -> None:
         async with app.router.lifespan_context(app):
-            assert app.state.http_client is None
+            assert isinstance(app.state.http_client, httpx.AsyncClient)
+            assert isinstance(app.state.live_providers, ProviderBundle)
+            live_calls = []
+
+            async def unavailable(url, **kwargs):
+                live_calls.append(url)
+                raise httpx.ConnectError("Offline regression test")
+
+            monkeypatch.setattr(app.state.http_client, "get", unavailable)
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),
                                          base_url="http://test") as client:
-                response = await client.post("/api/v1/recommend-rotation", json=REQUEST)
+                body = {**REQUEST, "irrigation": irrigation}
+                response = await client.post("/api/v1/recommend-rotation", json=body)
                 assert response.status_code == 200, response.text
                 payload = response.json()
                 assert payload["location"] == REQUEST["location"]
                 assert response.headers["x-request-id"] == payload["request_id"]
                 assert payload["sources"][0]["mode"] == "fixture"
+                assert live_calls == [], "Fixture requests must not fetch live observations"
+                assert payload["schema_version"] == "1.0.0"
+                assert payload["catalog_version"] == "1.0.1"
+                assert payload["rules_version"] == "agronomy-v1"
+                assert payload["status"] == status
+                assert payload["feasible_rotation_count"] == feasible_count
+                assert len(payload["recommendations"]) == feasible_count
+                assert payload["sources"][0] == {
+                    "provider": "power", "mode": "fixture", "product": "POWER daily AG UTC",
+                    "observed_start": "1991-01-01", "observed_end": "2025-10-15",
+                    "retrieved_at": "2026-09-26T15:09:58.389193Z",
+                    "grid_resolution_km": None, "spatial_support": "NASA POWER native point sample",
+                    "fixture_id": "faisalabad_2025",
+                    "used_for": ["/features/climate", "/features/slot_scenarios"],
+                }
+                assert [source["provider"] for source in payload["sources"]] == [
+                    "power", "soilgrids", "smap", "farmer_input",
+                ]
+                for source in payload["sources"][1:]:
+                    assert source["mode"] == "unavailable"
+                    assert source["used_for"] == []
+                    assert all(value is None for key, value in source.items()
+                               if key not in {"provider", "mode", "used_for"})
+                assert {item["code"] for item in payload["warnings"]} >= {
+                    "DEMO_FIXTURE", "SMAP_UNAVAILABLE", "SOILGRIDS_UNAVAILABLE",
+                }
+                if irrigation == "rainfed":
+                    assert {item["code"] for item in payload["exclusions"]} == {
+                        "CALENDAR_INCOMPATIBLE", "IRRIGATION_REQUIRED",
+                    }
+                    assert "NO_FEASIBLE_ROTATION" in {item["code"] for item in payload["warnings"]}
+                else:
+                    rotation = payload["recommendations"][0]
+                    assert rotation["score"] == 43.5
+                    assert rotation["rank"] == 1
+                    assert rotation["rotation_id"] == (
+                        "rot_1a2109813dec8cc4fe4c7af7588cc34d2041bfef3fbb39c7ace9519dc8541825"
+                    )
+                    assert rotation["slots"] == [{
+                        **REQUEST["slots"][0], "crop_id": "wheat", "crop_name": "Wheat",
+                    }]
+                repeated = (await client.post("/api/v1/recommend-rotation", json=body)).json()
+                assert {key: value for key, value in payload.items()
+                        if key not in {"request_id", "generated_at"}} == {
+                    key: value for key, value in repeated.items()
+                    if key not in {"request_id", "generated_at"}
+                }
+                # Auto mode must attempt live inputs and fail honestly, even at the pinned point.
                 auto = await client.post("/api/v1/recommend-rotation", json={**REQUEST, "data_mode": "auto"})
                 assert auto.status_code == 503
+                assert auto.json()["error"]["code"] == "REQUIRED_DATA_UNAVAILABLE"
+                assert live_calls
                 nearby = await client.post("/api/v1/recommend-rotation", json={
                     **REQUEST, "location": {"latitude": 31.4505, "longitude": 73.135}})
                 assert nearby.status_code == 422

@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "region_id": "uk_england_demo_v1",
+  "crops": [
+    {
+      "crop_id": "wheat",
+      "crop_name": "Winter wheat",
+      "family": "Poaceae",
+      "legume": false,
+      "temperature_min_c": 3,
+      "temperature_max_c": 22,
+      "ph_min": 6,
+      "ph_max": 8,
+      "region_ids": ["uk_england_demo_v1"],
+      "planting_windows": [{ "start_mmdd": "0915", "end_mmdd": "1101" }],
+      "irrigation_required": false,
+      "maturity_min_days": 200,
+      "maturity_max_days": 300,
+      "rainfall_min_mm": 450,
+      "rainfall_max_mm": 900,
+      "root_class": "deep",
+      "family_break_crops": 0,
+      "nitrogen_demand": "high",
+      "waterlogging_tolerant": false,
+      "drought_tolerant": false,
+      "references": [
+        "https://ahdb.org.uk/knowledge-library/wheat-growth-guide",
+        "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=2114",
+        "https://www.fao.org/4/v9926e/v9926e06.htm"
+      ]
+    },
+    {
+      "crop_id": "barley",
+      "crop_name": "Winter barley",
+      "family": "Poaceae",
+      "legume": false,
+      "temperature_min_c": 3,
+      "temperature_max_c": 22,
+      "ph_min": 6,
+      "ph_max": 8,
+      "region_ids": ["uk_england_demo_v1"],
+      "planting_windows": [{ "start_mmdd": "0915", "end_mmdd": "1031" }],
+      "irrigation_required": false,
+      "maturity_min_days": 180,
+      "maturity_max_days": 280,
+      "rainfall_min_mm": 400,
+      "rainfall_max_mm": 850,
+      "root_class": "medium",
+      "family_break_crops": 0,
+      "nitrogen_demand": "medium",
+      "waterlogging_tolerant": false,
+      "drought_tolerant": true,
+      "references": [
+        "https://ahdb.org.uk/knowledge-library/barley-growth-guide",
+        "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=2391",
+        "https://www.fao.org/4/v9926e/v9926e06.htm"
+      ]
+    },
+    {
+      "crop_id": "field_bean",
+      "crop_name": "Field bean",
+      "family": "Fabaceae",
+      "legume": true,
+      "temperature_min_c": 5,
+      "temperature_max_c": 24,
+      "ph_min": 6,
+      "ph_max": 8,
+      "region_ids": ["uk_england_demo_v1"],
+      "planting_windows": [{ "start_mmdd": "1001", "end_mmdd": "1115" }],
+      "irrigation_required": false,
+      "maturity_min_days": 200,
+      "maturity_max_days": 300,
+      "rainfall_min_mm": 400,
+      "rainfall_max_mm": 800,
+      "root_class": "deep",
+      "family_break_crops": 3,
+      "nitrogen_demand": "low",
+      "waterlogging_tolerant": false,
+      "drought_tolerant": false,
+      "references": [
+        "https://ahdb.org.uk/knowledge-library/pulse-growth-guide",
+        "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=2307",
+        "https://www.fao.org/4/v9926e/v9926e06.htm"
+      ]
+    }
+  ]
+}

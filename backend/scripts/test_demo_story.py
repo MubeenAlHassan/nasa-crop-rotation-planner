@@ -25,8 +25,8 @@ REQUIRED = (
     "https://nsidc.org/data/spl3smp_e/versions/6",
 )
 ACTION_ORDER = (
-    "Use pinned Faisalabad demo", "maize", "rabi_2025",
-    "Authorized demo fixture", "submit", "Climate observations",
+    "Rainfed demo", "maize", "rabi_2025",
+    "Authorized demo fixture", "Get recommendations", "Climate observations",
     "no-feasible-rotation", "Irrigation", "Available", "submit",
     "Rotation timeline", "warnings",
 )
@@ -60,6 +60,19 @@ def validate_demo_script(path: Path) -> None:
 
 def test_valid_pinned_judge_story() -> None:
     validate_demo_script(STORY)
+
+
+def test_story_names_current_ui_actions_and_production_entrypoint() -> None:
+    root = STORY.parents[1]
+    ui = (root / "frontend/src/app/planner/planner-client.tsx").read_text()
+    ui += (root / "frontend/src/components/recommendation-form.tsx").read_text()
+    story = STORY.read_text()
+    for action in (
+        "Rainfed demo", "Get recommendations", "Retry same request", "Run Faisalabad demo instead",
+    ):
+        assert action in ui and action in story
+    assert "app.main:app --app-dir backend" in story
+    assert "43.5" in story
 
 
 def test_rejects_broken_timing_and_outcome_claims(tmp_path: Path) -> None:
